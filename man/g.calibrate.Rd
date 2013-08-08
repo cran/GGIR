@@ -1,0 +1,55 @@
+\name{g.calibrate}
+\alias{g.calibrate}
+\title{
+function to estimate calibration error and make recommendation for addressing it
+}
+\description{
+Functions starts by identifying ten second windows of non-movement. Next, the
+average acceleration per axis per window is used to estimate calibration error 
+(offset and scaling) per axis. The function provides recommended correction factors
+to address the calibration error and a summary of the callibration procedure.
+}
+\usage{
+g.calibrate(datafile, use.temp = TRUE, spherecrit = 0.3, minloadcrit = 72, 
+printsummary = FALSE)
+}
+\arguments{
+  \item{datafile}{
+  name of binary file
+  }
+  \item{use.temp}{
+  use temperature sensor data if available (Geneactive only)
+  }
+  \item{spherecrit}{
+  the minimum required acceleration value (in g) on both sides of 0 g
+for each axis. Used to judge whether the sphere is sufficiently populated
+  }
+  \item{minloadcrit}{
+  the minimum number of hours the code needs to read for the
+autocalibration procedure to be effective (only sensitive to multitudes of 12 hrs, 
+other values will be ceiled). After loading these hours only extra data is loaded 
+if calibration error has not be reduced to under 0.01 g.
+  }
+  \item{printsummary}{
+  if TRUE will print a summary when done
+  }
+}
+\value{
+ \item{\code{scale}}{scaling correction values, e.g. c(1,1,1) }
+  \item{\code{offset}}{offset correction values, e.g. c(0,0,0)}
+  \item{\code{tempoffset}}{correction values related to temperature, e.g. c(0,0,0)}
+  \item{\code{cal.error.start}}{absolute difference between Euclidean norm during all
+  non-movement windows and 1 g before autocalibration}
+  \item{\code{cal.error.end}}{absolute difference between Euclidean norm during all 
+  non-movement windows and 1 g after autocalibration}
+  \item{\code{spheredata}}{average, standard deviation, Euclidean norm and temperature
+  (if available) for all ten second non-movement windows as used for the
+  autocalibration procedure}
+  \item{\code{npoints}}{number of 10 second no-movement windows used to populate
+  the sphere}
+  \item{\code{nhoursused}}{number of hours of measurement data scanned to find
+  the ten second time windows with no movement}}
+\author{
+  Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+  Zhou Fang
+}
