@@ -1,0 +1,80 @@
+\name{g.getmeta}
+\alias{g.getmeta}
+\title{
+function to extract meta-data (features) from data in binary file
+}
+\description{
+Reads binary file in blocks, extracts various features and stores average  feature
+value per short or long epoch. Acceleration and angle metrics are stored at short
+epoch lenghth. The non-wear indication score, the clipping score, temperature
+(if available), light (if available), and Euclidean norm are stored at long epoch
+length.
+}
+\usage{
+g.getmeta(datafile, desiredtz = "Europe/London", windowsizes = c(5, 900, 3600),
+daylimit = FALSE, offset = c(0, 0, 0), scale = c(1, 1, 1), tempoffset = c(0, 0, 0),
+do.bfen = FALSE, do.enmo = TRUE, do.angle = FALSE, do.lfenmo = FALSE, do.en = FALSE,
+do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2, hb = 15, n = 4)
+}
+\arguments{
+  \item{datafile}{name of binary file
+}
+  \item{desiredtz}{desired timezone: see also http://en.wikipedia.org/wiki/Zone.tab
+}
+  \item{windowsizes}{c(Short epoch length in seconds, Long epoch length in seconds,
+  Window size for assessing non-wear time in seconds)
+}
+  \item{daylimit}{number of days to limit (roughly), if set to FALSE no daylimit
+  will be applied
+}
+  \item{offset}{offset correction value per axis, usage:
+  value = scale(value,center = -offset, scale = 1/scale)
+}
+  \item{scale}{scaling correction value per axis, usage:
+  value = scale(value,center = -offset, scale = 1/scale)
+}
+  \item{tempoffset}{temperature offset correction value per axis, usage:
+  value = scale(value,center = -offset, scale = 1/scale)
+  + scale(temperature, center = rep(averagetemperate,3), scale = 1/tempoffset)
+}
+  \item{do.bfen}{if TRUE, calculate metric BFEN with band-pass filter
+  configuration set by \code{lb} and \code{hb}
+}
+  \item{do.enmo}{if TRUE (default), calculate metric ENMO
+}
+  \item{do.angle}{if TRUE, calculate metric angle (vertical arm angle)
+}
+  \item{do.lfenmo}{if TRUE, calculate metric LFENMO with low-pass filter
+  configuration set by \code{hb}
+}
+  \item{do.en}{if TRUE, calculate metric EN
+}
+  \item{do.hfen}{if TRUE, calculate metric HFEN with low-pass filter configuration
+  set by \code{hb}
+}
+  \item{do.hfenplus}{if TRUE, calculate metric HFENplus with band-pass filter
+  configuration set by \code{lb} and \code{hb}
+}
+  \item{lb}{lower boundary of the frequency filter (in Hertz)
+}
+  \item{hb}{upper boundary of the frequency filter (in Hertz)
+}
+  \item{n}{order of the frequency filter
+}
+}
+\value{
+  \item{metalong}{dataframe with long epoch meta-data: EN, non-wear score,
+  clipping score, temperature}
+  \item{metashort}{dataframe with short epoch meta-data: timestamp and metric}
+  \item{tooshort}{indicator of whether file was too short for processing (TRUE or FALSE)}
+  \item{corrupt}{indicator of whether file was considered corrupt (TRUE or FALSE)}
+}
+\references{
+van Hees VT, Gorzelniak L, Dean Leon EC, Eder M, Pias M, et al. (2013) Separating
+Movement and Gravity Components in an Acceleration Signal and Implications for
+the Assessment of Human Daily Physical Activity. PLoS ONE 8(4):
+e61691. doi:10.1371/journal.pone.0061691
+}
+\author{
+Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+}
