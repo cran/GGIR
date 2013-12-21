@@ -24,7 +24,7 @@
 g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,printsummary=FALSE) {
   
   # Arguments:
-  # datafile = name of data file (could be binary or csv)
+  # datafile = name of data file (could be binarvtvy or csv)
   # spherecrit - minimum value required for each axis in both directions to populate the spheree
   # use.temp - if temperature is available then use this in the autocalibration procedure
   # minloadcrit - number of hours the code needs to read for the autocalibration procedure (default = 24hrs)
@@ -420,8 +420,13 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
     print(tempoffset)
     cat("\n----------------------------------------\n")
   }
+  if (mon == 2) {
+    meantempcal = mean(spheredata[,8],na.rm=TRUE)
+  } else {
+    meantempcal = c()
+  }
   invisible(list(scale=scale,offset=offset,tempoffset=tempoffset,
                  cal.error.start=cal.error.start,cal.error.end=cal.error.end,
                  spheredata=spheredata,npoints=npoints,nhoursused=nhoursused,
-                 QCmessage=QCmessage,use.temp=use.temp))
+                 QCmessage=QCmessage,use.temp=use.temp,meantempcal=meantempcal))
 }

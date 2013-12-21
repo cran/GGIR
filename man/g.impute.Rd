@@ -48,6 +48,26 @@ g.impute(M, I, strategy = 1, hrs.del.start = 0, hrs.del.end = 0, maxdur = 0)
   \item{averageday}{matrix with n columns for n metrics values and m rows for
   m short epoch time windows in an average 24 hours period}
 }
+\examples{
+\dontrun{
+  #inspect file:
+  I = g.inspectfile(datafile)
+  
+  #autocalibration:
+  C = g.calibrate(datafile) 
+  
+  #get meta-data:
+  M = g.getmeta(datafile)
+}
+
+data(data.getmeta)
+data(data.inspectfile)
+
+#impute meta-data:
+IMP = g.impute(M=data.getmeta, I=data.inspectfile)
+
+}
+
 \author{
   Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
 }

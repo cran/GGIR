@@ -4,17 +4,18 @@
 function to extract meta-data (features) from data in binary file
 }
 \description{
-Reads binary file in blocks, extracts various features and stores average  feature
+Reads a binary file in blocks, extracts various features and stores average  feature
 value per short or long epoch. Acceleration and angle metrics are stored at short
 epoch lenghth. The non-wear indication score, the clipping score, temperature
 (if available), light (if available), and Euclidean norm are stored at long epoch
-length.
+length. The function has been designed and thoroughly tested with binary files 
+from GENEA and GENEActiv.
 }
 \usage{
 g.getmeta(datafile, desiredtz = "Europe/London", windowsizes = c(5, 900, 3600),
 daylimit = FALSE, offset = c(0, 0, 0), scale = c(1, 1, 1), tempoffset = c(0, 0, 0),
 do.bfen = FALSE, do.enmo = TRUE, do.angle = FALSE, do.lfenmo = FALSE, do.en = FALSE,
-do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2, hb = 15, n = 4)
+do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2, hb = 15, n = 4,meantempcal=c())
 }
 \arguments{
   \item{datafile}{name of binary file
@@ -61,6 +62,11 @@ do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2, hb = 15, n = 4)
 }
   \item{n}{order of the frequency filter
 }
+\item{meantempcal}{mean temperature corresponding to the data as used for 
+autocalibration. Only applies to data collected with GENEActiv monitor. If
+autocalibration is not done or if temperature was not available then leave
+blank (default)
+}
 }
 \value{
   \item{metalong}{dataframe with long epoch meta-data: EN, non-wear score,
@@ -69,12 +75,27 @@ do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2, hb = 15, n = 4)
   \item{tooshort}{indicator of whether file was too short for processing (TRUE or FALSE)}
   \item{corrupt}{indicator of whether file was considered corrupt (TRUE or FALSE)}
 }
+\examples{
+\dontrun{
+datafile = "C:/myfolder/testfile.bin"
+
+#Extract meta-data:
+M = g.getmeta(datafile)
+
+#Inspect first couple of rows of long epoch length meta data:
+print(M$metalong[1:5,])
+
+#Inspect first couple of rows of short epoch length meta data:
+print(M$metalong[1:5,])
+}
+}
 \references{
 van Hees VT, Gorzelniak L, Dean Leon EC, Eder M, Pias M, et al. (2013) Separating
 Movement and Gravity Components in an Acceleration Signal and Implications for
 the Assessment of Human Daily Physical Activity. PLoS ONE 8(4):
 e61691. doi:10.1371/journal.pone.0061691
 }
+
 \author{
 Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
 }
