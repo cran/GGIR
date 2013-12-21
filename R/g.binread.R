@@ -376,9 +376,9 @@ if (nargin < 3) {
 	pageend = Inf
 }
 timest = Inf
-require(bitops)
-library(matlab, lib.loc="/pa/data")
-require(matlab)
+# require(bitops)
+# library(matlab, lib.loc="/pa/data")
+# require(matlab)
 onebyte = 1024
 twobytes = 2*onebyte
 fourbytes = 4*onebyte

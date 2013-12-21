@@ -21,9 +21,7 @@ g.analyse <-
     
     fname=I$filename
     averageday = IMP$averageday
-    
     strategy = IMP$strategy
-    
     hrs.del.start = IMP$hrs.del.start
     hrs.del.end = IMP$hrs.del.end
     maxdur = IMP$maxdur
@@ -60,6 +58,11 @@ g.analyse <-
     } else {
       doquan = FALSE
     }
+    if (length(ilevels) > 0) {
+      dodist = TRUE    
+    } else {
+      dodist = FALSE
+    }
     #==========================================================================================
     #==========================================================================================
     #==========================================================================================
@@ -72,6 +75,7 @@ g.analyse <-
                           t_TWDI[1],"h & ",t_TWDI[2],"h",sep="")
       }
     }
+    
     #==============================
     #extract day summary?
     doperday = 1
@@ -360,20 +364,22 @@ g.analyse <-
                 daysummary[di,fi] = mean(varnum)* 1000; ds_names[fi] = "mean acceleration over the 24hr day (ENMO in mg)"; fi=fi+1 #ENMO 
                 
                 #newly added on 9-7-2013, percentiles of acceleration in the specified window:
-                q46 = quantile(varnum[((qwindow[1]*60*(60/ws3))+1):(qwindow[2]*60*(60/ws3))],probs=qlevels,na.rm=T,type=quantiletype) * 1000 #times 1000 to convert to mg
-                keepindex_46 = c(fi,(fi+(length(qlevels)-1)))
-                daysummary[di,fi:(fi+(length(qlevels)-1))] = q46; ds_names[fi:(fi+(length(qlevels)-1))] = rownames(as.matrix(q46));fi = fi+length(qlevels)
-                
+                if (doquan == TRUE) {
+                  q46 = quantile(varnum[((qwindow[1]*60*(60/ws3))+1):(qwindow[2]*60*(60/ws3))],probs=qlevels,na.rm=T,type=quantiletype) * 1000 #times 1000 to convert to mg
+                  keepindex_46 = c(fi,(fi+(length(qlevels)-1)))
+                  daysummary[di,fi:(fi+(length(qlevels)-1))] = q46; ds_names[fi:(fi+(length(qlevels)-1))] = rownames(as.matrix(q46));fi = fi+length(qlevels)
+                }
                 ####################
                 # TO DO: add time distrution between acceleration levels
-                breaks = ilevels
-                q47 = cut((varnum[((qwindow[1]*60*(60/ws3))+1):(qwindow[2]*60*(60/ws3))]*1000),breaks,right=FALSE)
-                q47 = table(q47)
-                q48  = (as.numeric(q47) * ws3)/60 #converting to minutes
-                
-                keepindex_48 = c(fi,(fi+(length(q48)-1)))
-                daysummary[di,fi:(fi+(length(q48)-1))] = q48; ds_names[fi:(fi+(length(q48)-1))] = rownames(q47); fi = fi+length(q48)
-                
+                if (dodist == TRUE) {
+                  breaks = ilevels
+                  q47 = cut((varnum[((qwindow[1]*60*(60/ws3))+1):(qwindow[2]*60*(60/ws3))]*1000),breaks,right=FALSE)
+                  q47 = table(q47)
+                  q48  = (as.numeric(q47) * ws3)/60 #converting to minutes
+                  
+                  keepindex_48 = c(fi,(fi+(length(q48)-1)))
+                  daysummary[di,fi:(fi+(length(q48)-1))] = q48; ds_names[fi:(fi+(length(q48)-1))] = rownames(q47); fi = fi+length(q48)
+                }
                 
               }
               if (mi == LFENMOi) {
@@ -432,37 +438,37 @@ g.analyse <-
                 daysummary[di,fi] = mean(varnum) * 1000;  ds_names[fi] = "mean acceleration over the 24hr day (HFENplus in mg)"; fi=fi+1 #HFEN+
               }
               if (mi == anglei) { #characteristation of angle (experimental, not finished)
-                difangle = abs(diff(varnum)) #absolute change in angle
-                posturechange = rep(0,length(difangle))
-                posturechange[which(difangle > 10)] = 1
-                pc1 = c(0,posturechange,0) #to find posture change periods
-                pc2 = c(1,posturechange,1) #to find non-posture change periods
-                pc1up = which(diff(pc1) == 1)
-                pc1down = which(diff(pc1) == -1)
-                pc2up = which(diff(pc2) == 1)
-                pc2down = which(diff(pc2) == -1)
-                pc3 = pc1down - pc1up # duration of posture change periods
-                pc4 = pc2up - pc2down # duration of non-posture change periods
-                #                 overv = matrix(0,(length(pc4)+length(pc3)),3)
-                #                 if(posturechange[1] == 1) {
-                #                   overv[seq(1,(length(pc3)*2),by=2),1] = pc3
-                #                   overv[seq(1,(length(pc3)*2),by=2),2] = "posture change"
-                #                   overv[seq(2,(length(pc4)*2),by=2),1] = pc4
-                #                   overv[seq(2,(length(pc4)*2),by=2),2] = "no posture change"
-                #                 } else {
-                #                   overv[seq(1,(length(pc4)*2),by=2),1] = pc4
-                #                   overv[seq(1,(length(pc4)*2),by=2),1] = "no posture change"
-                #                   overv[seq(2,(length(pc3)*2),by=2),2] = pc3
-                #                   overv[seq(2,(length(pc3)*2),by=2),2] = "posture change"
-                #                 }
-                daysummary[di,fi] = length(pc4); ds_names[fi] = "number of non-posture change periods per day"; fi =fi + 1
-                daysummary[di,fi] = length(pc3); ds_names[fi] = "number of posture change periods per day"; fi =fi + 1
-                posture_dur = (pc4* 5) / 60 # duration of non-posture change periods (minutes)
-                interup_dur = (pc3* 5) / 60 # duration of posture change periods (minutes)
-                daysummary[di,fi] = median(posture_dur); ds_names[fi] = "median duration postures (minutes)"; fi =fi + 1
-                daysummary[di,fi] = mean(posture_dur); ds_names[fi] = "mean duration postures (minutes)"; fi =fi + 1
-                daysummary[di,fi] = median(interup_dur); ds_names[fi] = "median duration posture interruptions (minutes)"; fi =fi + 1
-                daysummary[di,fi] = mean(interup_dur); ds_names[fi] = "mean duration posture interruptions (minutes)"; fi =fi + 1
+                #                 difangle = abs(diff(varnum)) #absolute change in angle
+                #                 posturechange = rep(0,length(difangle))
+                #                 posturechange[which(difangle > 10)] = 1
+                #                 pc1 = c(0,posturechange,0) #to find posture change periods
+                #                 pc2 = c(1,posturechange,1) #to find non-posture change periods
+                #                 pc1up = which(diff(pc1) == 1)
+                #                 pc1down = which(diff(pc1) == -1)
+                #                 pc2up = which(diff(pc2) == 1)
+                #                 pc2down = which(diff(pc2) == -1)
+                #                 pc3 = pc1down - pc1up # duration of posture change periods
+                #                 pc4 = pc2up - pc2down # duration of non-posture change periods
+                #                 #                 overv = matrix(0,(length(pc4)+length(pc3)),3)
+                #                 #                 if(posturechange[1] == 1) {
+                #                 #                   overv[seq(1,(length(pc3)*2),by=2),1] = pc3
+                #                 #                   overv[seq(1,(length(pc3)*2),by=2),2] = "posture change"
+                #                 #                   overv[seq(2,(length(pc4)*2),by=2),1] = pc4
+                #                 #                   overv[seq(2,(length(pc4)*2),by=2),2] = "no posture change"
+                #                 #                 } else {
+                #                 #                   overv[seq(1,(length(pc4)*2),by=2),1] = pc4
+                #                 #                   overv[seq(1,(length(pc4)*2),by=2),1] = "no posture change"
+                #                 #                   overv[seq(2,(length(pc3)*2),by=2),2] = pc3
+                #                 #                   overv[seq(2,(length(pc3)*2),by=2),2] = "posture change"
+                #                 #                 }
+                #                 daysummary[di,fi] = length(pc4); ds_names[fi] = "number of non-posture change periods per day"; fi =fi + 1
+                #                 daysummary[di,fi] = length(pc3); ds_names[fi] = "number of posture change periods per day"; fi =fi + 1
+                #                 posture_dur = (pc4* 5) / 60 # duration of non-posture change periods (minutes)
+                #                 interup_dur = (pc3* 5) / 60 # duration of posture change periods (minutes)
+                #                 daysummary[di,fi] = median(posture_dur); ds_names[fi] = "median duration postures (minutes)"; fi =fi + 1
+                #                 daysummary[di,fi] = mean(posture_dur); ds_names[fi] = "mean duration postures (minutes)"; fi =fi + 1
+                #                 daysummary[di,fi] = median(interup_dur); ds_names[fi] = "median duration posture interruptions (minutes)"; fi =fi + 1
+                #                 daysummary[di,fi] = mean(interup_dur); ds_names[fi] = "mean duration posture interruptions (minutes)"; fi =fi + 1
               }
             }
           }
@@ -694,94 +700,98 @@ g.analyse <-
         
         #===========================================================================
         # SUMMARISE Percentiles (q46)
-        if (length(q46) > 0) {
-          for (ki46 in keepindex_46[1]:keepindex_46[2]) {
-            v4 = mean(as.numeric(daysummary[,ki46]),na.rm=TRUE) #plain average of available days
-            summary[vi] = v4 # #average all availabel days
-            s_names[vi] = paste("V6_",ds_names[ki46]," all days (plain average of all available days, no weighting)",sep="") 
-            vi = vi + 1
-          }
-          
-          for (ki46 in keepindex_46[1]:keepindex_46[2]) {
-            dtw_wkend = as.numeric(daysummary[wkend,ki46])
-            v1 = mean(dtw_wkend,na.rm=TRUE)
-            summary[vi] = v1 # #weekend average
-            s_names[vi] = paste("V7_",ds_names[ki46]," on weekend days (plain average of all available days, no weighting)",sep="") #(in case double days are present and in case there are more than 2 weekend days then the two double days are replaced by one day being the average of the two)
-            vi = vi + 1
-          }
-          for (ki46 in keepindex_46[1]:keepindex_46[2]) {
-            dtw_wkday = as.numeric(daysummary[wkday,ki46])
-            v2 = mean(dtw_wkday,na.rm=TRUE)
-            summary[vi] = v2 # #weekday average
-            s_names[vi] = paste("V8_",ds_names[ki46]," on week days (plain average of all available days, no weighting)",sep="") #(in case double days are present and in case there are more than 5 week days then the two double days are replaced by one day being the average of the two)",        vi = vi + 1
-            vi = vi + 1
-          }
-          # Weighted average of available days
-          for (ki46 in keepindex_46[1]:keepindex_46[2]) {
-            dtw_wkend = as.numeric(daysummary[wkend,ki46])
-            if (length(dtw_wkend) > 2) {
-              dtw_wkend = c((dtw_wkend[1]+dtw_wkend[3])/2,dtw_wkend[2])
+        if (doquan == TRUE) {
+          if (length(q46) > 0) {
+            for (ki46 in keepindex_46[1]:keepindex_46[2]) {
+              v4 = mean(as.numeric(daysummary[,ki46]),na.rm=TRUE) #plain average of available days
+              summary[vi] = v4 # #average all availabel days
+              s_names[vi] = paste("V6_",ds_names[ki46]," all days (plain average of all available days, no weighting)",sep="") 
+              vi = vi + 1
             }
-            v1 = mean(dtw_wkend,na.rm=TRUE)
-            summary[vi] = v1 # #weekend average
-            s_names[vi] = paste("V9_",ds_names[ki46]," on weekend days (weighted average)",sep="") #(in case double days are present and in case there are more than 2 weekend days then the two double days are replaced by one day being the average of the two)
-            vi = vi + 1
-          }
-          for (ki46 in keepindex_46[1]:keepindex_46[2]) {
-            dtw_wkday = as.numeric(daysummary[wkday,ki46])
-            if (length(dtw_wkday) > 5) {
-              dtw_wkday = c((dtw_wkday[1]+dtw_wkday[6])/2,dtw_wkday[2:5])
+            
+            for (ki46 in keepindex_46[1]:keepindex_46[2]) {
+              dtw_wkend = as.numeric(daysummary[wkend,ki46])
+              v1 = mean(dtw_wkend,na.rm=TRUE)
+              summary[vi] = v1 # #weekend average
+              s_names[vi] = paste("V7_",ds_names[ki46]," on weekend days (plain average of all available days, no weighting)",sep="") #(in case double days are present and in case there are more than 2 weekend days then the two double days are replaced by one day being the average of the two)
+              vi = vi + 1
             }
-            v2 = mean(dtw_wkday,na.rm=TRUE)
-            summary[vi] = v2 # #weekday average
-            s_names[vi] = paste("V10_",ds_names[ki46]," on week days (weighted average)",sep="") #(in case double days are present and in case there are more than 5 week days then the two double days are replaced by one day being the average of the two)",
-            vi = vi+1
+            for (ki46 in keepindex_46[1]:keepindex_46[2]) {
+              dtw_wkday = as.numeric(daysummary[wkday,ki46])
+              v2 = mean(dtw_wkday,na.rm=TRUE)
+              summary[vi] = v2 # #weekday average
+              s_names[vi] = paste("V8_",ds_names[ki46]," on week days (plain average of all available days, no weighting)",sep="") #(in case double days are present and in case there are more than 5 week days then the two double days are replaced by one day being the average of the two)",        vi = vi + 1
+              vi = vi + 1
+            }
+            # Weighted average of available days
+            for (ki46 in keepindex_46[1]:keepindex_46[2]) {
+              dtw_wkend = as.numeric(daysummary[wkend,ki46])
+              if (length(dtw_wkend) > 2) {
+                dtw_wkend = c((dtw_wkend[1]+dtw_wkend[3])/2,dtw_wkend[2])
+              }
+              v1 = mean(dtw_wkend,na.rm=TRUE)
+              summary[vi] = v1 # #weekend average
+              s_names[vi] = paste("V9_",ds_names[ki46]," on weekend days (weighted average)",sep="") #(in case double days are present and in case there are more than 2 weekend days then the two double days are replaced by one day being the average of the two)
+              vi = vi + 1
+            }
+            for (ki46 in keepindex_46[1]:keepindex_46[2]) {
+              dtw_wkday = as.numeric(daysummary[wkday,ki46])
+              if (length(dtw_wkday) > 5) {
+                dtw_wkday = c((dtw_wkday[1]+dtw_wkday[6])/2,dtw_wkday[2:5])
+              }
+              v2 = mean(dtw_wkday,na.rm=TRUE)
+              summary[vi] = v2 # #weekday average
+              s_names[vi] = paste("V10_",ds_names[ki46]," on week days (weighted average)",sep="") #(in case double days are present and in case there are more than 5 week days then the two double days are replaced by one day being the average of the two)",
+              vi = vi+1
+            }
           }
         }
         #======================================================
         # SUMMARISE acceleration distribution(q48)
-        if (length(q48) > 0) {
-          for (ki48 in keepindex_48[1]:keepindex_48[2]) {
-            v4 = mean(as.numeric(daysummary[,ki48]),na.rm=TRUE) #plain average of available days
-            summary[vi] = v4 # #average all availabel days
-            s_names[vi] = paste("V11_",ds_names[ki48]," all days (plain average of all available days, no weighting)",sep="") 
-            vi = vi + 1
-          }
-          
-          for (ki48 in keepindex_48[1]:keepindex_48[2]) {
-            dtw_wkend = as.numeric(daysummary[wkend,ki48])
-            v1 = mean(dtw_wkend,na.rm=TRUE)
-            summary[vi] = v1 # #weekend average
-            s_names[vi] = paste("V12_",ds_names[ki48]," on weekend days (plain average of all available days, no weighting)",sep="") #(in case double days are present and in case there are more than 2 weekend days then the two double days are replaced by one day being the average of the two)
-            vi = vi + 1
-          }
-          for (ki48 in keepindex_48[1]:keepindex_48[2]) {
-            dtw_wkday = as.numeric(daysummary[wkday,ki48])
-            v2 = mean(dtw_wkday,na.rm=TRUE)
-            summary[vi] = v2 # #weekday average
-            s_names[vi] = paste("V13_",ds_names[ki48]," on week days (plain average of all available days, no weighting)",sep="") #(in case double days are present and in case there are more than 5 week days then the two double days are replaced by one day being the average of the two)",        vi = vi + 1
-            vi = vi + 1
-          }
-          # Weighted average of available days
-          for (ki48 in keepindex_48[1]:keepindex_48[2]) {
-            dtw_wkend = as.numeric(daysummary[wkend,ki48])
-            if (length(dtw_wkend) > 2) {
-              dtw_wkend = c((dtw_wkend[1]+dtw_wkend[3])/2,dtw_wkend[2])
+        if (dodist == TRUE) {
+          if (length(q48) > 0) {
+            for (ki48 in keepindex_48[1]:keepindex_48[2]) {
+              v4 = mean(as.numeric(daysummary[,ki48]),na.rm=TRUE) #plain average of available days
+              summary[vi] = v4 # #average all availabel days
+              s_names[vi] = paste("V11_",ds_names[ki48]," all days (plain average of all available days, no weighting)",sep="") 
+              vi = vi + 1
             }
-            v1 = mean(dtw_wkend,na.rm=TRUE)
-            summary[vi] = v1 # #weekend average
-            s_names[vi] = paste("V14_",ds_names[ki48]," on weekend days (weighted average)",sep="") #(in case double days are present and in case there are more than 2 weekend days then the two double days are replaced by one day being the average of the two)
-            vi = vi + 1
-          }
-          for (ki48 in keepindex_48[1]:keepindex_48[2]) {
-            dtw_wkday = as.numeric(daysummary[wkday,ki48])
-            if (length(dtw_wkday) > 5) {
-              dtw_wkday = c((dtw_wkday[1]+dtw_wkday[6])/2,dtw_wkday[2:5])
+            
+            for (ki48 in keepindex_48[1]:keepindex_48[2]) {
+              dtw_wkend = as.numeric(daysummary[wkend,ki48])
+              v1 = mean(dtw_wkend,na.rm=TRUE)
+              summary[vi] = v1 # #weekend average
+              s_names[vi] = paste("V12_",ds_names[ki48]," on weekend days (plain average of all available days, no weighting)",sep="") #(in case double days are present and in case there are more than 2 weekend days then the two double days are replaced by one day being the average of the two)
+              vi = vi + 1
             }
-            v2 = mean(dtw_wkday,na.rm=TRUE)
-            summary[vi] = v2 # #weekday average
-            s_names[vi] = paste("V15_",ds_names[ki48]," on week days (weighted average)",sep="") #(in case double days are present and in case there are more than 5 week days then the two double days are replaced by one day being the average of the two)",
-            vi = vi+1
+            for (ki48 in keepindex_48[1]:keepindex_48[2]) {
+              dtw_wkday = as.numeric(daysummary[wkday,ki48])
+              v2 = mean(dtw_wkday,na.rm=TRUE)
+              summary[vi] = v2 # #weekday average
+              s_names[vi] = paste("V13_",ds_names[ki48]," on week days (plain average of all available days, no weighting)",sep="") #(in case double days are present and in case there are more than 5 week days then the two double days are replaced by one day being the average of the two)",        vi = vi + 1
+              vi = vi + 1
+            }
+            # Weighted average of available days
+            for (ki48 in keepindex_48[1]:keepindex_48[2]) {
+              dtw_wkend = as.numeric(daysummary[wkend,ki48])
+              if (length(dtw_wkend) > 2) {
+                dtw_wkend = c((dtw_wkend[1]+dtw_wkend[3])/2,dtw_wkend[2])
+              }
+              v1 = mean(dtw_wkend,na.rm=TRUE)
+              summary[vi] = v1 # #weekend average
+              s_names[vi] = paste("V14_",ds_names[ki48]," on weekend days (weighted average)",sep="") #(in case double days are present and in case there are more than 2 weekend days then the two double days are replaced by one day being the average of the two)
+              vi = vi + 1
+            }
+            for (ki48 in keepindex_48[1]:keepindex_48[2]) {
+              dtw_wkday = as.numeric(daysummary[wkday,ki48])
+              if (length(dtw_wkday) > 5) {
+                dtw_wkday = c((dtw_wkday[1]+dtw_wkday[6])/2,dtw_wkday[2:5])
+              }
+              v2 = mean(dtw_wkday,na.rm=TRUE)
+              summary[vi] = v2 # #weekday average
+              s_names[vi] = paste("V15_",ds_names[ki48]," on week days (weighted average)",sep="") #(in case double days are present and in case there are more than 5 week days then the two double days are replaced by one day being the average of the two)",
+              vi = vi+1
+            }
           }
         }
       }

@@ -48,7 +48,21 @@ if calibration error has not be reduced to under 0.01 g.
   \item{\code{npoints}}{number of 10 second no-movement windows used to populate
   the sphere}
   \item{\code{nhoursused}}{number of hours of measurement data scanned to find
-  the ten second time windows with no movement}}
+  the ten second time windows with no movement}
+  \item{\code{meantempcal}}{mean temperature corresponding to the data as used for 
+autocalibration. Only applies to data collected with GENEActiv monitor. 
+  }
+}
+\examples{
+\dontrun{
+datafile = "C:/myfolder/testfile.bin"
+
+#Apply autocalibration:
+C = g.calibrate(datafile)
+print(C$scale)
+print(C$offset)
+}
+}
 \author{
   Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
   Zhou Fang

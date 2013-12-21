@@ -27,6 +27,28 @@ number of days to plot
 \value{
 function only produces a plot, no values
 }
+\examples{
+\dontrun{
+  #inspect file:
+  I = g.inspectfile(datafile)
+  
+  #autocalibration:
+  C = g.calibrate(datafile) 
+  
+  #get meta-data:
+  M = g.getmeta(datafile)
+}
+data(data.getmeta)
+data(data.inspectfile)
+
+#impute meta-data:
+IMP = g.impute(M = data.getmeta, I = data.inspectfile, strategy = 1,
+hrs.del.start = 0, hrs.del.end = 0, maxdur = 0)
+
+#plot data
+g.plot(IMP, M = data.getmeta, I = data.inspectfile, durplot=4)
+}
+
 \author{
   Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
 }

@@ -15,17 +15,48 @@ factors; \link{g.getmeta} extracts the signal features and other meta-data;
 (e.g. monitor not worn or signal clips near its extreme) and replaces these
 sections by imputed values; and finally  \link{g.analyse} takes the output from
 all the functions, runs a basic descriptive analysis and then summarises the output
-both per measurement and per day of measurement.
+both per measurement and per day of measurement.\cr
+GGIR has primarily been developed for binary data collected with Genea and
+Geneactive accelerometers. If you want to use this package for a different data 
+format (e.g. from a different accelerometer brand) then please provide me with:
+the R-code to read the data and example files for testing purposes.
 }
 \details{
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 0.6-17\cr
-Date: \tab 2013-8-8\cr
+Version: \tab 1.0-00\cr
+Date: \tab 2013-12-21\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 }
 }
+\examples{
+\dontrun{
+  #inspect file:
+  I = g.inspectfile(datafile)
+  
+  #autocalibration:
+  C = g.calibrate(datafile)
+  
+  #get meta-data:
+  M = g.getmeta(datafile)
+}
+
+data(data.getmeta)
+data(data.inspectfile)
+data(data.calibrate)
+
+
+#impute meta-data:
+IMP = g.impute(M = data.getmeta, I = data.inspectfile)
+
+#analyse and produce summary:
+A = g.analyse(I = data.inspectfile, C = data.calibrate, M = data.getmeta, IMP)
+
+#plot data
+g.plot(IMP, M = data.getmeta, I = data.inspectfile, durplot=4)
+}
+
 \author{
 Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
 Zhou Fang co-developed function \link{g.calibrate}

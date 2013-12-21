@@ -71,8 +71,133 @@ resoltion of L5 and M5 analysis in minutes (default: 10 minutes)
 
 }
 \value{
-\item{\code{summary}}{summary for the file that was analysed}
-\item{\code{daysummary}}{summary per day for the file that was analysed}
+\item{\code{summary}}{summary for the file that was analysed (see details)}
+\item{\code{daysummary}}{summary per day for the file that was analysed (see details)}
+}
+
+\details{
+The value \code{summary} is a dataframe and comes with the following variables:\cr
+\itemize{
+\item \code{ID} Participant id extracted from file header
+\item \code{Device serial number} Device serial number extracted from file header
+\item \code{Body location} Body locationextracted from file header
+\item \code{File name}Name of the binary file
+\item \code{Start time experiment} Timestamp when experiment started
+\item \code{Start day} Name of day when experiment started
+\item \code{Sample frequency (Hz)}Sample frequency (Hz)
+\item \code{Clipping score} Fraction of 15 minute windows per file for which the
+acceleration in one of the three axis was close to the maximum for at least 80
+percent of the time. This should be 0
+\item \code{Measurement duration (days)} Measurement duration (days)
+\item \code{Completeness score} Fraction of 15 minute windows per 24 hours for which
+no valid data is available at any day of the measurement
+\item \code{Measurement duration according to protocol (days)} Measurement duration
+(days) minus the hours that are ignored at the beginning and end of the measurement
+motived by protocol design
+\item \code{Wear duration according to protocol (days)} Measurement duration according 
+to protocol (days) minus invalid time periods
+\item \code{Calibration error (static estimate)} Estimated based on all non-movement
+periods in the measurement after applying the autocalibration
+\item \code{Calibration status} Summary statement about the status of the calibration
+error minimisation
+\item \code{ENMO} ENMO is the main summary measure of acceleration. The value 
+presented is the average ENMO over all the available data normalised per 24 hour
+cycles, with invalid data imputed by the average at similar timepoints on different
+days of the week. In addition to ENMO it is possible to extract other acceleration 
+metrics (i.e. BFEN, HFEN, HFENplus)
+\item \code{Xth perc btwn 0h & 24h of ENMO (mg)} This variable represents the Xth 
+percentile in the distribution of short epoch acceleration values of the average 
+day. The average day may not be ideal. Therefore, the code also extracts similar 
+variables per day and then takes the averages over days (see below)
+\item \code{L5 hour of ENMO (mg)} Starting time in hours and fractions of hours of the
+least active five* hours in the day (* window size is modifiable in g.getmeta)
+\item \code{L5 value of ENMO (mg)}Average acceleration over L5
+\item \code{M5 hour of ENMO (mg)} Starting time in hours and fractions of hours of the
+most active five* hours in the day (* window size is modifiable in g.getmeta)
+\item \code{M5 value of ENMO (mg)} Average acceleration over M5
+\item \code{Accelerationa 1am-6am value of ENMO (mg)}Average acceleration between 1am 
+and 6am
+\item \code{N valid weekend days} Number of valid weekend days
+\item \code{N valid weekdays} Number of valid week days
+\item \code{V1_... all days (plain average of all available days, no weighting)} The
+variable ... was calculated per day and then averaged over all the available days
+\item \code{V2_... on weekend days (plain average of all available days, no weighting)}
+The variable ... was calculated per day and then averaged over weekend days only
+\item \code{V3_... on week days (plain average of all available days, no weighting)}
+The variable ... was calculated per day and then averaged over week days only
+\item \code{V4_... on weekend days (weighted average)} The variable ... was calculated
+per day and then averaged over weekend days. Double weekend days are averaged
+This is only relevant for experiments that last for more than seven days
+\item \code{V5_... on week days (weighted average)} The variable ... was calculated per
+day and then averaged over week days. Double weekend days were averaged. This is
+only relevant for experiments that last for more than seven days)
+\item \code{V6_... till V10_} Same as V1_ till V5_, but applied to distribution
+percentiles and renumbered to make variables easier to find
+\item \code{V11_... till V15_} Same as V1_ till V5_, but applied to value distribution
+and renumbered to make variables easier to find
+\item \code{data exclusion strategy} A log of the decision made when calling  g.impute:
+value=1 mean ignore specific hours; value=2 mean ignore all data before the first
+midnight and after the last midnight
+\item \code{number of hours ignored at the start of the measurement (if strategy = 1)}
+A log of the decision made when calling g.impute
+\item \code{number of hours ignored at the end of the measurement (if strategy = 1)}
+A log of the decision made when calling  g.impute
+\item \code{number of days of measurement after which all data is ignored (if strategy = 1)}
+A log of the decision made when calling  g.impute
+}
+
+The value \code{daysummary} is a dataframe and comes with the following variables:\cr
+\itemize{
+\item \code{ID} Participant id extracted from file header
+\item \code{File name} File name
+\item \code{Calender date} Calender data
+\item \code{Body location} Body location (if known)
+\item \code{N valid hours} Number of hours with valid data
+\item \code{N hours} Number of hours of measurement
+\item \code{Day of the week}Day of the week
+\item \code{Day of measurement} Day number relative to start of the measurement
+\item \code{L5 hour ENMO (mg)} Starting hour of L5 on a scale from 0 to 24, where
+ 14.5 means 14:30)
+\item \code{L5 ENMO (mg)} Magnitude of average acceleration during the least active five
+hours calculated with metric ENMO
+\item \code{M5 hour ENMO (mg)} Starting hour of M5 on a scale from 0 to 24, where
+ 14.5 means 14:30)
+\item \code{M5 ENMO (mg)} Magnitude of average acceleration during the least active five
+hours calculated with metric ENMO
+\item \code{mean acceleration ENMO (mg) between 1am and 6am} -
+\item \code{mean acceleration over the 24hr day (ENMO in mg)} -
+\item \code{X percent} Percentile in the short epoch distribution based on 24
+hours of data with invalid data imputed [value A, value B)	Time spent in
+minutes between (and including) acceleration value A in mg and (excluding)
+acceleration value B in mg
+}
+}
+
+\examples{
+\dontrun{
+  #inspect file:
+  I = g.inspectfile(datafile)
+  
+  #autocalibration:
+  C = g.calibrate(datafile, use.temp = TRUE, spherecrit = 0.3, minloadcrit = 72, 
+  
+  #get meta-data:
+  M = g.getmeta(datafile, desiredtz = "Europe/London", windowsizes = c(5, 900, 3600),
+  daylimit = FALSE, offset = c(0, 0, 0), scale = c(1, 1, 1), tempoffset = c(0, 0, 0),
+  do.bfen = FALSE, do.enmo = TRUE, do.angle = FALSE, do.lfenmo = FALSE, do.en = FALSE,
+  do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2, hb = 15, n = 4)
+}
+
+data(data.getmeta)
+data(data.inspectfile)
+data(data.calibrate)
+
+#impute meta-data:
+IMP = g.impute(M = data.getmeta, I = data.inspectfile)
+
+#analyse and produce summary:
+A = g.analyse(I = data.inspectfile, C = data.calibrate, M = data.getmeta, IMP)
+
 }
 \author{
 Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>

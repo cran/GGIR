@@ -1,15 +1,15 @@
 Package: GGIR
 Type: Package
 Title: GGIR
-Version: 0.6-17
-Date: 2013-08-08
-Author: Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+Version: 1.0-00
+Date: 2013-12-21
+Author: Vincent T van Hees [aut, cre], Zhou Fang [ctb], Jing Hua Zhao [ctb] 
 Maintainer: Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
 Description: GGIR is a tool to process multi-day raw acceleration data
 License: LGPL (>= 2.0, < 3)
-Suggests: MASS, signal, seewave, zoo, mmap
-Depends: stats, utils, GENEAread, matlab, bitops
-Packaged: 2013-08-08 16:22:41 UTC; nvhv
+Suggests: MASS, signal, seewave, zoo, mmap, bitops
+Depends: stats, utils, GENEAread, matlab, R (>= 2.10)
+Packaged: 2013-12-21 15:28:06 UTC; nvhv
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-08-08 19:46:43
+Date/Publication: 2013-12-21 16:47:52
