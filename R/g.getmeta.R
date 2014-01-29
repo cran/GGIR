@@ -131,7 +131,7 @@ g.getmeta <-
       } else if (mon == 2 & dformat == 1) {
         try(expr={P = read.bin(binfile=datafile,start=(blocksize*(i-1)),
                                end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
-        if (length(P) == 0) {
+        if (length(P) <= 2) {
           print("initial attempt to read data unsuccessful, try again with mmap turned on:")
           #try again but now with mmap.load turned on
           try(expr={P = read.bin(binfile=datafile,start=(blocksize*(i-1)),
