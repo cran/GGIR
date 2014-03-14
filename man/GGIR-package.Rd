@@ -25,8 +25,8 @@ the R-code to read the data and example files for testing purposes.
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.0-1\cr
-Date: \tab 2014-1-29\cr
+Version: \tab 1.0-2\cr
+Date: \tab 2014-3-14\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 }
 }

@@ -1,18 +1,23 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-
-
+\section{Changes in version 1.0-2 (release date: 14-3-2014)}{
+\itemize{
+  \item Expanded g.analyse with estimates of time spent in moderate and vigorous
+  activity (a construct popular among physical activity researchers)
+  \item Re-named a number of variables in the output from g.analyse to be more
+  friendly for re-use in stata or sas. The majority of variable names are now 
+  shorter and do not include spaces, dots or commas
+  }
+}
 \section{Changes in version 1.0-1 (release date: 29-1-2014)}{
 \itemize{
   \item Fixed Linux-Windows sensitivty in g.getmeta. Certain damaged files can only
   be read with mmap.load set to FALSE in package GENEAread. Function g.getmeta in
   GGIR catches this problem and turns mmap.load to FALSE if necessary. This catch
-  worked  well under Linux, but not for R in Windows. I have now fixed this.
+  worked  well under Linux, but not for R in Windows. I have now fixed this
   }
 }
-
-
 \section{Changes in version 1.0-00 (release date: 21-12-2013)}{
 \itemize{
 	\item Added examples
@@ -30,7 +35,7 @@ the course of 2014. Please contact me if this causes you problems
 \section{Changes in version 0.6-17 (release date: 8-8-2013)}{
 \itemize{
   \item This was the first version released. It was developed and tested
-  in recording from over 15000 individuals with on average one week of accelerometer
+  in recordings from over 15000 individuals with on average one week of accelerometer
   data.  
 }
 }
