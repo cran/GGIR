@@ -1,6 +1,11 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 1.0-3 (release date: 27-3-2014)}{
+\itemize{
+  \item Fixed bug in modified g.analyse in version 1.0-2
+  }
+}
 \section{Changes in version 1.0-2 (release date: 14-3-2014)}{
 \itemize{
   \item Expanded g.analyse with estimates of time spent in moderate and vigorous

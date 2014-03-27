@@ -17,8 +17,10 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   # Value:
   # summary - one line of summary measures for the file that was analysed
   # daysummary - summary measures per day for the file that was analysed
-  require(GGIR)
+#   require(GGIR)
   
+  
+  print("a")
   fname=I$filename
   averageday = IMP$averageday
   strategy = IMP$strategy
@@ -49,7 +51,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   # Time window for distribution analysis
   t_TWDI = qwindow #start and of 24 hour clock hours
   
-  
+  print("b")
   #==========================================================================================
   #==========================================================================================
   #==========================================================================================
@@ -104,6 +106,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       }
     }
   }
+  print("c")
   #---------------------
   # detect first and last midnight and all midnights
   tsi = which(colnames(metalong) == "timestamp")
@@ -569,7 +572,9 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   #------------------------------
   # Extract the average 24 hr
   lookat = c(2:ncol(metashort))
-  lookat = lookat[-c(which(colnames(metashort) == "angle")-1)]
+#   if (length(which(colnames(metashort) == "angle")) > 0) {
+#     lookat = lookat[-c(which(colnames(metashort) == "angle")-1)]
+#   }
   colnames_to_lookat = colnames(metashort)[lookat]
   
   MA = matrix(NA,length(lookat),1)
