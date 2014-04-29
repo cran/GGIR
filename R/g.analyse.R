@@ -1,5 +1,5 @@
 g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M5window = c(0,24),M5L5res=10,
-                       includedaycrit = 16,ilevels=c(),winhr=5,idloc=1,
+                       includedaycrit = 16,ilevels=c(),winhr=5,idloc=1,snloc=1,
                        mvpathreshold = c(),boutcriter=c()) {
   # Arguments:
   # IMP - output from g.impute()
@@ -20,7 +20,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
 #   require(GGIR)
   
   
-  print("a")
   fname=I$filename
   averageday = IMP$averageday
   strategy = IMP$strategy
@@ -51,7 +50,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   # Time window for distribution analysis
   t_TWDI = qwindow #start and of 24 hour clock hours
   
-  print("b")
   #==========================================================================================
   #==========================================================================================
   #==========================================================================================
@@ -106,7 +104,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       }
     }
   }
-  print("c")
+  
   #---------------------
   # detect first and last midnight and all midnights
   tsi = which(colnames(metalong) == "timestamp")
@@ -380,8 +378,10 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
               if (domvpa == TRUE) {
                 
                 for (mvpai in 1:length(mvpathreshold)) {
+                  
                   # METHOD 1: time spent above threhold based on 5 sec epoch
                   mvpa1 = length(which(varnum*1000 >= mvpathreshold[mvpai])) / (60/ws3) #time spent MVPA in minutes
+                  
                   # METHOD 2: time spent above threshold based on 1minute epoch
                   varnum2 = cumsum(c(0,varnum))
                   select = seq(1,length(varnum2),by=60/ws3)
@@ -466,6 +466,22 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                   }
                   rr1[which(rr1t == 2)] = 1
                   mvpa6 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
+                  if (length(which(varnum*1000 >= mvpathreshold[mvpai])) < 0 & length(varnum) < 100) {
+                    mvpa1 = 0
+                    mvpa2 = 0
+                    mvpa3 = 0
+                    mvpa4 = 0
+                    mvpa5 = 0
+                    mvpa6 = 0
+                  }
+                  if (is.nan(mvpa1) == TRUE) mvpa1 = 0
+                  if (is.nan(mvpa2) == TRUE) mvpa2 = 0
+                  if (is.nan(mvpa3) == TRUE) mvpa3 = 0
+                  if (is.nan(mvpa4) == TRUE) mvpa4 = 0
+                  if (is.nan(mvpa5) == TRUE) mvpa5 = 0
+                  if (is.nan(mvpa6) == TRUE) mvpa6 = 0
+                      
+                  
                   mvpanames[,mvpai] = c( paste("MVPA_E",ws3,"S_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E1M_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E5M_T",mvpathreshold[mvpai],sep=""),
@@ -614,14 +630,21 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   #-----------------------------------
   if (idloc == 2) {
     summary[vi] = unlist(strsplit(fname,"_"))[1] #id
-    summary[(vi+1)] = unlist(strsplit(fname,"_"))[2] #SN
   } else if (idloc == 4) {
-    summary[vi:(vi+1)] = c(idd,SN)
+    summary[vi] = idd
   } else if (idloc == 1) {
-    summary[vi:(vi+1)] = c(id,SN)
+    summary[vi] = id
   } else if (idloc == 3) {
-    summary[vi:(vi+1)] = c(id2,SN)
+    summary[vi] = id2
   }
+  #-----------------------------------
+  if (snloc == 1) {
+    summary[(vi+1)] = SN
+  } else if (snloc == 2) {
+    summary[(vi+1)] = unlist(strsplit(fname,"_"))[2]
+  }
+  
+  
   s_names[vi:(vi+1)] = c("ID","device_sn")
   vi = vi+2
   #-----------------------------------
@@ -684,7 +707,9 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     v2 = which(is.na(as.numeric(daysummary[wkday,10])) == F)	
     wkday = wkday[v2]
     summary[vi] = length(wkend) # number of weekend days
+    if (is.na(summary[vi]) == TRUE) summary[vi] = 0
     summary[(vi+1)] = length(wkday) # number of week day
+    if (is.na(summary[(vi+1)]) == TRUE) summary[(vi+1)] = 0
     s_names[vi:(vi+1)] = c("N valid WEdays","N valid WKdays")
     vi = vi + 2
     #############################################################
@@ -887,5 +912,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   }
   summary = data.frame(value=t(summary)) #needs to be t() because it will be a column otherwise
   names(summary) = s_names
+
   invisible(list(summary=summary,daysummary=daysummary))
 }

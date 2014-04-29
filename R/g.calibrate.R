@@ -63,6 +63,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   mon = INFI$monc
   dformat = INFI$dformc
   sf = INFI$sf
+  if (sf == 0) sf = 80 #assume 80Hertz in the absense of any other info
   header = INFI$header
   decn = g.dotorcomma(datafile,dformat,mon) #detect dot or comma dataformat
   
@@ -86,7 +87,6 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   #===============================================
   # Read file
   switchoffLD = 0 #dummy variable part of "end of loop mechanism"
-  
   while (LD > 1) {
     P = c()
     print(paste("Loading block: ",i,sep=""))
@@ -131,28 +131,58 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       }
     } else if (mon == 2 & dformat == 2) {
       try(expr={P = read.csv(datafile,nrow = (blocksize*300), skip=(100+(blocksize*300*(i-1))),dec=decn)},silent=TRUE)
+#       if (length(P) > 1) {
+#         P = as.matrix(P)
+#         if (nrow(P) < ((sf*ws)+1)) {
+#           P = c() ; switchoffLD = 1 #added 30-6-2012
+#           print("Error: data too short for doing non-wear detection 1")		
+#         }
+#       } else {
+#         P = c()
+#         print("End of file reached")
+#       }
+#       
+      
       if (length(P) > 1) {
         P = as.matrix(P)
-        if (nrow(P) < ((sf*ws)+1)) {
+        if (nrow(P) < ((sf*ws*2)+1) & i == 1) {
           P = c() ; switchoffLD = 1 #added 30-6-2012
-          print("Error: data too short for doing non-wear detection 1")		
+          print("Error code 1: data too short for doing non-wear detection")  	
+          filetooshort = TRUE
         }
       } else {
         P = c()
         print("End of file reached")
       }
+      
+  
     } else if (mon == 3 & dformat == 2) {
       try(expr={P = read.csv(datafile,nrow = (blocksize*300), skip=(10+(blocksize*300*(i-1))),dec=decn)},silent=TRUE)
+#       if (length(P) > 1) {
+#         P = as.matrix(P)
+#         if (nrow(P) < ((sf*ws)+1)) {
+#           P = c() ; switchoffLD = 1 #added 30-6-2012
+#           print("Error: data too short for doing non-wear detection 1")		
+#         }
+#       } else {
+#         P = c()
+#         print("End of file reached")
+#       }
+      use.temp = FALSE
       if (length(P) > 1) {
         P = as.matrix(P)
-        if (nrow(P) < ((sf*ws)+1)) {
+        if (nrow(P) < ((sf*ws*2)+1) & i == 1) {
           P = c() ; switchoffLD = 1 #added 30-6-2012
-          print("Error: data too short for doing non-wear detection 1")		
+          print("Error code 1: data too short for doing non-wear detection")
+          filetooshort = TRUE
         }
       } else {
         P = c()
         print("End of file reached")
       }
+      
+      
+      
     }
     #process data as read from binary file
     if (length(P) > 0) { #would have been set to zero if file was corrupt or empty
@@ -188,8 +218,10 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
           temperature = as.numeric(data[,7])
         } else if (dformat == 2) {
           data2 = matrix(NA,nrow(data),3)
+          if (ncol(data) == 3) extra = 0
+          if (ncol(data) == 4) extra = 1
           for (jij in 1:3) {
-            data2[,jij] = as.numeric(data[,(jij+1)])
+            data2[,jij] = as.numeric(data[,(jij+extra)])
           }
           Gx = as.numeric(data2[,1]); Gy = as.numeric(data2[,2]); Gz = as.numeric(data2[,3])
           if (mon == 2) {
@@ -388,6 +420,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   
   if (length(ncol(meta_temp)) != 0) {
     spheredata = data.frame(A = meta_temp)
+
     if (use.temp == TRUE) {
       names(spheredata) = c("Euclidean Norm","meanx","meany","meanz","sdx","sdy","sdz","temperature")
     } else {

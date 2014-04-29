@@ -18,7 +18,7 @@ name of data file
 \value{
  \item{header}{fileheader}
   \item{monn}{monitor name (genea, geneactive)}
-  \item{monc}{monitor brand code (1 = genea; 2 = geneactive)}
+  \item{monc}{monitor brand code (1 = genea; 2 = geneactive, 3 = actigraph)}
   \item{dformn}{data format (bin, csv)}
   \item{dformc}{data format code (1 = bin, 2 = csv)}
   \item{sf}{samplefrequency in Hertz}

@@ -17,7 +17,7 @@ with a 5 sec epoch.
 \usage{
 g.analyse(I, C, M, IMP, qlevels = c(), qwindow = c(0, 24), quantiletype = 7,
 L5M5window = c(0, 24), M5L5res = 10, includedaycrit = 16, ilevels = c(),
-winhr = 5, idloc = 1,mvpathreshold = c(),boutcriter=c())
+winhr = 5, idloc = 1,snloc=1,mvpathreshold = c(),boutcriter=c())
 }
 
 \arguments{
@@ -69,8 +69,13 @@ resoltion of L5 and M5 analysis in minutes (default: 10 minutes)
   }
   \item{idloc}{
     If value = 1 (default) the code assumes that ID number is stored in the
-    obvious header field. If value = 2 the code use the character string preceding
+    obvious header field. If value = 2 the code uses the character string preceding
     the character '_' in the filename as the ID number
+  }
+  \item{snloc}{
+    If value = 1 (default) the code assumes that device serial number is stored in
+    the obvious header field. If value = 2 the code uses the character string between
+    the first and second character '_' in the filename as the serial number
   }
   \item{mvpathreshold}{
     Threshold for MVPA estimation. Threshold needs to be based on metric ENMO.

@@ -9,7 +9,8 @@ value per short or long epoch. Acceleration and angle metrics are stored at shor
 epoch lenghth. The non-wear indication score, the clipping score, temperature
 (if available), light (if available), and Euclidean norm are stored at long epoch
 length. The function has been designed and thoroughly tested with binary files 
-from GENEA and GENEActiv.
+from GENEA and GENEActiv. Further, the function should be able to cope with csv-format
+data procuded by GENEActiv and Actigraph
 }
 \usage{
 g.getmeta(datafile, desiredtz = "Europe/London", windowsizes = c(5, 900, 3600),

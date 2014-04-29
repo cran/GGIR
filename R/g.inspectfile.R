@@ -25,12 +25,13 @@ function(datafile) {
       testcsv = read.csv(paste(datafile,sep=""),nrow=10,skip=10)
       if (ncol(testcsv) == 2) { #it is a geneactivefile
         mon = 2
-      } else if (ncol(testcsv) == 4) {	#it is an actigraph file
+      } else if (ncol(testcsv) >= 3) {	#it is an actigraph file
         mon = 3
       }
     } else if (tmp2[length(tmp2)] == "in") { #this is a bin file
       dformat = 1 #1 = binary
     }
+    
     if (dformat == 1) {
       # try read the file as if it is a geneactiv and store output in variable 'isitageneactive'
       suppressWarnings(try(expr={isitageneactive = header.info(binfile=datafile)},silent=TRUE))
@@ -137,6 +138,7 @@ function(datafile) {
   if (length(filename) == 0) {
     print("no files to analyse")
   }
+  
   INFI = getbrand(filename,datafile)
   mon = INFI$mon
   dformat = INFI$dformat
@@ -176,12 +178,14 @@ function(datafile) {
       H = cbind(c(1:length(H)),H)
     }
   }
-  if (mon == 2) {
+  
+  if (mon == 2 & dformat == 1) {
     varname = rownames(as.matrix(H))
     H = data.frame(varname = varname,varvalue = as.character(H))
   } else {    
     H = data.frame(varname = H[,1],varvalue = H[,2])
   }
+  
   #   }
   closeAllConnections()
   header = data.frame(value=H[,2],row.names=H[,1])

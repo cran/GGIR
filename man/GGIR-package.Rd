@@ -17,16 +17,17 @@ sections by imputed values; and finally  \link{g.analyse} takes the output from
 all the functions, runs a basic descriptive analysis and then summarises the output
 both per measurement and per day of measurement.\cr
 GGIR has primarily been developed for binary data collected with Genea and
-Geneactive accelerometers. If you want to use this package for a different data 
-format (e.g. from a different accelerometer brand) then please provide me with:
-the R-code to read the data and example files for testing purposes.
+Geneactive accelerometers. Additionally, it should work for csv data from
+Geneactiv and Actigraph accelerometer. If you want to use this package for a
+different data format (e.g. from a different accelerometer brand) then please 
+provide me with: the R-code to read the data and example files for testing purposes.
 }
 \details{
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.0-3\cr
-Date: \tab 2014-3-27\cr
+Version: \tab 1.0-4\cr
+Date: \tab 2014-4-29\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 }
 }

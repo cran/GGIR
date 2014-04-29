@@ -75,6 +75,7 @@ g.getmeta <-
     mon = INFI$monc
     dformat = INFI$dformc
     sf = INFI$sf
+    if (sf == 0) sf = 80 #assume 80Hertz in the absense of any other info
     header = INFI$header
     decn =g.dotorcomma(datafile,dformat,mon)
     
@@ -240,26 +241,83 @@ g.getmeta <-
             starttime = as.POSIXlt(starttime)
             lengthheader = 20
           } else if (dformat == 2 & mon == 3) {
-            starttime = as.character(P[1,1])
-            starttime = as.POSIXlt(starttime,format='%d.%m.%Y %H:%M:%S')
+#             #solution if timestamps would be in file
+#             starttime = as.character(P[1,1])
+#             starttime = as.POSIXlt(starttime,format='%d.%m.%Y %H:%M:%S')
+            # extract starttime from header (added on 29/04/2014
+
+            
+            
+            tmph = read.csv(datafile,nrow=8,skip=1)
+            tmphi = 1
+            while (tmphi < 10) {
+              if (length(unlist(strsplit(as.character(tmph[tmphi,1]),"Start Time"))) > 1) {
+                break
+              }
+              tmphi = tmphi + 1
+            }
+            starttime = unlist(strsplit(as.character(tmph[tmphi,1]),"Start Time"))[2]
+            #-------------------------------
+            tmphi = 1
+            while (tmphi < 10) {
+              if (length(unlist(strsplit(as.character(tmph[tmphi,1]),"Start Date"))) > 1) {
+                break
+              }
+              tmphi = tmphi + 1
+            }
+            startdate = unlist(strsplit(as.character(tmph[tmphi,1]),"Start Date"))[2]
+            starttime = paste(startdate," ",starttime,sep="")
+
+            topline = as.matrix(colnames(as.matrix(read.csv(datafile,nrow=1,skip=0))))
+            
+            if (length(strsplit(topline,"M[.]d[.]yyyy")) > 0) {
+              starttime = as.POSIXlt(starttime,format='%m/%d/%Y %H:%M:%S')
+#               print("a")
+            } else if (length(strsplit(topline,"MM[.]dd[.]yyyy")) > 0) {
+              starttime = as.POSIXlt(starttime,format='%m/%d/%Y %H:%M:%S')
+#               print("b")
+            } else if (length(strsplit(topline,"dd[.]MM[.]yyyy")) > 0) {
+              starttime = as.POSIXlt(starttime,format='%d/%m/%Y %H:%M:%S')
+#               print("c")
+            } else if (length(strsplit(topline,"d[.]M[.]yyyy")) > 0) {
+              starttime = as.POSIXlt(starttime,format='%d/%m/%Y %H:%M:%S')
+#               print("d")
+            }
+          
+            
+            
+# print(starttime)
+
             lengthheader = 9
           }
+
           #==================================================
           #inspection timezone
           timezone = attr(unclass(as.POSIXlt(starttime[1])),which="tzone")
           starttimebefore = as.POSIXlt(starttime)
+#           print(starttime)
+#           bpnobpb
+          
           # assuming that timestamps is good, but that timezone might be lost in conversion from string to POSIXct
           if (dformat == 1) { #not sure whether this is required for csv-format (2)
             if (length(which(timezone == "GMT")) > 0) {
               starttime = as.POSIXlt(starttime[1],tz=desiredtz)
             }
-          }        # alternative function??? format(...,tz=desiredtz,usetz=TRUE)
+          } else {
+            starttime = as.POSIXlt(starttime[1],tz=desiredtz)
+#             starttime = as.numeric(starttime)
+#             starttime = as.POSIXlt(starttime,tz=desiredtz,origin="1970-01-01")
+          }
+#           print(starttime)
+#           bobobo
           #================================================
           #assess weekday
           wday = unclass(as.POSIXlt(starttime[1]))$wday #day of the week 0-6 and 0 is Sunday
           wday = wday + 1
           weekdays = c("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
           wdayname = weekdays[wday]
+          
+          
           #======================================================
           #assess how much data to delete till next 15 minute period
           temp = unlist(strsplit(as.character(starttime)," "))
@@ -272,6 +330,7 @@ g.getmeta <-
           minshift = start_meas - (((start_min/start_meas) - floor(start_min/start_meas)) * start_meas)
           minshift = minshift - 1
           sampleshift = (minshift*60*sf) + (secshift*sf) #derive sample shift
+
           data = data[-c(1:floor(sampleshift)),] #delete data accordingly
           newmin = start_min+minshift #recalculate first timestamp
           #===
@@ -289,6 +348,9 @@ g.getmeta <-
             }
           }
           starttime3 = paste(temp[1]," ",start_hr,":",newmin,":",newsec,sep="") #<<<====  changed 17-12-2013
+          
+#           print(starttime3)
+    
           #====
           # deleted 18-12-2013
           #         if (newmin == 60) {
@@ -311,6 +373,7 @@ g.getmeta <-
           LD = 0 #ignore rest of the data and store what has been loaded so far.
           
         }
+        
         #store data that could not be used for this block, but will be added to next block
         if (LD != 0) {
           use = (floor(LD / (ws*sf))) * (ws*sf) #number of datapoint to use
@@ -340,8 +403,10 @@ g.getmeta <-
             Gx = as.numeric(data[,2]); Gy = as.numeric(data[,3]); Gz = as.numeric(data[,4])
           } else if (dformat == 2) {
             data2 = matrix(NA,nrow(data),3)
+            if (ncol(data) == 3) extra = 0
+            if (ncol(data) == 4) extra = 1
             for (jij in 1:3) {
-              data2[,jij] = as.numeric(data[,(jij+1)])
+              data2[,jij] = as.numeric(data[,(jij+extra)])
             }
             if (mon == 3) {
               data2[,1:3] = scale(data2[,1:3],center = -offset, scale = 1/scale)  #rescale data
@@ -495,9 +560,12 @@ g.getmeta <-
                 maxwacc = max(as.numeric(data[(1+hoc1):hoc2,(jj+(mon-1))]))
                 minwacc = min(as.numeric(data[(1+hoc1):hoc2,(jj+(mon-1))]))
               } else if (dformat == 2) {
-                sdwacc = sd(as.numeric(data[(1+hoc1):hoc2,(jj+1)]))
-                maxwacc = max(as.numeric(data[(1+hoc1):hoc2,(jj+1)]))
-                minwacc = min(as.numeric(data[(1+hoc1):hoc2,(jj+1)]))
+                if (ncol(data) == 3) extra = 0
+                if (ncol(data) == 4) extra = 1
+                
+                sdwacc = sd(as.numeric(data[(1+hoc1):hoc2,(jj+extra)]))
+                maxwacc = max(as.numeric(data[(1+hoc1):hoc2,(jj+extra)]))
+                minwacc = min(as.numeric(data[(1+hoc1):hoc2,(jj+extra)]))
               }
               #estimate number of data points of clipping based on raw data at about 87 Hz
               if (mon == 1) {
@@ -510,7 +578,9 @@ g.getmeta <-
               if (dformat == 1) {
                 CW[h,jj] = length(which(abs(as.numeric(data[(1+cliphoc1):cliphoc2,(jj+(mon-1))])) > clipthres))
               } else if (dformat == 2) {
-                CW[h,jj] = length(which(abs(as.numeric(data[(1+cliphoc1):cliphoc2,(jj+1)])) > clipthres))
+                if (ncol(data) == 3) extra = 0
+                if (ncol(data) == 4) extra = 1
+                CW[h,jj] = length(which(abs(as.numeric(data[(1+cliphoc1):cliphoc2,(jj+extra)])) > clipthres))
               }
               #non-wear criteria are monitor specific
               if (mon == 1) {

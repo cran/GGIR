@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 1.0-4 (release date: 29-4-2014)}{
+\itemize{
+  \item Implemented functionality for csv-fromat data from GENEActiv and Actigraph.
+  It seems to work for the test files I have, more testing may be necessary
+  \item Cleaned up some of the NaN and NA output to aim for consistent annotation
+  of missing data
+  }
+}
 \section{Changes in version 1.0-3 (release date: 27-3-2014)}{
 \itemize{
   \item Fixed bug in modified g.analyse in version 1.0-2
