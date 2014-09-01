@@ -1,4 +1,2 @@
 export(g.analyse,g.calibrate,g.getmeta,g.impute,g.inspectfile,g.binread,g.plot)
-import(matlab,GENEAread)
-
-
+import(GENEAread)

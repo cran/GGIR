@@ -37,7 +37,8 @@ winhr = 5, idloc = 1,snloc=1,mvpathreshold = c(),boutcriter=c())
     array of percentiles for which value needs to be extracted. These need to
     be expressed as a fraction of 1, e.g. c(0.1, 0.5, 0.75). There is no limit
     to the number of percentiles. If left empty then percentiles will not be 
-    extracted. Distribution will be derived from short epoch metric data, see \link{g.getmeta}.
+    extracted. Distribution will be derived from short epoch metric data, see
+    \link{g.getmeta}.
   }
   \item{qwindow}{
   start and end time, in 24 hour clock hours, over which distribution in metric 
@@ -163,11 +164,11 @@ then average according to AD, WD, WWE, WWD
 \item \code{data exclusion strategy} A log of the decision made when calling  g.impute:
 value=1 mean ignore specific hours; value=2 mean ignore all data before the first
 midnight and after the last midnight
-\item \code{number of hours ignored at the start of the measurement (if strategy = 1)}
+\item \code{n hours ignored at the start of the measurement (if strategy = 1)}
 A log of the decision made when calling g.impute
-\item \code{number of hours ignored at the end of the measurement (if strategy = 1)}
+\item \code{n hours ignored at the end of the measurement (if strategy = 1)}
 A log of the decision made when calling  g.impute
-\item \code{number of days of measurement after which all data is ignored
+\item \code{n days of measurement after which data is ignored
 (if strategy = 1)}
 A log of the decision made when calling  g.impute
 }

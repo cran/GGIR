@@ -13,10 +13,13 @@ from GENEA and GENEActiv. Further, the function should be able to cope with csv-
 data procuded by GENEActiv and Actigraph
 }
 \usage{
-g.getmeta(datafile, desiredtz = "Europe/London", windowsizes = c(5, 900, 3600),
-daylimit = FALSE, offset = c(0, 0, 0), scale = c(1, 1, 1), tempoffset = c(0, 0, 0),
-do.bfen = FALSE, do.enmo = TRUE, do.angle = FALSE, do.lfenmo = FALSE, do.en = FALSE,
-do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2, hb = 15, n = 4,meantempcal=c())
+g.getmeta(datafile, desiredtz = "Europe/London", 
+windowsizes = c(5, 900, 3600),daylimit = FALSE, 
+offset = c(0, 0, 0), scale = c(1, 1, 1),
+tempoffset = c(0, 0, 0),do.bfen = FALSE, do.enmo = TRUE,
+do.angle = FALSE, do.lfenmo = FALSE, do.en = FALSE,
+do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2,
+hb = 15, n = 4,meantempcal=c(),chunksize=c())
 }
 \arguments{
   \item{datafile}{name of binary file
@@ -63,10 +66,15 @@ do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2, hb = 15, n = 4,meantempcal=c())
 }
   \item{n}{order of the frequency filter
 }
-\item{meantempcal}{mean temperature corresponding to the data as used for 
+  \item{meantempcal}{mean temperature corresponding to the data as used for 
 autocalibration. Only applies to data collected with GENEActiv monitor. If
 autocalibration is not done or if temperature was not available then leave
 blank (default)
+}
+\item{chunksize}{number between 0.2 and 1 to specificy the size of chunks to be 
+loaded as a fraction of a 24 hour period, e.g. 0.5 equals 12 hour chunks.
+The default is 1 (24 hrs). For machines with less than 4Gb of RAM memory a value
+below 1 is recommended.
 }
 }
 \value{

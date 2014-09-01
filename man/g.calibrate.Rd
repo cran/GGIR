@@ -67,3 +67,11 @@ print(C$offset)
   Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
   Zhou Fang
 }
+\references{
+\itemize{
+\item van Hees VT, Fang Z, Langford J, Assah F, Mohammad A, da Silva IC, Trenell MI, 
+White T, Wareham NJ, Brage S. Auto-calibration of accelerometer data for
+free-living physical activity assessment using local gravity and temperature: 
+an evaluation on four continents. J Appl Physiol (1985). 2014 Aug 7
+}
+}

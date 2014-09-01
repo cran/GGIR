@@ -17,9 +17,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   # Value:
   # summary - one line of summary measures for the file that was analysed
   # daysummary - summary measures per day for the file that was analysed
-#   require(GGIR)
-  
-  
+
   fname=I$filename
   averageday = IMP$averageday
   strategy = IMP$strategy

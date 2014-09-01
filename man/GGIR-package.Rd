@@ -18,16 +18,20 @@ all the functions, runs a basic descriptive analysis and then summarises the out
 both per measurement and per day of measurement.\cr
 GGIR has primarily been developed for binary data collected with Genea and
 Geneactive accelerometers. Additionally, it should work for csv data from
-Geneactiv and Actigraph accelerometer. If you want to use this package for a
-different data format (e.g. from a different accelerometer brand) then please 
-provide me with: the R-code to read the data and example files for testing purposes.
+Geneactiv and Actigraph accelerometer. Note for Actigraph users: please do not
+export timestamps to the csv-file as this causes memory issues. To cope with the
+absense of timestamps the code will re-caculate timestamps from the sample frequency
+and the start time and date as presented in the file header.
+If you want to use this package for a different data format (e.g. from a different
+accelerometer brand) then please provide me with: the R-code to read the data and
+example files for testing purposes.
 }
 \details{
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.0-4\cr
-Date: \tab 2014-4-29\cr
+Version: \tab 1.0-6\cr
+Date: \tab 2014-9-1\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 }
 }
@@ -64,8 +68,14 @@ Zhou Fang co-developed function \link{g.calibrate}
 Jing Hua Zhao <jinghua.zhao@mrc-epid.cam.ac.uk> co-developed function \link{g.binread}
 }
 \references{
-van Hees VT, Gorzelniak L, Dean Leon EC, Eder M, Pias M, et al. (2013) Separating
+\itemize{
+\item van Hees VT, Gorzelniak L, Dean Leon EC, Eder M, Pias M, et al. (2013) Separating
 Movement and Gravity Components in an Acceleration Signal and Implications for the
 Assessment of Human Daily Physical Activity. PLoS ONE 8(4): e61691.
 doi:10.1371/journal.pone.0061691
+\item van Hees VT, Fang Z, Langford J, Assah F, Mohammad A, da Silva IC, Trenell MI, 
+White T, Wareham NJ, Brage S. Auto-calibration of accelerometer data for
+free-living physical activity assessment using local gravity and temperature: 
+an evaluation on four continents. J Appl Physiol (1985). 2014 Aug 7
+}
 }
