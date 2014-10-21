@@ -11,7 +11,7 @@ to address the calibration error and a summary of the callibration procedure.
 }
 \usage{
 g.calibrate(datafile, use.temp = TRUE, spherecrit = 0.3, minloadcrit = 72, 
-printsummary = FALSE)
+printsummary = FALSE,chunksize=c())
 }
 \arguments{
   \item{datafile}{
@@ -33,6 +33,11 @@ if calibration error has not be reduced to under 0.01 g.
   \item{printsummary}{
   if TRUE will print a summary when done
   }
+  \item{chunksize}{number between 0.2 and 1 to specificy the size of chunks to be 
+loaded as a fraction of a 12 hour period, e.g. 0.5 equals 6 hour chunks.
+The default is 1 (12 hrs). For machines with less than 4Gb of RAM memory a value
+below 1 is recommended.
+}
 }
 \value{
  \item{\code{scale}}{scaling correction values, e.g. c(1,1,1) }

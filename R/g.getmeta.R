@@ -1,40 +1,21 @@
-g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,3600),
-                      daylimit=FALSE,offset=c(0,0,0),scale=c(1,1,1),tempoffset = c(0,0,0),
-                      do.bfen=FALSE,do.enmo=TRUE,
-                      do.angle=FALSE,do.lfenmo=FALSE,
-                      do.en=FALSE,do.hfen=FALSE,
-                      do.hfenplus=FALSE,
-                      lb = 0.2, hb = 15,  n = 4,meantempcal=c(),chunksize=c()) {
+g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,3600),
+                     daylimit=FALSE,offset=c(0,0,0),scale=c(1,1,1),tempoffset = c(0,0,0),
+                     do.bfen=FALSE,do.enmo=TRUE,
+                     do.angle=FALSE,do.lfenmo=FALSE,
+                     do.en=FALSE,do.hfen=FALSE,
+                     do.hfenplus=FALSE,do.teLindert2013=FALSE,
+                     do.anglex=FALSE,do.angley=FALSE,do.anglez=FALSE,do.enmoa=FALSE,
+                     lb = 0.2, hb = 15,  n = 4,meantempcal=c(),chunksize=c()) {
+  #do.teLindert2013=FALSE,
   
   if (length(chunksize) == 0) chunksize = 1
   if (chunksize > 1) chunksize = 1
   if (chunksize < 0.2) chunksize = 0.2 
-  #do.extrametrics = FALSE
-  nmetrics = sum(c(do.bfen,do.enmo,do.angle,do.lfenmo,do.en,do.hfen,do.hfenplus))
+  nmetrics = sum(c(do.bfen,do.enmo,do.angle,do.lfenmo,do.en,do.hfen,do.hfenplus,
+                   do.teLindert2013,do.anglex,do.angley,do.anglez,do.enmoa))
   if (length(nmetrics) == 0) {
     print("WARNING: No metrics selected")
   }
-  
-  #--------------------------------------------
-  # Input:
-  # - desiredtz
-  # Select desired timezone: see also http://en.wikipedia.org/wiki/Zone.tab
-  # desiredtz = "America/Sao_Paulo"  #for Pelotas
-  # desiredtz = "Europe/Berlin" #for central Europe
-  #	desiredtz = "Australia/ACT"  #for Australia
-  # - windowsize
-  # [1] Length of Short window for data storage in seconds (e.g. 5 seconds)
-  # [2] Length of Long window for data storage in seconds (e.g. 900 seconds = 15 minutes)
-  # [3] Window size for assessing non-wear time (seconds)
-  # - daylimit = FALSE, number of days to limit (roughly), if set to FALSE no daylimit will be applied
-  
-  #---------------------------------------------
-  # Value:
-  # metalong
-  # metashort
-  # tooshort
-  # corrupt
-  
   filename = unlist(strsplit(as.character(datafile),"/"))
   filename = filename[length(filename)]
   
@@ -67,14 +48,17 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
   LD = 2 #dummy variable used to identify end of file and to make the process stop
   
   # inspect file
+  options(warn=-1)
   INFI = g.inspectfile(datafile)  # Check which file type and monitor brand it is
+  options(warn=0)
   mon = INFI$monc
   dformat = INFI$dformc
   sf = INFI$sf
   if (sf == 0) sf = 80 #assume 80Hertz in the absense of any other info
   header = INFI$header
-  decn =g.dotorcomma(datafile,dformat,mon)
-  
+  options(warn=-1)
+  decn =g.dotorcomma(datafile,dformat,mon=mon)
+  options(warn=0)
   # setting size of blocks that are loaded (too low slows down the process)
   # the setting below loads blocks size of 24 hours (modify if causing memory problems)
   blocksize = round(14512 * (sf/50) * chunksize)
@@ -113,6 +97,8 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
   while (LD > 1) {
     P = c()
     print(paste("Loading block: ",i,sep=""))
+    options(warn=-1) #turn off warnings (code complains about unequal rowlengths
+    #when trying to read files of a different format)
     if (mon == 1 & dformat == 1) {
       try(expr={P = g.binread(binfile=datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
       if (length(P) > 1) {
@@ -129,12 +115,12 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
         print("End of file reached")
       }
     } else if (mon == 2 & dformat == 1) {
-      try(expr={P = read.bin(binfile=datafile,start=(blocksize*(i-1)),
+      try(expr={P = GENEAread::read.bin(binfile=datafile,start=(blocksize*(i-1)),
                              end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
       if (length(P) <= 2) {
         print("initial attempt to read data unsuccessful, try again with mmap turned on:")
         #try again but now with mmap.load turned on
-        try(expr={P = read.bin(binfile=datafile,start=(blocksize*(i-1)),
+        try(expr={P = GENEAread::read.bin(binfile=datafile,start=(blocksize*(i-1)),
                                end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=TRUE)},silent=TRUE)
         if (length(P) != 0) {
           print("data read succesfully")
@@ -151,7 +137,7 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
       if (length(P) == 0) { #if first block doens't read then probably corrupt
         if (i == 1) {
           #try to read without specifying blocks (file too short)
-          try(expr={P = read.bin(binfile=datafile,calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
+          try(expr={P = GENEAread::read.bin(binfile=datafile,calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
           if (length(P) == 0) {
             print("Error: file possibly corrupt")
             P= c(); switchoffLD = 1
@@ -198,7 +184,7 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
         print("End of file reached")
       }
     }
-    
+    options(warn=0) #turn on warnings
     #============
     #process data as read from binary file
     if (length(P) > 0) { #would have been set to zero if file was corrupt or empty
@@ -246,16 +232,16 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
           tmph = read.csv(datafile,nrow=8,skip=1)
           tmphi = 1
           while (tmphi < 10) {
-            if (length(unlist(strsplit(as.character(tmph[tmphi,1]),"tart Time"))) > 1) {
+            if (length(unlist(strsplit(as.character(tmph[tmphi,1]),"Start Time"))) > 1) {
               break
             }
             tmphi = tmphi + 1
           }
-          starttime = unlist(strsplit(as.character(tmph[tmphi,1]),"tart Time"))[2]
+          starttime = unlist(strsplit(as.character(tmph[tmphi,1]),"Start Time"))[2]
           #-------------------------------
           tmphi = 1
           while (tmphi < 10) {
-            if (length(unlist(strsplit(as.character(tmph[tmphi,1]),"tart Date"))) > 1) {
+            if (length(unlist(strsplit(as.character(tmph[tmphi,1]),"Start Date"))) > 1) {
               break
             }
             tmphi = tmphi + 1
@@ -265,6 +251,7 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
           #remove possible spaces in date or time
           startdate = as.character(unlist(strsplit(as.character(startdate)," "))) 
           starttime = as.character(unlist(strsplit(as.character(starttime)," ")))
+          
           if (length(startdate) > 1) {
             for (rpsi in 1:length(startdate)) {
               if (length(unlist(strsplit(startdate[rpsi],"")))>1) {
@@ -284,22 +271,23 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
           #-----------------------------------------
           # flexible four date/time formats
           starttime = paste(startdate," ",starttime,sep="")
+          options(warn=-1)
           topline = as.matrix(colnames(as.matrix(read.csv(datafile,nrow=1,skip=0))))
-          B1 = length(unlist(strsplit(as.character(topline),"MM[.]dd[.]yyyy")))
-          B2 = length(unlist(strsplit(as.character(topline),"M[.]d[.]yyyy")))
-          B3 = length(unlist(strsplit(as.character(topline),"dd[.]MM[.]yyyy")))
-          B4 = length(unlist(strsplit(as.character(topline),"d[.]M[.]yyyy")))
-          if (B1 > 1) {
-            starttime = as.POSIXlt(starttime,format="%m/%d/%Y %H:%M:%S")
-          } else if (B2 > 1) {
-            starttime = as.POSIXlt(starttime,format="%m/%d/%Y %H:%M:%S")
-          } else if (B3 > 1) {
-            starttime = as.POSIXlt(starttime,format="%d/%m/%Y %H:%M:%S")
-          } else if (B4 > 1) {
-            starttime = as.POSIXlt(starttime,format="%d/%m/%Y %H:%M:%S")
+          options(warn=0)
+          B1 = length(unlist(strsplit(topline,"MM[.]dd[.]yyyy")))
+          B2 = length(unlist(strsplit(topline,"M[.]d[.]yyyy")))
+          B3 = length(unlist(strsplit(topline,"dd[.]MM[.]yyyy")))
+          B4 = length(unlist(strsplit(topline,"d[.]M[.]yyyy")))
+          if (length(B1) > 1) {
+            starttime = as.POSIXlt(starttime,format='%m/%d/%Y %H:%M:%S')
+          } else if (length(B2) > 1) {
+            starttime = as.POSIXlt(starttime,format='%m/%d/%Y %H:%M:%S')
+          } else if (length(B3) > 1) {
+            starttime = as.POSIXlt(starttime,format='%d/%m/%Y %H:%M:%S')
+          } else if (length(B4) > 1) {
+            starttime = as.POSIXlt(starttime,format='%d/%m/%Y %H:%M:%S')
           }
           lengthheader = 9
-          starttime = as.POSIXlt(starttime,format='%d/%m/%Y %H:%M:%S')
         }
         #==================================================
         #inspection timezone
@@ -311,12 +299,11 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
             starttime = as.POSIXlt(starttime[1],tz=desiredtz)
           }
         } else {        
-#           print(as.numeric(starttime))
-#           starttime = as.POSIXlt(as.numeric(starttime),tz=desiredtz,origin="1970-01-01")
+          #           print(as.numeric(starttime))
+          #           starttime = as.POSIXlt(as.numeric(starttime),tz=desiredtz,origin="1970-01-01")
         }
         #================================================
         #assess weekday
-        
         wday = unclass(as.POSIXlt(starttime[1]))$wday #day of the week 0-6 and 0 is Sunday
         wday = wday + 1
         weekdays = c("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
@@ -331,31 +318,39 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
         start_sec = as.numeric(starttime2[3])
         secshift = 60 - start_sec #shift in seconds needed
         start_min = start_min +1 #shift in minutes needed (+1 one to account for seconds comp)
+        #-----------
         minshift = start_meas - (((start_min/start_meas) - floor(start_min/start_meas)) * start_meas)
         minshift = minshift - 1
+        #-----------
         sampleshift = (minshift*60*sf) + (secshift*sf) #derive sample shift
+#         print("***")
+#         print(starttime2)
+#         print(start_meas)
+#         print(start_min)
+#         print("**")
+#         print(sf)
+#         print(minshift)
+#         print(secshift)
+#         print(sampleshift)
+#         print(dim(data))
         
         data = data[-c(1:floor(sampleshift)),] #delete data accordingly
-        
         newmin = start_min+minshift #recalculate first timestamp
         #===
         # add 18-12-2013
         newsec = start_sec+secshift #<<<====  added17-12-2013
-        if (newsec >= 60) { #<<<====  added17-12-2013
-          newsec = newsec - 60 #<<<====  added17-12-2013
-          newmin = newmin + 1 #<<<====  added17-12-2013
+        if (newsec >= 60) { #<<<====  added 17-12-2013
+          newsec = newsec - 60 #<<<====  added 17-12-2013
+          newmin = newmin + 1 #<<<====  added 17-12-2013
         } #<<<====  added17-12-2013
-        if (newmin >= 60) { #<<<====  added17-12-2013
-          newmin = newmin - 60 #<<<====  added17-12-2013
+        if (newmin >= 60) { #<<<====  added 17-12-2013
+          newmin = newmin - 60 #<<<====  added 17-12-2013
           start_hr = start_hr + 1
           if (start_hr == 24) { #if measurement is started in 15 minutes before midnight
             starttime3 = as.character(starttime) # forget about timeshift for now, not plausible
           }
         }
         starttime3 = paste(temp[1]," ",start_hr,":",newmin,":",newsec,sep="") #<<<====  changed 17-12-2013
-        
-        #           print(starttime3)
-        
         #====
         # deleted 18-12-2013
         #         if (newmin == 60) {
@@ -368,17 +363,34 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
         #         starttime3 = paste(temp[1]," ",start_hr,":",newmin,":",(start_sec+secshift),sep="")
         #=====
         #create timestamp from string (now desiredtz is added)
-        starttime = as.POSIXct(starttime3,origin="1970-01-01",tz=desiredtz)
+        starttime_a = as.POSIXct(starttime3,format="%d/%m/%Y %H:%M:%S",tz=desiredtz) #,origin="1970-01-01"
+        starttime_b = as.POSIXct(starttime3,format="%d-%m-%Y %H:%M:%S",tz=desiredtz) #,origin="1970-01-01"
+        starttime_c = as.POSIXct(starttime3,format="%Y/%m/%d %H:%M:%S",tz=desiredtz) #,origin="1970-01-01"
+        starttime_d = as.POSIXct(starttime3,format="%Y-%m-%d %H:%M:%S",tz=desiredtz) #,origin="1970-01-01"
+        if (is.na(starttime_a) == FALSE) {
+          starttime = starttime_a
+        } else {
+          if (is.na(starttime_b) == FALSE) {
+            starttime = starttime_b
+          } else {
+            if (is.na(starttime_c) == FALSE) {
+              starttime = starttime_c
+            } else {
+              if (is.na(starttime_d) == FALSE) {
+                starttime = starttime_d
+              } else {
+                print("date not recognized")
+              }
+            }
+          }
+        }
       }
       LD = nrow(data)
-      
       if (LD < (ws*sf)) {
         print("Error: data too short for doing non-wear detection 3")
         switchoffLD = 1
         LD = 0 #ignore rest of the data and store what has been loaded so far.
-        
       }
-      
       #store data that could not be used for this block, but will be added to next block
       if (LD != 0) {
         use = (floor(LD / (ws*sf))) * (ws*sf) #number of datapoint to use
@@ -434,7 +446,7 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
           hb = round(sf/2) - 1
         }
         if (do.bfen == TRUE) {
-          BFEN = g.metric(Gx,Gy,Gz,n,sf,ii=7,TW,lb,hb,mon) #calling function metric.R to do the calculation
+          BFEN = g.metric(Gx,Gy,Gz,n,sf=sf,ii=7,TW=TW,lb=lb,hb=hb,mon=mon) #calling function metric.R to do the calculation
           #averaging per second
           BFEN2 =cumsum(c(0,BFEN))
           select = seq(1,length(BFEN2),by=sf)
@@ -458,43 +470,70 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
         ##==================================================
         # Angle based on y-axes
         if (do.angle == TRUE) {
-          angle =g.metric(Gx,Gy,Gz,n,sf,ii=8,TW,lb,hb,mon) #calling function metric.R to do the calculation
+          angle =g.metric(Gx,Gy,Gz,n,sf=sf,ii=8,TW=TW,lb=lb,hb=hb,mon=mon) #calling function metric.R to do the calculation
           #averaging angle per ws3 seconds
           angle2 =cumsum(c(0,angle))
           select = seq(1,length(angle),by=sf*ws3)
           angle3b = diff(angle2[round(select)]) / abs(diff(round(select)))
+          #           print(length(angle3b))
         }
         #------------------------------------------------------------
         # space for extra metrics
         if (do.lfenmo == TRUE) {
-          LFENMO =g.metric(Gx,Gy,Gz,n,sf,ii=9,TW,lb,hb=3.5,mon) #calling function metric.R to do the calculation
+          LFENMO =g.metric(Gx,Gy,Gz,n,sf=sf,ii=9,TW=TW,lb=lb,hb=3.5,mon=mon) #calling function metric.R to do the calculation
           LFENMO[which(LFENMO < 0)] = 0
           #averaging HFEN per ws3 seconds
           LFENMO2 =cumsum(c(0,LFENMO))
           select = seq(1,length(LFENMO),by=sf*ws3)
           LFENMO3b = diff(LFENMO2[round(select)]) / abs(diff(round(select)))
         }
-        
-        
         if (do.hfen == TRUE) {
-          HFEN =g.metric(Gx,Gy,Gz,n,sf,ii=1,TW,lb,hb,mon) #calling function metric.R to do the calculation
+          HFEN =g.metric(Gx,Gy,Gz,n,sf=sf,ii=1,TW=TW,lb=lb,hb=hb,mon=mon) #calling function metric.R to do the calculation
           #averaging HFEN per ws3 seconds
           HFEN2 =cumsum(c(0,HFEN))
           select = seq(1,length(HFEN),by=sf*ws3)
           HFEN3b = diff(HFEN2[round(select)]) / abs(diff(round(select)))
         }
         # do this one anyway
-        EN = g.metric(Gx,Gy,Gz,n,sf,ii=3,TW,lb,hb,mon) #calling function metric.R to do the calculation
+        EN = g.metric(Gx,Gy,Gz,n,sf=sf,ii=3,TW=TW,lb=lb,hb=hb,mon=mon) #calling function metric.R to do the calculation
         EN2 =cumsum(c(0,EN))
         select = seq(1,length(EN),by=sf*ws3)
         EN3b = diff(EN2[round(select)]) / abs(diff(round(select)))
-        if (do.hfenplus) {
-          HFENplus = g.metric(Gx,Gy,Gz,n,sf,ii=5,TW,lb,hb,mon) #calling function metric.R to do the calculation
+        if (do.hfenplus == TRUE) {
+          HFENplus = g.metric(Gx,Gy,Gz,n,sf=sf,ii=5,TW=TW,lb=lb,hb=hb,mon=mon) #calling function metric.R to do the calculation
           HFENplus[which(HFENplus < 0)] = 0
           #averaging HFENplus per ws3 seconds
           HFENplus2 =cumsum(c(0,HFENplus))
           select = seq(1,length(HFENplus),by=sf*ws3)
           HFENplus3b = diff(HFENplus2[round(select)]) / abs(diff(round(select)))
+        }
+        if (do.teLindert2013 == TRUE) {
+          teLindert2013 = g.metric(Gx,Gy,Gz,sf=sf,ii=10,mon=mon) #calling function metric.R to do the calculation
+          teLindert2013 = teLindert2013[seq(1+round(sf/2),length(teLindert2013),by=sf)] #per second
+          teLindert2013 = teLindert2013 * 3.07
+          select = seq(1,length(teLindert2013),by=ws3) #per 5 seconds
+          teLindert2013 =cumsum(c(0,teLindert2013))
+          teLindert2013b = diff(teLindert2013[round(select)]) # not deviding by abs... because this is the sum
+          # this is now a count per 5 seconds, later on this needs to be added over 15 sec epoch
+          # next. there is a weighting formula
+        }
+        if (do.anglex == TRUE | do.angley == TRUE | do.anglez == TRUE) {
+          angle = g.metric(Gx,Gy,Gz,n,sf=sf,ii=11,TW=TW,lb=lb,hb=hb,mon=mon) #calling function metric.R to do the calculation
+          angle_x = angle[,1]; angle_y = angle[,2]; angle_z = angle[,3]
+          #averaging per ws3 seconds
+          angle_x2 =cumsum(c(0,angle_x)); select = seq(1,length(angle_x),by=sf*ws3)
+          angle_x3b = diff(angle_x2[round(select)]) / abs(diff(round(select)))
+          angle_y2 =cumsum(c(0,angle_y)); select = seq(1,length(angle_y),by=sf*ws3)
+          angle_y3b = diff(angle_y2[round(select)]) / abs(diff(round(select)))
+          angle_z2 =cumsum(c(0,angle_z)); select = seq(1,length(angle_z),by=sf*ws3)
+          angle_z3b = diff(angle_z2[round(select)]) / abs(diff(round(select)))
+        }
+        if (do.enmoa == TRUE) {
+          ENMOa =g.metric(Gx,Gy,Gz,n,sf=sf,ii=12,TW=TW,lb=lb,hb=3.5,mon=mon) #calling function metric.R to do the calculation
+          ENMOa[which(ENMOa < 0)] = 0
+          ENMOa2 =cumsum(c(0,ENMOa))
+          select = seq(1,length(ENMOa),by=sf*ws3)
+          ENMOa3b = diff(ENMOa2[round(select)]) / abs(diff(round(select)))
         }
       }
       if (LD != 0) {
@@ -534,7 +573,26 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
           metashort[(count):(count-1+length(HFENplus3b)),col_msi] = HFENplus3b; col_msi = col_msi + 1
           rm(HFENplus3b)
         }
-        
+        if (do.teLindert2013 == TRUE) {
+          metashort[(count):(count-1+length(teLindert2013b)),col_msi] = teLindert2013b; col_msi = col_msi + 1
+          rm(teLindert2013b)
+        }
+        if (do.anglex == TRUE) {
+          metashort[(count):(count-1+length(angle_x3b)),col_msi] = angle_x3b; col_msi = col_msi + 1
+          rm(angle_x3b)
+        }
+        if (do.angley == TRUE) {
+          metashort[(count):(count-1+length(angle_y3b)),col_msi] = angle_y3b; col_msi = col_msi + 1
+          rm(angle_y3b)
+        }
+        if (do.anglez == TRUE) {
+          metashort[(count):(count-1+length(angle_z3b)),col_msi] = angle_z3b; col_msi = col_msi + 1
+          rm(angle_z3b)
+        }
+        if (do.enmoa == TRUE) {
+          metashort[(count):(count-1+length(ENMOa3b)),col_msi] = ENMOa3b; col_msi = col_msi + 1
+          rm(ENMOa3b)
+        }
         count = count + length(EN3b) #increasing "count" the indicator of how many seconds have been read
         rm(Gx); rm(Gy); rm(Gz)
         if (mon == 2) { #extract extra info from data if it is a Geneactive
@@ -605,7 +663,6 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
               sdcriter = 0.013 #ADJUSTMENT NEEDED FOR ACTIGRAPH???????????
               racriter = 0.15 #ADJUSTMENT NEEDED FOR ACTIGRAPH???????????
             }
-            
             if (sdwacc < sdcriter) { 
               if (abs(maxwacc - minwacc) < racriter) { 
                 NW[h,jj] = 1
@@ -621,16 +678,16 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
         metalong[count2:((count2-1)+nrow(NWav)),col_mli] = NWav; col_mli = col_mli + 1
         metalong[(count2):((count2-1)+nrow(NWav)),col_mli] = CWav; col_mli = col_mli + 1
         #going from ws3 second average to ws2 second period
-        if (do.bfen == TRUE) {
-          BFEN3c = cumsum(c(0,BFEN3))
-          BFEN4 = diff(BFEN3c[seq(1,length(BFEN3c),by=ws2)]) / ws2
-          rm(BFEN,BFEN3)
-        }
-        if (do.enmo == TRUE) {
-          ENMO3c = cumsum(c(0,ENMO3))
-          ENMO4 = diff(ENMO3c[seq(1,length(ENMO3c),by=(ws2))]) / (ws2)
-          rm(ENMO,ENMO3)
-        }
+#         if (do.bfen == TRUE) {
+#           BFEN3c = cumsum(c(0,BFEN3))
+#           BFEN4 = diff(BFEN3c[seq(1,length(BFEN3c),by=ws2)]) / ws2
+#           rm(BFEN,BFEN3)
+#         }
+#         if (do.enmo == TRUE) {
+#           ENMO3c = cumsum(c(0,ENMO3))
+#           ENMO4 = diff(ENMO3c[seq(1,length(ENMO3c),by=(ws2))]) / (ws2)
+#           rm(ENMO,ENMO3)
+#         }
         if (mon == 2) { #going from sample to ws2
           #light (running mean)
           lightc = cumsum(c(0,light))
@@ -688,24 +745,27 @@ g.getmeta =  function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900
     }
     if (nrow(metashort) > 1) {
       starttime3 = round(as.numeric(starttime)) #numeric time but relative to the desiredtz
+#       print("starttime 5")
+#       print(starttime3)
       time5 = seq(starttime3,(starttime3+((nrow(metashort)-1)*ws3)),by=ws3)
       time6 = as.POSIXlt(time5,origin="1970-01-01",tz=desiredtz)
       metashort[,1] = as.character(time6)
     }
-    
     cut2 = (count2+1):nrow(metalong)
     if (length(cut2) > 1) {
       metalong = as.matrix(metalong[-cut2,])
     }
     if (nrow(metalong) > 2) {
       starttime4 = round(as.numeric(starttime)) #numeric time but relative to the desiredtz
+#       print("starttime 6")
+#       print(starttime4)
       time1 = seq(starttime4,(starttime4+(nrow(metalong)*ws2)-1),by=ws2)
       time2 = as.POSIXlt(time1,origin="1970-01-01",tz=desiredtz)
       metalong[,1] = as.character(time2)
     }
-    metricnames_short = c("timestamp","BFEN","ENMO","angle","LFENMO","EN","HFEN","HFENplus")
-    metricnames_short = as.character(metricnames_short[c(TRUE,do.bfen,do.enmo,do.angle,do.lfenmo,do.en,do.hfen,do.hfenplus)])
-    
+    metricnames_short = c("timestamp","BFEN","ENMO","angle","LFENMO","EN","HFEN","HFENplus","teLindert2013","anglex","angley","anglez","ENMOa") #
+    metricnames_short = as.character(metricnames_short[c(TRUE,do.bfen,do.enmo,do.angle,do.lfenmo,do.en,do.hfen,do.hfenplus,
+                                                         do.teLindert2013,do.anglex,do.angley,do.anglez,do.enmoa)]) #
     metashort = data.frame(A = metashort)
     names(metashort) = metricnames_short
     if (mon != 2) {

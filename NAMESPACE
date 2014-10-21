@@ -1,2 +1,1 @@
-export(g.analyse,g.calibrate,g.getmeta,g.impute,g.inspectfile,g.binread,g.plot)
-import(GENEAread)
+export(g.analyse,g.calibrate,g.getmeta,g.impute,g.inspectfile,g.binread,g.plot,g.part1,g.part2,g.shell.GGIR)

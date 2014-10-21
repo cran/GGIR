@@ -6,22 +6,54 @@
 a package to process multi-day raw accelerometer data
 }
 \description{
-GGIR is a tool to process multi-day raw accelerometer data. The package currently
-works for the accelerometer brands Genea and Geneactive. Function \link{g.inspectfile}
-assessess to which monitor brand the files belongs  and it extracts the file
-header; \link{g.calibrate} to investigate calibration error and propose correction
-factors; \link{g.getmeta} extracts the signal features and other meta-data;
-\link{g.impute} takes that information, identifies unreliable signal sections
-(e.g. monitor not worn or signal clips near its extreme) and replaces these
+GGIR is an R-package to process multi-day raw accelerometer data. It was developed
+in the context of research on study human daily physical activity with wearable
+tri-axial acceleration sensors. The term raw accelerometry refers to data being
+expressed in m/s2 or gravitational acceleration as opposed to the previous
+generation accelerometers which stored only processed summary measures.\cr
+\cr
+The package has been developed with and for the accelerometer brands Genea and Geneactive.
+Additionally, it should work for csv data from Geneactiv and
+Actigraph accelerometer data. Although, I have tested this less thoroughly
+compared with the binary data formats from Genea and Geneactiv.\cr
+Note for Actigraph users: please do not
+export timestamps to the csv-file as this causes memory issues. To cope with the
+absense of timestamps the code will re-caculate timestamps from the sample frequency
+and the start time and date as presented in the file header.\cr
+\cr
+Function \link{g.inspectfile} assessess to which monitor brand the files belongs 
+and extracts the file header; function \link{g.calibrate} helps to investigate
+calibration error based on free-living data and propose correction factors;
+function \link{g.getmeta} extracts the signal features and
+other meta-data; \link{g.impute} takes that information, identifies unreliable signal
+sections (e.g. monitor not worn or signal clips near its extreme) and replaces these
 sections by imputed values; and finally  \link{g.analyse} takes the output from
 all the functions, runs a basic descriptive analysis and then summarises the output
 both per measurement and per day of measurement.\cr
-GGIR has primarily been developed for binary data collected with Genea and
-Geneactive accelerometers. Additionally, it should work for csv data from
-Geneactiv and Actigraph accelerometer. Note for Actigraph users: please do not
-export timestamps to the csv-file as this causes memory issues. To cope with the
-absense of timestamps the code will re-caculate timestamps from the sample frequency
-and the start time and date as presented in the file header.
+\cr
+To enhance the feasibility of using these individual functions I am providing a 
+couple of shell functions to ease implementing the above functions in study data
+by less experience R-users. Here, the main shell function is \link{g.shell.GGIR}
+and allows for automating the full analysis of a dataset
+including all necessary calls to the functions above. Function
+g.shell.GGIR relies on functions \link{g.part1} and \link{g.part2}, also part
+of this package. In summary, the user is expected to specify the location of the
+acceleerometer data and the desired output folder. Next, data is loaded and pre-
+processed with g.getmeta and g.calibrate. Next, the output is converted
+to a conveniently portable .RData-format away from the R workspace
+. Next, these .RData files are used as input for g.part2.\cr
+\cr
+Note that g.part1 generates a folder structure to help the user keep track of
+various output files. The reason why g.part1 and g.part2 are not merged as one
+generic shell function is because g.part1 takes much longer to run and involves
+only minor decisions of interest to the movement scientist. Function g.part2
+on the other hand is relatively fast and comes with all the decisions that directly
+impact on the variables that are of interest to the movement scientist. Therefore,
+the user may want to run g.part1 overnight or on a computing cluster, while 
+g.part2 can then be the main playing ground for the movement scientist. So,
+function g.shell.GGIR basically is the central point for operating both g.part1 and
+g.part2 and most users should not really need g.part1 or g.part2.\cr
+\cr
 If you want to use this package for a different data format (e.g. from a different
 accelerometer brand) then please provide me with: the R-code to read the data and
 example files for testing purposes.
@@ -30,9 +62,10 @@ example files for testing purposes.
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.0-6\cr
-Date: \tab 2014-9-1\cr
+Version: \tab 1.1-3\cr
+Date: \tab 2014-10-21\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
+Discussion group: \tab https://groups.google.com/forum/#!forum/rpackageggir\cr
 }
 }
 \examples{
@@ -51,7 +84,6 @@ data(data.getmeta)
 data(data.inspectfile)
 data(data.calibrate)
 
-
 #impute meta-data:
 IMP = g.impute(M = data.getmeta, I = data.inspectfile)
 
@@ -61,11 +93,13 @@ A = g.analyse(I = data.inspectfile, C = data.calibrate, M = data.getmeta, IMP)
 #plot data
 g.plot(IMP, M = data.getmeta, I = data.inspectfile, durplot=4)
 }
-
 \author{
-Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
-Zhou Fang co-developed function \link{g.calibrate}
-Jing Hua Zhao <jinghua.zhao@mrc-epid.cam.ac.uk> co-developed function \link{g.binread}
+\itemize{
+\item Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+\item Zhou Fang co-developed function \link{g.calibrate}
+\item Jing Hua Zhao <jinghua.zhao@mrc-epid.cam.ac.uk> co-developed function \link{g.binread}
+\item Severine Sabia tested and provided feedback on various functions
+}
 }
 \references{
 \itemize{

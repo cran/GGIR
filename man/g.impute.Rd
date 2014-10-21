@@ -10,7 +10,8 @@ Functions takes the output from \link{g.getmeta} and information about the study
 protocol to impute the data.
 }
 \usage{
-g.impute(M, I, strategy = 1, hrs.del.start = 0, hrs.del.end = 0, maxdur = 0)
+g.impute(M, I, strategy = 1, hrs.del.start = 0, hrs.del.end = 0, maxdur = 0,
+ndayswindow = 7)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -24,7 +25,8 @@ g.impute(M, I, strategy = 1, hrs.del.start = 0, hrs.del.end = 0, maxdur = 0)
     how to deal with knowledge about study protocol. value = 1 means select data
     based on \code{hrs.del.start}, \code{hrs.del.end}, and \code{maxdur}.
     Value = 2 makes that only the data between the first midnight and the last
-    midnight is used for imputation
+    midnight is used for imputation. Value = 3 only selects the most active X days
+    in the files. X is specified by arguement \code{ndayswindow}
   }
   \item{hrs.del.start}{
     how many HOURS after start of experiment did wearing of monitor start?
@@ -36,6 +38,10 @@ g.impute(M, I, strategy = 1, hrs.del.start = 0, hrs.del.end = 0, maxdur = 0)
   \item{maxdur}{
   how many DAYS after start of experiment did experiment
     definitely stop? (set to zero if unknown = default)
+}
+\item{ndayswindow}{
+  If \code{strategy} is set to 3 then this is the size of the window as a number
+  of days
 }
 }
 

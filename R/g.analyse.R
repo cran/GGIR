@@ -1,23 +1,11 @@
 g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M5window = c(0,24),M5L5res=10,
-                       includedaycrit = 16,ilevels=c(),winhr=5,idloc=1,snloc=1,
-                       mvpathreshold = c(),boutcriter=c()) {
-  # Arguments:
-  # IMP - output from g.impute()
-  # M - output from g.getmeta()
-  # I - output from g.inspectfile
-  # qlevels - percentiles for which value needs to be extracted
-  # L5M5window - start [1] in 24 hour clock hours and [2] end in 24 hour clock hours (if a value higher than 24 is chosen, it will take early hours of previous day to complete the 5 hour window)
-  # qwindow -  start and of 24 hour clock hours over which distribution in short epoch values needs to be evaluated
-  # quantiletype - type of quantile function to use
-  # includedaycrit - numbeactir of hours of valid data needed for a day specific summary, this is not used for general summary measures
-  # boutduration - in minutes
-  # boutcriterion - ratio of a bout for which the acceleration needs to be above the lower boundary
-  # M5L5res - resultion of L5 and M5 in minutes
-  #
-  # Value:
-  # summary - one line of summary measures for the file that was analysed
-  # daysummary - summary measures per day for the file that was analysed
-
+                      includedaycrit = 16,ilevels=c(),winhr=5,idloc=1,snloc=1,
+                      mvpathreshold = c(),boutcriter=c()) {
+#   ,get.TAC.vars=FALSE,minTACdur=30,minTACcount=20,anglethreshold=60
+#     if (get.TAC.vars == TRUE) {
+#     require(ineq)
+#   }
+  
   fname=I$filename
   averageday = IMP$averageday
   strategy = IMP$strategy
@@ -47,6 +35,8 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   t1_LFMF = L5M5window[2]+(winhr-(M5L5res/60)) #end in 24 hour clock hours (if a value higher than 24 is chosen, it will take early hours of previous day to complete the 5 hour window
   # Time window for distribution analysis
   t_TWDI = qwindow #start and of 24 hour clock hours
+  
+  
   
   #==========================================================================================
   #==========================================================================================
@@ -478,7 +468,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                   if (is.nan(mvpa4) == TRUE) mvpa4 = 0
                   if (is.nan(mvpa5) == TRUE) mvpa5 = 0
                   if (is.nan(mvpa6) == TRUE) mvpa6 = 0
-                      
+                  
                   
                   mvpanames[,mvpai] = c( paste("MVPA_E",ws3,"S_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E1M_T",mvpathreshold[mvpai],sep=""),
@@ -555,7 +545,48 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
               daysummary[di,fi] = mean(varnum) * 1000;  ds_names[fi] = "mean_HFENplus_mg_24hr"; fi=fi+1 #HFEN+
             }
             if (mi == anglei) { #characteristation of angle (experimental, not finished)
-              # to do
+#               if (get.TAC.vars == TRUE) {
+#                 print("========================================================================================")
+#                 print("WARNING - You selected 'get.TAC.vars = TRUE', this will extract variables which")
+#                 print("are not described in a publication yet and currently only provided for beta-testing")
+#                 print("========================================================================================")
+#                 require(ineq)
+#                 difangle = abs(diff(varnum[((qwindow[1]*60*(60/ws3))+1):(qwindow[2]*60*(60/ws3))])) #absolute change in angle
+#                 armanglechange = rep(0,length(difangle))
+#                 armanglechange[which(difangle > anglethreshold)] = 1
+#                 pc1 = c(0,armanglechange,0) #to find absense of arm angle change (TAC) periods
+#                 pc2 = c(1,armanglechange,1) #to find non-absense of arm angle change (TAC) periods
+#                 pc1up = which(diff(pc1) == 1)
+#                 pc1down = which(diff(pc1) == -1)
+#                 pc2up = which(diff(pc2) == 1)
+#                 pc2down = which(diff(pc2) == -1)
+#                 pc3 = pc1down - pc1up # duration of arm angle change periods
+#                 pc4 = pc2up - pc2down # duration of absense of arm angle change periods
+#                 
+#                 minTACdur = round(minTACdur / 5) * 5 #to protect against accidentilly filling in strange number
+#                 select23 = which(pc4 >= minTACdur/ws3)
+#                 if (length(select23) >= minTACcount) { #check that there are enough periods left
+#                   TAC_dur = (pc4* 5) / 60 # duration of absense of arm angle change periods (minutes)
+#                   TAC_dur15 = (pc4[select23]* 5) / 60 #select only those lasting at least minTACdur
+#                   pc4b = pc4[select23]
+#                   meanposdur = mean(TAC_dur)
+#                   meanposdur15 = mean(TAC_dur15)
+#                   gini_temp = ineq(TAC_dur,type="Gini")
+#                   gini_temp15 = ineq(TAC_dur15,type="Gini")
+#                 } else {
+#                   print("not enough TAC periods")
+#                   pc4b = c()
+#                   meanposdur = meanposdur15 = ""
+#                   gini_temp = gini_temp15 = ""
+#                 }
+#                 
+#                 daysummary[di,fi] = length(pc4); ds_names[fi] = "N.TAC.periods_perday"; fi =fi + 1
+#                 daysummary[di,fi] = length(pc4b); ds_names[fi] = paste("N.TAC.periods_perday_>=",minTACcount,"x",minTACdur,"sec",sep=""); fi =fi + 1
+#                 daysummary[di,fi] = meanposdur; ds_names[fi] = "mean.dur.TAC.periods_min"; fi =fi + 1
+#                 daysummary[di,fi] = meanposdur15; ds_names[fi] = paste("mean.dur.TAC.periods_>=",minTACcount,"x",minTACdur,"sec",sep=""); fi =fi + 1
+#                 daysummary[di,fi] = gini_temp; ds_names[fi] = "TAC.dur.gini"; fi =fi + 1
+#                 daysummary[di,fi] = gini_temp15; ds_names[fi] = paste("TAC.dur.gini_>=",minTACcount,"x",minTACdur,"sec",sep=""); fi =fi + 1
+#               }
             }
           }
         }
@@ -586,9 +617,9 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   #------------------------------
   # Extract the average 24 hr
   lookat = c(2:ncol(metashort))
-#   if (length(which(colnames(metashort) == "angle")) > 0) {
-#     lookat = lookat[-c(which(colnames(metashort) == "angle")-1)]
-#   }
+  #   if (length(which(colnames(metashort) == "angle")) > 0) {
+  #     lookat = lookat[-c(which(colnames(metashort) == "angle")-1)]
+  #   }
   colnames_to_lookat = colnames(metashort)[lookat]
   
   MA = matrix(NA,length(lookat),1)
@@ -618,7 +649,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       MA[h] = mean(average24h) #average acceleration in an average 24 hour cycle
     }
   } else {
-    print("particpant skipped for general average")
+    print("file skipped for general average caculation because not enough data")
   }
   id[which(id == "NA")] =iid[which(id == "NA")]
   id2[which(id2 == "NA")] =iid2[which(id2 == "NA")]
@@ -676,7 +707,9 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   summary[vi] = C$cal.error.end #CALIBRATE
   summary[vi+1] = C$QCmessage #CALIBRATE
   for (la in 1:length(lookat)) {
-    MA[la] = 	MA[la] * 1000
+    if (colnames(metashort)[lookat[la]] != "angle") {
+      MA[la] = 	MA[la] * 1000
+    }
   }
   q0 = length(MA) + 1
   summary[(vi+2):(vi+q0)] = MA
@@ -733,11 +766,45 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                      which(ds_names == "mean_BFEN_mg_24hr"),
                      which(ds_names == "mean_EN_mg_24hr"),
                      which(ds_names == "mean_HFEN_mg_24hr"),
-                     which(ds_names == "mean_HFENplus_mg_24hr"))
+                     which(ds_names == "mean_HFENplus_mg_24hr")
+                     
+#                      which(ds_names == "N.TAC.periods_perday"),
+#                      which(ds_names ==  paste("N.TAC.periods_perday_>=",minTACcount,"x",minTACdur,"sec",sep="")),
+#                      which(ds_names == "mean.dur.TAC.periods_min"),
+#                      which(ds_names == paste("mean.dur.TAC.periods_>=",minTACcount,"x",minTACdur,"sec",sep="")),
+#                      which(ds_names == "TAC.dur.gini"),
+#                      which(ds_names == paste("TAC.dur.gini_>=",minTACcount,"x",minTACdur,"sec",sep="")) )
+    
+  
+#     listposvars = c(which(ds_names == "N.TAC.periods_perday"),
+#                     which(ds_names ==  paste("N.TAC.periods_perday_>=",minTACcount,"x",minTACdur,"sec",sep="")),
+#                     which(ds_names == "mean.dur.TAC.periods_min"),
+#                     which(ds_names == paste("mean.dur.TAC.periods_>=",minTACcount,"x",minTACdur,"sec",sep="")),
+#                     which(ds_names == "TAC.dur.gini"),
+#                     which(ds_names == paste("TAC.dur.gini_>=",minTACcount,"x",minTACdur,"sec",sep="")) 
+                )
+    
+    ndayscut = 0
     dtwtel = 0
     if (length(daytoweekvar) >= 1) {
       sp = length(daytoweekvar) + 1
       for (dtwi in daytoweekvar) {
+        
+        #==================================================
+        # if arm angle variable is assessed then delete days with abnormal low number of TACc periods
+#         if (length(which(listposvars == dtwi)) > 0) { #is this a TAC variable?
+#           #leave out a day when it has less than the number of TAC periods lasting for at least minTACdur is minTACcount
+#           nposi = which(ds_names == paste("N.TAC.periods_perday_>=",minTACdur,"sec",sep=""))
+#           nposperday_all = as.numeric(daysummary[,nposi]) #get list of number of TACs per day
+#           if (length(which(is.na(nposperday_all) == F)) >= 3) { #only do this if there are at least 3 days
+#             icut = which(nposperday_all < minTACcount) #leave out days with less than minTACcount TAC periods
+#             if (length(icut) > 0) {
+#               daysummary = daysummary[-icut,]
+#               ndayscut = length(icut)
+#             }
+#           } 
+#         }
+        
         #           print("store mvpa per day")
         v4 = mean(as.numeric(daysummary[,dtwi]),na.rm=TRUE) #plain average of available days
         summary[(vi+1+(dtwtel*sp))] = v4 # #average all availabel days
@@ -771,6 +838,11 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
         dtwtel = dtwtel + 1
       }
       vi = vi+6+((dtwtel*sp)-1)
+#       if (get.TAC.vars==TRUE) {
+#         summary[vi] = ndayscut
+#         s_names[vi] = "N.days.removed.for.TAC.vars"
+#         vi = vi + 1
+#       }
       #===========================================================================
       # SUMMARISE Percentiles (q46)
       if (doquan == TRUE) {
@@ -871,12 +943,17 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     summary[(vi+2)] = hrs.del.end
     summary[(vi+3)] = maxdur
     summary[(vi+4)] = windowsizes[1]
-    summary[(vi+5)] = "2014-03-14 12:14:00 GMT"
+    #get GGIR version
+    SI = sessionInfo()
+	GGIRversion = c()
+    GGIRversion = SI$otherPkgs$GGIR$Version
+	if (length(GGIRversion) == 0) GGIRversion = "GGIR not used"
+    summary[(vi+5)] = GGIRversion #"2014-03-14 12:14:00 GMT"
     s_names[vi:(vi+5)] = c("data exclusion stategy (value=1, ignore specific hours; value=2, ignore all data before the first midnight and after the last midnight)",
                            "n hours ignored at start of meas (if strategy=1)",
                            "n hours ignored at end of meas (if strategy=1)",
                            "n days of measurement after which all data is ignored (if strategy=1)",
-                           "epoch size to which acceleration was averaged (seconds)","analysis version")
+                           "epoch size to which acceleration was averaged (seconds)","GGIR version")
     vi = vi + 5
   }
   #---------------------------------------------------------------
@@ -896,7 +973,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       daysummary = t(daysummary) #if there is only one day of data
     }
   }
-  daysummary = data.frame(value=daysummary)
+  daysummary = data.frame(value=daysummary,stringsAsFactors=FALSE)
   names(daysummary) = ds_names  
   #--------------
   mw = which(is.na(summary)==T)
@@ -908,8 +985,8 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     s_names = s_names[-cut]
     summary = summary[-cut]
   }
-  summary = data.frame(value=t(summary)) #needs to be t() because it will be a column otherwise
+  summary = data.frame(value=t(summary),stringsAsFactors=FALSE) #needs to be t() because it will be a column otherwise
   names(summary) = s_names
-
+  
   invisible(list(summary=summary,daysummary=daysummary))
 }

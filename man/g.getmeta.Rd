@@ -6,7 +6,7 @@ function to extract meta-data (features) from data in binary file
 \description{
 Reads a binary file in blocks, extracts various features and stores average  feature
 value per short or long epoch. Acceleration and angle metrics are stored at short
-epoch lenghth. The non-wear indication score, the clipping score, temperature
+epoch length. The non-wear indication score, the clipping score, temperature
 (if available), light (if available), and Euclidean norm are stored at long epoch
 length. The function has been designed and thoroughly tested with binary files 
 from GENEA and GENEActiv. Further, the function should be able to cope with csv-format
@@ -15,11 +15,13 @@ data procuded by GENEActiv and Actigraph
 \usage{
 g.getmeta(datafile, desiredtz = "Europe/London", 
 windowsizes = c(5, 900, 3600),daylimit = FALSE, 
-offset = c(0, 0, 0), scale = c(1, 1, 1),
-tempoffset = c(0, 0, 0),do.bfen = FALSE, do.enmo = TRUE,
+offset = c(0,0,0), scale = c(1,1,1),
+tempoffset = c(0,0,0),do.bfen = FALSE, do.enmo = TRUE,
 do.angle = FALSE, do.lfenmo = FALSE, do.en = FALSE,
-do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2,
-hb = 15, n = 4,meantempcal=c(),chunksize=c())
+do.hfen = FALSE, do.hfenplus = FALSE,
+do.teLindert2013=FALSE,do.anglex=FALSE,do.angley=FALSE,do.anglez=FALSE,
+do.enmoa = FALSE,
+lb = 0.2,hb = 15, n = 4,meantempcal=c(),chunksize=c())
 }
 \arguments{
   \item{datafile}{name of binary file
@@ -45,9 +47,10 @@ hb = 15, n = 4,meantempcal=c(),chunksize=c())
   \item{do.bfen}{if TRUE, calculate metric BFEN with band-pass filter
   configuration set by \code{lb} and \code{hb}
 }
-  \item{do.enmo}{if TRUE (default), calculate metric ENMO
+  \item{do.enmo}{if TRUE (default), calculate metric ENMO with negative values
+  rounded to zero
 }
-  \item{do.angle}{if TRUE, calculate metric angle (vertical arm angle)
+  \item{do.angle}{if TRUE, calculate metric angle using only the y-axis
 }
   \item{do.lfenmo}{if TRUE, calculate metric LFENMO with low-pass filter
   configuration set by \code{hb}
@@ -59,6 +62,25 @@ hb = 15, n = 4,meantempcal=c(),chunksize=c())
 }
   \item{do.hfenplus}{if TRUE, calculate metric HFENplus with band-pass filter
   configuration set by \code{lb} and \code{hb}
+}
+     \item{do.teLindert2013}{
+  if TRUE, calculate the 5 sec epoch Actiwatch count replication as described 
+  by te Lindert et al 2013 in the journal SLEEP (volume 36, issue 5, page 781)
+  }
+  \item{do.anglex}{
+  if TRUE, calculate the angle of the x-axis relative to the horizontal plane
+  (degrees) utilizing all three axes
+  }
+  \item{do.angley}{
+  if TRUE, calculate the angle of the y-axis relative to the horizontal plane
+  (degrees) utilizing all three axes
+  }
+  \item{do.anglez}{
+  if TRUE, calculate the angle of the z-axis relative to the horizontal plane
+  (degrees) utilizing all three axes
+  }
+  \item{do.enmoa}{if TRUE (default), calculate metric ENMOa which is equal to
+  metric ENMO but with the absolute taken from the Euclidean norm minus one.
 }
   \item{lb}{lower boundary of the frequency filter (in Hertz)
 }

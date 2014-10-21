@@ -1,5 +1,5 @@
 g.impute <-
-function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0) {
+function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0,ndayswindow = 7) {
   
   #-----------------------------------------------------------
   # Arguments:
@@ -9,6 +9,7 @@ function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0) {
   # hrs.del.start - how many HOURS after start of experiment did wearing of monitor started?
   # hrs.del.end - how many HOURS before the end of the experiment did wearing of monitor definitely ended?
   # maxdur - how many DAYS after start of experiment did experiment definitely stop? (set to zero if unknown)  
+  # ndayswindow - if strategy = 3 then this is the supposed wear duration
   #
   # Values:
   # metashort - imputed short epoch variables
@@ -99,7 +100,57 @@ function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0) {
       r4[1:(firstmidnighti-1)] = 1 #-1 because first midnight 00:00 itself contributes to the first full day
     }
     r4[(lastmidnighti):length(r4)] = 1  #ignore everything after the first midnight
+  } else if (strategy == 3) { #select X most active days
+    #==========================================
+    # Look out for X most active days and use this to define window of interest
+    
+    atest = as.numeric(as.matrix(M$metashort[,2]))
+    ws3 = M$windowsizes[1]
+    ws2 = M$windowsizes[2]
+    r2tempe = rep(r2,each=(ws2/ws3))
+    atest[which(r2tempe == 1)] = 0
+    NDAYS = length(atest) / (12*60*24)
+    pend = round((NDAYS - ndayswindow) * 4)
+    if (pend < 1) pend = 1
+    atestlist = rep(0,pend)
+    for (ati in 1:pend) { #40 x quarter a day
+      p0 = (((ati-1)*12*60*6)+1)
+      p1 = (ati+(ndayswindow*4))*12*60*6  #ndayswindow x quarter of a day = 1 week
+      if (p0 > length(atest)) p0 = length(atest)
+      if (p1 > length(atest)) p1 = length(atest)
+      if ((p1 - p0) > 1000) {
+        atestlist[ati] = mean(atest[p0:p1],na.rm=TRUE)
+      } else {
+        print("zero")
+        atestlist[ati] = 0
+      }
+    }
+    atik = which(atestlist == max(atestlist))
+    hrs.del.start = atik * 6
+    maxdur = (atik/4) +ndayswindow
+    if (maxdur > NDAYS) maxdur = NDAYS
+    # now calculate r4    
+    if (hrs.del.start > 0) {
+      r4[1:(hrs.del.start*(3600/ws2))] = 1
+    }
+    if (hrs.del.end > 0) {
+      if (length(r4) > hrs.del.end*(3600/ws2)) {
+        r4[((length(r4)+1)-(hrs.del.end*(3600/ws2))):length(r4)] = 1
+      } else {
+        r4[1:length(r4)] = 1
+      }
+    }
+    if (maxdur > 0 & (length(r4) > ((maxdur*n_ws2_perday)+1))) {
+      r4[((maxdur*n_ws2_perday)+1):length(r4)] = 1
+    }
+    if (LD < 1440){
+      r4 = r4[1:floor(LD/(ws2/60))]
+    }
+    starttimei = 1
+    endtimei = length(r4)
   }
+  
+  
   #extracting calibration value during periods of non-wear
   if (length(which(r1==1)) > 0) {
     CALIBRATE = mean(as.numeric(metalong[which(r1==1 & r2 != 1),9])) #mean EN during non-wear time and non-clipping time

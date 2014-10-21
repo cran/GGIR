@@ -1,49 +1,9 @@
-# <g.calibrate.R to evaluate the calibration of the signal>
-#    Copyright (C) <2013>  <Vincent van Hees, MRC Epidemiology Unit, Cambridge, UK, and;
-#    Newcastle Univeristy, Newcastle upon Tyne>
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Lesser General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Lesser General Public License for more details.
-#
-#    <http://www.gnu.org/licenses/>.
-#
-#===================================================
-
-
-#Description:
-# function loads file and derives ws4 seconds average and standardeviation per axis and stores this in temporary variable 'out'
-# variable out is then used to verify the calibration of the sensor
-
-g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,printsummary=FALSE) {
-  
-  # Arguments:
-  # datafile = name of data file (could be binarvtvy or csv)
-  # spherecrit - minimum value required for each axis in both directions to populate the spheree
-  # use.temp - if temperature is available then use this in the autocalibration procedure
-  # minloadcrit - number of hours the code needs to read for the autocalibration procedure (default = 24hrs)
-  # printsumm - TRUE will print a summary at the end of the procedure
-  
-  # value:
-  # spheredata - all 10 second no-movement windows used to populate the sphere and to do the autocalibration
-  # npoints - number of 10 second no-movement windows used to populate the sphere
-  # nhoursused - number of hours of measurement data scanned for no-movement periods
-  # scale - scaling correction values
-  # offset - translation correction values
-  # tempoffset - correction values related to temperature
-  # cal.error.start - difference between Euclinean norm during all no-movement windows and 1 g before autocalibration
-  # cal.error.end - difference between Euclinean norm during all no-movement windows and 1 g after autocalibration
-  
-  
+g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,printsummary=FALSE,chunksize=c()) {
+  if (length(chunksize) == 0) chunksize = 1
+  if (chunksize > 1) chunksize = 1
+  if (chunksize < 0.4) chunksize = 0.4
   filename = unlist(strsplit(as.character(datafile),"/"))
   filename = filename[length(filename)]
-  
   # set parameters
   ws4 = 10 #epoch for recalibration, don't change
   ws2 = 900 #dummy variable
@@ -59,14 +19,22 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   offset = c(0,0,0)
   
   #inspect file  
+  options(warn=-1) #turn off warnings
   INFI = g.inspectfile(datafile)  # Check which file type and monitor brand it is
+  options(warn=0) #turn off warnings
+  
   mon = INFI$monc
   dformat = INFI$dformc
   sf = INFI$sf
   if (sf == 0) sf = 80 #assume 80Hertz in the absense of any other info
   header = INFI$header
-  decn = g.dotorcomma(datafile,dformat,mon) #detect dot or comma dataformat
   
+  options(warn=-1) #turn off warnings
+  suppressWarnings(expr={
+    decn = g.dotorcomma(datafile,dformat,mon) #detect dot or comma dataformat
+  })
+  options(warn=0) #turn off warnings
+
   #creating matrixes for storing output
   S = matrix(0,0,4) #dummy variable needed to cope with head-tailing succeeding blocks of data
   NR = ceiling((90*10^6) / (sf*ws4)) + 1000 #NR = number of 'ws4' second rows (this is for 10 days at 80 Hz) 
@@ -78,8 +46,8 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   
   # setting size of blocks that are loaded (too low slows down the process)
   # the setting below loads blocks size of 12 hours (modify if causing memory problems)
-  blocksize = round((14512 * (sf/50)) / 2) 
-  blocksizegenea = round((20608 * (sf/80)) / 2)
+  blocksize = round((14512 * (sf/50)) * (chunksize*0.5)) 
+  blocksizegenea = round((20608 * (sf/80)) * (chunksize*0.5))
   if (mon == 1) {
     blocksize = blocksizegenea
   }
@@ -91,6 +59,8 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
     P = c()
     print(paste("Loading block: ",i,sep=""))
     #try to read data blocks based on monitor type and data format
+    options(warn=-1) #turn off warnings (code complains about unequal rowlengths
+    #when trying to read files of a different format)
     if (mon == 1 & dformat == 1) {
       use.temp = FALSE
       try(expr={P = g.binread(datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
@@ -103,9 +73,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
         P = c()
       }
     } else if (mon == 2 & dformat == 1) {
-      try(expr={P = read.bin(binfile=datafile,start=(blocksize*(i-1)),end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
-      
-      
+      try(expr={P = GENEAread::read.bin(binfile=datafile,start=(blocksize*(i-1)),end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
       if (length(P) > 0) {
         if (nrow(P$data.out) < blocksize*300) { #last block
           print("last block")
@@ -114,7 +82,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       }
       if (length(P) == 0) { #if first block doens't read then probably corrupt
         if (i == 1) {
-          try(expr={P = read.bin(binfile=datafile,calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
+          try(expr={P = GENEAread::read.bin(binfile=datafile,calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
           if(length(P) ==0) {
             P= c()
             switchoffLD = 1
@@ -131,18 +99,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       }
     } else if (mon == 2 & dformat == 2) {
       try(expr={P = read.csv(datafile,nrow = (blocksize*300), skip=(100+(blocksize*300*(i-1))),dec=decn)},silent=TRUE)
-#       if (length(P) > 1) {
-#         P = as.matrix(P)
-#         if (nrow(P) < ((sf*ws)+1)) {
-#           P = c() ; switchoffLD = 1 #added 30-6-2012
-#           print("Error: data too short for doing non-wear detection 1")		
-#         }
-#       } else {
-#         P = c()
-#         print("End of file reached")
-#       }
-#       
-      
+    
       if (length(P) > 1) {
         P = as.matrix(P)
         if (nrow(P) < ((sf*ws*2)+1) & i == 1) {
@@ -154,20 +111,8 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
         P = c()
         print("End of file reached")
       }
-      
-  
     } else if (mon == 3 & dformat == 2) {
       try(expr={P = read.csv(datafile,nrow = (blocksize*300), skip=(10+(blocksize*300*(i-1))),dec=decn)},silent=TRUE)
-#       if (length(P) > 1) {
-#         P = as.matrix(P)
-#         if (nrow(P) < ((sf*ws)+1)) {
-#           P = c() ; switchoffLD = 1 #added 30-6-2012
-#           print("Error: data too short for doing non-wear detection 1")		
-#         }
-#       } else {
-#         P = c()
-#         print("End of file reached")
-#       }
       use.temp = FALSE
       if (length(P) > 1) {
         P = as.matrix(P)
@@ -180,10 +125,8 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
         P = c()
         print("End of file reached")
       }
-      
-      
-      
     }
+    options(warn=0) #turn on warnings
     #process data as read from binary file
     if (length(P) > 0) { #would have been set to zero if file was corrupt or empty
       if (mon == 1) {

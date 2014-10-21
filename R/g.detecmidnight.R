@@ -1,5 +1,4 @@
-g.detecmidnight <-
-function(ND,time,cnt) {
+g.detecmidnight = function(ND,time) {
   midnights = midnightsi = matrix(0,(ND+3),1)
   countmidn = 1
   pr = 0
@@ -8,27 +7,25 @@ function(ND,time,cnt) {
     temp2 = as.numeric(unlist(strsplit(temp,":"))[1])
     temp3 = as.numeric(unlist(strsplit(temp,":"))[2])
     temp4 = as.numeric(unlist(strsplit(temp,":"))[3])
-	nr = temp2+temp3+temp4
-	if ((pr == 68 & nr == 1 & temp3 == 0 & temp4 == 0) | (nr == 0)) { #68 means a jump from 23:45 to 1:00 #added 9-5-2013
+    nr = temp2+temp3+temp4
+    if ((pr == 68 & nr == 1 & temp3 == 0 & temp4 == 0) | (nr == 0)) { #68 means a jump from 23:45 to 1:00 #added 9-5-2013
       midnights[countmidn] = as.character(time[cnt])
       midnightsi[countmidn] = cnt
       countmidn = countmidn + 1
-  
-      if (countmidn >2) { #added on 9-5-2013
-	      midleng = abs(midnightsi[countmidn-1]-midnightsi[(countmidn-2)])
-	      if (midleng != 96) {
-				print(paste("Day length is ", midleng / 4," hours",sep=""))
-	      }
-      }
+      #       if (countmidn >2) { #added on 9-5-2013
+      #         midleng = abs(midnightsi[countmidn-1]-midnightsi[(countmidn-2)])
+      #         if (midleng != 96) {
+      #           print(paste("Day length is ",midleng," long time windows",sep=""))
+      #         }
+      #       }
     }
- 		pr = nr
+    pr = nr
   }
-	dt = diff(midnightsi) #added 9-5-2013
-	dtw = which(dt !=96)
-	if (length(dtw) > 0) {
-		
-	}
-  
+  #   dt = diff(midnightsi) #added 9-5-2013
+  #   dtw = which(dt !=96)
+  #   if (length(dtw) > 0) {
+  #     
+  #   }
   if (countmidn == 1) {
     tooshort = 1
     lastmidnight = time[length(time)]
