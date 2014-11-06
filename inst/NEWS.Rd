@@ -2,25 +2,32 @@
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
-\section{Changes in version 1.1-2 (release date: 21-10-2014)}{
+\section{Changes in version 1.1-4 (release date: 06-11-2014)}{
 \itemize{
-  \item Package expanded with functions: \link{g.part1}, \link{g.part2},
-   and \link{g.shell.GGIR}. These shell functions should help movement scientists
+  \item Additional bugs fixs related to recognising data format in Actigraph data
+  \item Angle variables are now extracted based on 5 second rolling median as
+  opposed to 501 sample rolling median
+}
+}
+
+\section{Changes in version 1.1-3 (release date: 21-10-2014)}{
+\itemize{
+  \item Package expanded with functions: g.part1, g.part2, and g.shell.GGIR.
+  These shell functions should help movement scientists
    to utilize the package without too much prior knowledge about R
   \item Additional bugs fixs related to recognising data format in Actigraph data
   \item Package expanded with axis angle metrics
   \item Package expanded with metric for replicating teLindert2013 counts, see
   \link{g.getmeta}
-  \item Package expanded with metric ENMOa which is the same as metric ENMO, see
-  \link{g.getmeta}
+  \item Package expanded with metric ENMOa, see function tutorial g.getmeta
   }
 }
 \section{Changes in version 1.0-6 (release date: 1-9-2014)}{
 \itemize{
   \item Bug fixed related to recognising date format in csv-file header from
   Actigraph accelerometer brand
-  \item Literature reference added to function \link{g.calibrate}
-  \item function \link{g.getmeta} expanded with argument 'chunksize'
+  \item Literature reference added to function g.calibrate
+  \item function g.getmeta expanded with argument 'chunksize'
   }
 }
 \section{Changes in version 1.0-4 (release date: 29-4-2014)}{

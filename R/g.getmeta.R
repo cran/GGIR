@@ -6,8 +6,6 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
                      do.hfenplus=FALSE,do.teLindert2013=FALSE,
                      do.anglex=FALSE,do.angley=FALSE,do.anglez=FALSE,do.enmoa=FALSE,
                      lb = 0.2, hb = 15,  n = 4,meantempcal=c(),chunksize=c()) {
-  #do.teLindert2013=FALSE,
-  
   if (length(chunksize) == 0) chunksize = 1
   if (chunksize > 1) chunksize = 1
   if (chunksize < 0.2) chunksize = 0.2 
@@ -18,7 +16,6 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
   }
   filename = unlist(strsplit(as.character(datafile),"/"))
   filename = filename[length(filename)]
-  
   #   #parameters
   ws3 = windowsizes[1] ; ws2 = windowsizes[2]; ws = windowsizes[3]  #window sizes
   if ((ws2/300) != round(ws2/300)) {
@@ -26,8 +23,6 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
     print("WARNING: The long windowsize needs to be a multitude of five minutes periods. The")
     print(paste("long windowsize has now been automatically adjusted to: ",ws2," seconds in order to meet this criteria.",sep=""))
   }
-  
-  
   if ((ws2/ws3) != round(ws2/ws3)) {
     def = c(1,5,10,15,20,30,60)
     def2 = abs(def - ws3)
@@ -36,9 +31,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
     print(paste("short windowsize has now been automatically adjusted to: ",ws3," seconds in order to meet this criteria.",sep=""))
   }
   windowsizes = c(ws3,ws2,ws)
-  
   start_meas = ws2/60 #ensures that first window starts at logical timepoint relative to its size (15,30,45 or 60 minutes of each hour) 
-  
   monnames = c("genea","geneactive","actigraph") #monitor names
   filecorrupt = FALSE
   filetooshort = FALSE
@@ -46,7 +39,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
   count = 1 #counter to keep track of the number of seconds that have been read
   count2 = 1 #count number of blocks read with length "ws2" (15 minutes or whatever is specified above)
   LD = 2 #dummy variable used to identify end of file and to make the process stop
-  
+
   # inspect file
   options(warn=-1)
   INFI = g.inspectfile(datafile)  # Check which file type and monitor brand it is
@@ -225,10 +218,6 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
           starttime = as.POSIXlt(starttime)
           lengthheader = 20
         } else if (dformat == 2 & mon == 3) {
-          #             #solution if timestamps would be in file
-          #             starttime = as.character(P[1,1])
-          #             starttime = as.POSIXlt(starttime,format='%d.%m.%Y %H:%M:%S')
-          # extract starttime from header (added on 29/04/2014
           tmph = read.csv(datafile,nrow=8,skip=1)
           tmphi = 1
           while (tmphi < 10) {
@@ -278,13 +267,13 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
           B2 = length(unlist(strsplit(topline,"M[.]d[.]yyyy")))
           B3 = length(unlist(strsplit(topline,"dd[.]MM[.]yyyy")))
           B4 = length(unlist(strsplit(topline,"d[.]M[.]yyyy")))
-          if (length(B1) > 1) {
+          if (B1 > 1) {
             starttime = as.POSIXlt(starttime,format='%m/%d/%Y %H:%M:%S')
-          } else if (length(B2) > 1) {
+          } else if (B2 > 1) {
             starttime = as.POSIXlt(starttime,format='%m/%d/%Y %H:%M:%S')
-          } else if (length(B3) > 1) {
+          } else if (B3 > 1) {
             starttime = as.POSIXlt(starttime,format='%d/%m/%Y %H:%M:%S')
-          } else if (length(B4) > 1) {
+          } else if (B4 > 1) {
             starttime = as.POSIXlt(starttime,format='%d/%m/%Y %H:%M:%S')
           }
           lengthheader = 9
@@ -298,9 +287,6 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
           if (length(which(timezone == "GMT")) > 0) {
             starttime = as.POSIXlt(starttime[1],tz=desiredtz)
           }
-        } else {        
-          #           print(as.numeric(starttime))
-          #           starttime = as.POSIXlt(as.numeric(starttime),tz=desiredtz,origin="1970-01-01")
         }
         #================================================
         #assess weekday
@@ -323,45 +309,21 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
         minshift = minshift - 1
         #-----------
         sampleshift = (minshift*60*sf) + (secshift*sf) #derive sample shift
-#         print("***")
-#         print(starttime2)
-#         print(start_meas)
-#         print(start_min)
-#         print("**")
-#         print(sf)
-#         print(minshift)
-#         print(secshift)
-#         print(sampleshift)
-#         print(dim(data))
-        
         data = data[-c(1:floor(sampleshift)),] #delete data accordingly
         newmin = start_min+minshift #recalculate first timestamp
-        #===
-        # add 18-12-2013
-        newsec = start_sec+secshift #<<<====  added17-12-2013
-        if (newsec >= 60) { #<<<====  added 17-12-2013
-          newsec = newsec - 60 #<<<====  added 17-12-2013
-          newmin = newmin + 1 #<<<====  added 17-12-2013
-        } #<<<====  added17-12-2013
-        if (newmin >= 60) { #<<<====  added 17-12-2013
-          newmin = newmin - 60 #<<<====  added 17-12-2013
+        newsec = start_sec+secshift
+        if (newsec >= 60) {
+          newsec = newsec - 60
+          newmin = newmin + 1
+        }
+        if (newmin >= 60) {
+          newmin = newmin - 60
           start_hr = start_hr + 1
           if (start_hr == 24) { #if measurement is started in 15 minutes before midnight
             starttime3 = as.character(starttime) # forget about timeshift for now, not plausible
           }
         }
         starttime3 = paste(temp[1]," ",start_hr,":",newmin,":",newsec,sep="") #<<<====  changed 17-12-2013
-        #====
-        # deleted 18-12-2013
-        #         if (newmin == 60) {
-        #           newmin = 0
-        #           start_hr = start_hr + 1
-        #           if (start_hr == 24) { #if measurement is started in 15 minutes before midnight
-        #             starttime3 = as.character(starttime) # forget about timeshift for now, not plausible
-        #           }
-        #         }
-        #         starttime3 = paste(temp[1]," ",start_hr,":",newmin,":",(start_sec+secshift),sep="")
-        #=====
         #create timestamp from string (now desiredtz is added)
         starttime_a = as.POSIXct(starttime3,format="%d/%m/%Y %H:%M:%S",tz=desiredtz) #,origin="1970-01-01"
         starttime_b = as.POSIXct(starttime3,format="%d-%m-%Y %H:%M:%S",tz=desiredtz) #,origin="1970-01-01"

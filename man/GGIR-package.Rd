@@ -62,8 +62,8 @@ example files for testing purposes.
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.1-3\cr
-Date: \tab 2014-10-21\cr
+Version: \tab 1.1-4\cr
+Date: \tab 2014-11-06\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 Discussion group: \tab https://groups.google.com/forum/#!forum/rpackageggir\cr
 }

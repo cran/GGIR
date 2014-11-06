@@ -22,8 +22,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   filelist = FALSE
   #   verify whether path1 is a directory or a list of files
   if (length(path1) == 1) { #could be a directory or one file
-    if (length(unlist(strsplit(path1,".bi")))>1) filelist = TRUE
-    if (length(unlist(strsplit(path1,".cs")))>1) filelist = TRUE
+    if (length(unlist(strsplit(path1,"[.]bi")))>1) filelist = TRUE
+    if (length(unlist(strsplit(path1,"[.]cs")))>1) filelist = TRUE
   } else { #multiple files
     filelist = TRUE    
   }

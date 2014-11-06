@@ -102,7 +102,9 @@ g.metric= function(Gx,Gy,Gz,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),mon,gravity = 1) {
     Gzfil[,1] = signal::filter(bf,Gz)
     Gfil[,1] = sqrt((Gxfil[,1]^2) + (Gyfil[,1]^2) + (Gzfil[,1]^2))
   } else if (ii == 8) { #angle
-    Gym = zoo::rollmedian(Gy,k=501,na.pad=TRUE)
+    winsi = round(sf*5)
+    if (round(winsi/2) == round(winsi/2)) winsi = winsi+1
+    Gym = zoo::rollmedian(Gy,k=winsi,na.pad=TRUE)
     Gym[which(is.na(Gym[1:1000]) ==T)] = Gym[which(is.na(Gym[1:1000]) ==F)[1]]
     p1 = which(is.na(Gym) ==F)
     Gym[which(is.na(Gym) ==T)] = Gym[p1[length(p1)]]
@@ -131,9 +133,14 @@ g.metric= function(Gx,Gy,Gz,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),mon,gravity = 1) {
     Gzfil[,1] = round(Gzfil[,1] * (128/5)) # convert into numbers between 0 and 128     
     Gfil = zoo::rollmax(Gzfil,k=sf,na.pad=TRUE,fill=0)
   } else if (ii == 11) { 
-    Gxm = zoo::rollmedian(Gx,k=501,na.pad=TRUE)
-    Gym = zoo::rollmedian(Gy,k=501,na.pad=TRUE)
-    Gzm = zoo::rollmedian(Gz,k=501,na.pad=TRUE)
+    winsi = round(sf*5)
+    if (round(winsi/2) == round(winsi/2)) winsi = winsi+1
+    Gxm = zoo::rollmedian(Gx,k=winsi,na.pad=TRUE)
+    Gym = zoo::rollmedian(Gy,k=winsi,na.pad=TRUE)
+    Gzm = zoo::rollmedian(Gz,k=winsi,na.pad=TRUE)
+#     Gxm = zoo::rollmedian(Gx,k=501,na.pad=TRUE)
+#     Gym = zoo::rollmedian(Gy,k=501,na.pad=TRUE)
+#     Gzm = zoo::rollmedian(Gz,k=501,na.pad=TRUE)
     Gxm[which(is.na(Gxm[1:1000]) ==T)] = Gxm[which(is.na(Gxm[1:1000]) ==F)[1]]
     Gym[which(is.na(Gym[1:1000]) ==T)] = Gym[which(is.na(Gym[1:1000]) ==F)[1]]
     Gzm[which(is.na(Gzm[1:1000]) ==T)] = Gzm[which(is.na(Gzm[1:1000]) ==F)[1]]

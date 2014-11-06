@@ -27,7 +27,7 @@ print.filename=FALSE)
   }
   \item{datadir}{
   Directory where the accelerometer files are stored or list of accelerometer
-  filenames and directories
+  filenames and directories.
   }
   \item{outputdir}{
   Directory where the output needs to be stored. Note that this function will

@@ -16,8 +16,8 @@ g.inspectfile <-
     #function to inspect the file and to assess from which brand it is and what the data format is
     getbrand = function(filename=c(),datafile=c()) {
       sf = c(); isitageneactive = c();  isitagenea = c();  mon = c();dformat = c() #generating empty variables
-      tmp1 = unlist(strsplit(filename,".c"))
-      tmp2 = unlist(strsplit(filename,".b"))
+      tmp1 = unlist(strsplit(filename,"[.]c"))
+      tmp2 = unlist(strsplit(filename,"[.]b"))
       if (tmp1[length(tmp1)] == "sv") { #this is a csv file
         dformat = 2 #2 = csv
         testcsv = read.csv(paste(datafile,sep=""),nrow=10,skip=10)

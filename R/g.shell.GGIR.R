@@ -18,8 +18,8 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
   # verify whether datadir is a directory or a list of files
   filelist = FALSE
   if (length(datadir) == 1) { #could be a directory or one file
-    if (length(unlist(strsplit(datadir,".bi")))>1) filelist = TRUE
-    if (length(unlist(strsplit(datadir,".cs")))>1) filelist = TRUE
+    if (length(unlist(strsplit(datadir,"[.]bi")))>1) filelist = TRUE
+    if (length(unlist(strsplit(datadir,"[.]cs")))>1) filelist = TRUE
   } else { #multiple files
     filelist = TRUE
   }
