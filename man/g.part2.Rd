@@ -5,18 +5,24 @@ function to analyse and summarize pre-processed output from \link{g.part1}
 }
 \description{
 Loads the output from \link{g.part1} and then applies \link{g.impute} and 
-\link{g.analyse}, after which the output is aggregated in csv two spreadsheets.
-The variables in this spreadsheet are the same variables as described in
+\link{g.analyse}, after which the output is converted to .RData-format
+which will be used by \link{g.shell.GGIR} to generate reports. 
+The variables in these reports are the same variables as described in
 \link{g.analyse}.
 }
 \usage{
-g.part2(metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.del.start = 0.5,
+g.part2(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.del.start = 0.5,
 hrs.del.end = 0.5, maxdur = 7, includedaycrit = 16,
 L5M5window = c(0,24), M5L5res = 10, winhr = 5, qwindow=c(0,24), qlevels = c(0.1),
 ilevels = c(0,10), mvpathreshold = c(100),boutcriter = 0.8,ndayswindow=7,idloc=1,
-do.imp=TRUE)
+do.imp=TRUE,storefolderstructure=FALSE,overwrite=FALSE,epochvalues2csv=FALSE)
 }
 \arguments{
+\item{datadir}{
+  Directory where the accelerometer files are stored or list, e.g. "C:/mydata"
+  of accelerometer filenames and directories,
+  e.g. c("C:/mydata/myfile1.bin","C:/mydata/myfile2.bin").
+  }
   \item{metadatadir}{
   Directory where the output from \link{g.part1} was stored
   }
@@ -28,10 +34,12 @@ do.imp=TRUE)
    File index to finish with (defaults to number of files available)
   }
   \item{strategy}{
-    how to deal with knowledge about study protocol. value = 1 means select data
+    how to deal with knowledge about study protocol. value = 1 to select data
     based on \code{hrs.del.start}, \code{hrs.del.end}, and \code{maxdur}.
-    Value = 2 makes that only the data between the first midnight and the last
-    midnight is used for imputation, see \link{g.impute}
+    Value = 2 to only use the data between the first midnight and the last
+    midnight, value = 3 only selects the most active X days
+    in the files. X is specified by argument \code{ndayswindow}
+    See also \link{g.impute}
   }
   \item{hrs.del.start}{
     how many HOURS after start of experiment did wearing of monitor start?, 
@@ -99,6 +107,20 @@ do.imp=TRUE)
   Whether to impute missing values (e.g. suspected of monitor non-wear) or not
   by \link{g.impute}. Default and recommended setting is TRUE
   }
+   \item{storefolderstructure}{
+  Store folder structure of the accelerometer data
+  }
+     \item{overwrite}{
+    Overwrite previously generated milestone data by this function for this
+    particular dataset. If FALSE then it will skip the previously processed files
+    (default = FALSE).
+  }
+     \item{epochvalues2csv}{
+    If TRUE then epoch values are exported to a CSV spreadsheet. Here, non-wear time
+    is imputed where possible (default = FALSE).
+  }
+  
+  
 }
 \value{
  The function provides no values, it only ensures that other functions are called
@@ -111,7 +133,7 @@ g.part2(metadatadir)
 }
 }
 \author{
-  Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+  Vincent T van Hees <vincentvanhees@gmail.com>
 }
 \references{
 \itemize{

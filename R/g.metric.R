@@ -1,4 +1,4 @@
-g.metric= function(Gx,Gy,Gz,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),mon,gravity = 1) {
+g.metric= function(Gx,Gy,Gz,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),gravity = 1) {
   #--------------------------------------
   #Input:
   # G = acceleration signal
@@ -101,21 +101,21 @@ g.metric= function(Gx,Gy,Gz,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),mon,gravity = 1) {
     Gyfil[,1] = signal::filter(bf,Gy)
     Gzfil[,1] = signal::filter(bf,Gz)
     Gfil[,1] = sqrt((Gxfil[,1]^2) + (Gyfil[,1]^2) + (Gzfil[,1]^2))
-  } else if (ii == 8) { #angle
-    winsi = round(sf*5)
-    if (round(winsi/2) == round(winsi/2)) winsi = winsi+1
-    Gym = zoo::rollmedian(Gy,k=winsi,na.pad=TRUE)
-    Gym[which(is.na(Gym[1:1000]) ==T)] = Gym[which(is.na(Gym[1:1000]) ==F)[1]]
-    p1 = which(is.na(Gym) ==F)
-    Gym[which(is.na(Gym) ==T)] = Gym[p1[length(p1)]]
-    angle = Gym
-    angle[which(angle < -1)] = -1 #rounding to -1 and 1 as sine cant deal with numbers outside this range
-    angle[which(angle > 1)] = 1
-    angle = (asin(angle) / (2*pi)) * 360# conversion to degrees
-    if (nrow(Gfil) != length(angle)) {
-      warning
-    }
-    Gfil[,1] = angle
+#   } else if (ii == 8) { #angle
+#     winsi = round(sf*5)
+#     if (round(winsi/2) == (winsi/2)) winsi = winsi+1
+#     Gym = zoo::rollmedian(Gy,k=winsi,na.pad=TRUE)
+#     Gym[which(is.na(Gym[1:1000]) ==T)] = Gym[which(is.na(Gym[1:1000]) ==F)[1]]
+#     p1 = which(is.na(Gym) ==F)
+#     Gym[which(is.na(Gym) ==T)] = Gym[p1[length(p1)]]
+#     angle = Gym
+#     angle[which(angle < -1)] = -1 #rounding to -1 and 1 as sine cant deal with numbers outside this range
+#     angle[which(angle > 1)] = 1
+#     angle = (asin(angle) / (2*pi)) * 360# conversion to degrees
+#     if (nrow(Gfil) != length(angle)) {
+#       warning
+#     }
+#     Gfil[,1] = angle
   } else if (ii == 9) { #Low pass filtered followed by ENMO  
     bf = signal::butter(n,c(hb/(sf/2)),type=c("low")) #creating filter coefficients
     Gxfil[,1] = signal::filter(bf,Gx)
@@ -134,13 +134,10 @@ g.metric= function(Gx,Gy,Gz,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),mon,gravity = 1) {
     Gfil = zoo::rollmax(Gzfil,k=sf,na.pad=TRUE,fill=0)
   } else if (ii == 11) { 
     winsi = round(sf*5)
-    if (round(winsi/2) == round(winsi/2)) winsi = winsi+1
+    if (round(winsi/2) == (winsi/2)) winsi = winsi+1
     Gxm = zoo::rollmedian(Gx,k=winsi,na.pad=TRUE)
     Gym = zoo::rollmedian(Gy,k=winsi,na.pad=TRUE)
     Gzm = zoo::rollmedian(Gz,k=winsi,na.pad=TRUE)
-#     Gxm = zoo::rollmedian(Gx,k=501,na.pad=TRUE)
-#     Gym = zoo::rollmedian(Gy,k=501,na.pad=TRUE)
-#     Gzm = zoo::rollmedian(Gz,k=501,na.pad=TRUE)
     Gxm[which(is.na(Gxm[1:1000]) ==T)] = Gxm[which(is.na(Gxm[1:1000]) ==F)[1]]
     Gym[which(is.na(Gym[1:1000]) ==T)] = Gym[which(is.na(Gym[1:1000]) ==F)[1]]
     Gzm[which(is.na(Gzm[1:1000]) ==T)] = Gzm[which(is.na(Gzm[1:1000]) ==F)[1]]

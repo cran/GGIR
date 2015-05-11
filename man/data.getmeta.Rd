@@ -5,8 +5,7 @@
 Example output from g.getmeta
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
-C is example output from g.getmeta
+data.getmeta is example output from \link{g.getmeta}
 }
 \usage{data(data.getmeta)}
 \format{

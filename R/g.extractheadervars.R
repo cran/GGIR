@@ -1,5 +1,4 @@
-g.extractheadervars <-
-function(I) {
+g.extractheadervars = function(I) {
   header= I$header
   mon = I$monn
   hnames = rownames(header)

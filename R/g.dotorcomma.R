@@ -1,5 +1,4 @@
-g.dotorcomma <-
-function(inputfile,dformat,mon) {
+g.dotorcomma = function(inputfile,dformat,mon) {
 	if (dformat == 2) {
 		deci = read.csv(inputfile,skip = 100,nrow=10)
 		deci = as.matrix(deci)
@@ -28,5 +27,4 @@ function(inputfile,dformat,mon) {
 		}
 	}
 	dotorcomma = decn
-
 }

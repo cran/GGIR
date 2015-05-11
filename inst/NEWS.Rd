@@ -1,7 +1,20 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-
+\section{Changes in version 1.1-5 (release date: 11-05-2015)}{
+\itemize{
+  \item Additional bugs fixs related to dealing with csv-format data from the Actigraph accelerometer brand
+  \item g.part2 now also stores its output as milestone data just like g.part1. This to facilitate parallel processing of large  amounts of data files on clusters. \item The orginal report generation functionality in g.part2 has now been moved to shell function g.shell.GGIR because part3, 4 and 5 which are scheduled for later
+  this year will combine milestone data from multiple analysis parts. It therefore, is more logical to control all report generation from the top level in the function hierarchy (g.shell.GGIR).
+  \item g.part1 now comes with the option to provide backup calibration coefficients in case auto-calibration is unsuccessful. This function is primarily designed for studies with  short lasting experiments.
+  \item g.part2 now has the option to export epoch values to a csv-file. Note that these same epoch values are also stored in the .RData milestone file from part2.
+  The export option is mainly to ease access to epoch level data outside the R environment.
+  \item g.shell.GGIR now offers the option to overwrite previously generated
+  milestone data with variable 'overwrite'. The default setting (FALSE) is still to skip previously analysed files, which is intended to avoid having to do the same analyses twice after an interruption. However, overwriting previously generated milestone data could be useful when modifications are being made to the input arguments.
+  \item g.shell.GGIR now offers the option to record the folderstructure in which
+  an accelerometer file is located, especially useful for studies where accelerometer files are stored hierarchally in line with the study design.
+}
+}
 \section{Changes in version 1.1-4 (release date: 06-11-2014)}{
 \itemize{
   \item Additional bugs fixs related to recognising data format in Actigraph data
@@ -9,7 +22,6 @@
   opposed to 501 sample rolling median
 }
 }
-
 \section{Changes in version 1.1-3 (release date: 21-10-2014)}{
 \itemize{
   \item Package expanded with functions: g.part1, g.part2, and g.shell.GGIR.

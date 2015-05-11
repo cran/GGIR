@@ -1,40 +1,13 @@
-g.impute <-
-function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0,ndayswindow = 7) {
-  
-  #-----------------------------------------------------------
-  # Arguments:
-  # Strategy for data seletection based on protocol (i.o.w. :which part of the data are definitely not wear time based on knowledge about protocol?)
-    # strategy 1 is selecting data based on criteria listed below
-  # strategy 2 is to select data from first midnight to last midnight
-  # hrs.del.start - how many HOURS after start of experiment did wearing of monitor started?
-  # hrs.del.end - how many HOURS before the end of the experiment did wearing of monitor definitely ended?
-  # maxdur - how many DAYS after start of experiment did experiment definitely stop? (set to zero if unknown)  
-  # ndayswindow - if strategy = 3 then this is the supposed wear duration
-  #
-  # Values:
-  # metashort - imputed short epoch variables
-  # rout - indicator of imputation strategy for each long epoch time window...with columns r1, r2, r3, r4 and r5.
-  # dcomplscore - indicator of the extend to which non-imputed data was available for avery section of the data (1 = full day, 0 = no data)
-  # averageday - metric values for an average 24 hour period
-  # windowsizes - ...
-  # LC - ...
-  # LC2 - ...
-  
-  #---------------------------------------------------
-  # parameters
+g.impute = function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0,ndayswindow = 7) {
   windowsizes = M$windowsizes #c(5,900,3600)
   metashort = M$metashort
   metalong = M$metalong
   ws3 = windowsizes[1]
   ws2 = windowsizes[2]
-  
-  #=================================
   # What is the minimum number of accelerometer axis needed to meet the criteria for nonwear in order for the data to be detected as nonwear?
   wearthreshold = 2 #needs to be 0, 1 or 2
-  
   n_ws2_perday = (1440*60) / ws2
   n_ws3_perday = (1440*60) / ws3
-  
   #check that matrices match
   if (((nrow(metalong)/((1440*60)/ws2)*10) - (nrow(metashort)/((60/ws3)*1440)) * 10) > 1) {
     print("Matrices 'metalong' and 'metashort' are not compatible")
@@ -46,12 +19,10 @@ function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0,ndayswindow = 7) 
   # Deriving file characteristics from 15 min summary files
   LD = nrow(metalong) * (ws2/60) #length data in minutes
   ND = nrow(metalong)/n_ws2_perday #number of days
-  
   #==============================================
   # Generating time variable
   timeline = seq(0,ceiling(nrow(metalong)/n_ws2_perday),by=1/n_ws2_perday)	
   timeline = timeline[1:nrow(metalong)]
-  
   #========================================
   # Extracting non-wear and clipping and make decision on which additional time needs to be considered non-wear
   out = g.weardec(M,wearthreshold,ws2)
@@ -63,13 +34,11 @@ function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0,ndayswindow = 7) 
   LC2 = out$LC2
   #======================================
   # detect first and last midnight and all midnights
-  
   tooshort = 0
   dmidn = g.detecmidnight(ND,time)
   firstmidnight=dmidn$firstmidnight;  firstmidnighti=dmidn$firstmidnighti
   lastmidnight=dmidn$lastmidnight;    lastmidnighti=dmidn$lastmidnighti
   midnights=dmidn$midnights;          midnightsi=dmidn$midnightsi
-  
   #===================================================================
   # Select data based on strategy
   if (strategy == 1) { 	#protocol based data selection
@@ -103,7 +72,6 @@ function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0,ndayswindow = 7) 
   } else if (strategy == 3) { #select X most active days
     #==========================================
     # Look out for X most active days and use this to define window of interest
-    
     atest = as.numeric(as.matrix(M$metashort[,2]))
     ws3 = M$windowsizes[1]
     ws2 = M$windowsizes[2]
@@ -149,8 +117,6 @@ function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0,ndayswindow = 7) 
     starttimei = 1
     endtimei = length(r4)
   }
-  
-  
   #extracting calibration value during periods of non-wear
   if (length(which(r1==1)) > 0) {
     CALIBRATE = mean(as.numeric(metalong[which(r1==1 & r2 != 1),9])) #mean EN during non-wear time and non-clipping time
@@ -214,10 +180,8 @@ function(M,I,strategy=1,hrs.del.start=0,hrs.del.end=0,maxdur=0,ndayswindow = 7) 
       metashort[,mi] = as.numeric(imp[1:nrow(metashort)]) #to cut off the latter part of the last day used as a dummy data
     } else {
       dcomplscore = length(which(r5long == 0))/wpd
-      
     }
   }
-  
   metashortimp = metashort
   rout = data.frame(r1=r1,r2=r2,r3=r3,r4=r4,r5=r5)
   invisible(list(metashort=metashortimp,rout=rout,dcomplscore=dcomplscore,averageday=averageday,windowsizes=windowsizes,strategy=strategy,

@@ -1,5 +1,4 @@
-g.downsample <-
-function(sig,fs,ws3,ws2) {
+g.downsample = function(sig,fs,ws3,ws2) {
 	#averaging per second => var1
 	sig2 =cumsum(c(0,sig))
 	select = seq(1,length(sig2),by=fs)

@@ -1,18 +1,12 @@
 g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M5window = c(0,24),M5L5res=10,
                       includedaycrit = 16,ilevels=c(),winhr=5,idloc=1,snloc=1,
                       mvpathreshold = c(),boutcriter=c()) {
-#   ,get.TAC.vars=FALSE,minTACdur=30,minTACcount=20,anglethreshold=60
-#     if (get.TAC.vars == TRUE) {
-#     require(ineq)
-#   }
-  
   fname=I$filename
   averageday = IMP$averageday
   strategy = IMP$strategy
   hrs.del.start = IMP$hrs.del.start
   hrs.del.end = IMP$hrs.del.end
-  maxdur = IMP$maxdur
-  
+  maxdur = IMP$maxdur  
   windowsizes = M$windowsizes
   metalong = M$metalong
   metashort = IMP$metashort
@@ -35,11 +29,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   t1_LFMF = L5M5window[2]+(winhr-(M5L5res/60)) #end in 24 hour clock hours (if a value higher than 24 is chosen, it will take early hours of previous day to complete the 5 hour window
   # Time window for distribution analysis
   t_TWDI = qwindow #start and of 24 hour clock hours
-  
-  
-  
-  #==========================================================================================
-  #==========================================================================================
   #==========================================================================================
   # Setting paramters (NO USER INPUT NEEDED FROM HERE ONWARDS)
   domvpa = doilevels = doquan = FALSE
@@ -50,8 +39,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   #------------------------------------------------------
   summary = matrix(" ",1,100) #matrix to be stored with summary per participant
   s_names = rep(" ",ncol(summary))
-  nfeatures = 50+length(levels)+length(ilevels)    
-  summaryperday = matrix(0,(2*24),nfeatures) #matrix to be stored with summary per participant
+  nfeatures = 50+length(qlevels)+length(ilevels)    #levels changed into qlevels 
   i = 1  
   #---------------
   if (domvpa) { #create dummy data
@@ -92,7 +80,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       }
     }
   }
-  
   #---------------------
   # detect first and last midnight and all midnights
   tsi = which(colnames(metalong) == "timestamp")
@@ -134,14 +121,14 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   HFENi = which(colnames(metashort) == "HFEN")
   HFENplusi = which(colnames(metashort) == "HFENplus")
   ENi = which(colnames(metashort) == "EN")
-  anglei = which(colnames(metashort) == "angle")
+  #   anglei = which(colnames(metashort) == "angle")
   if (length(ENMOi) == 0) ENMOi = -1
   if (length(LFENMOi) == 0) LFENMOi = -1
   if (length(BFENi) == 0) BFENi = -1
   if (length(HFENi) == 0) HFENi = -1
   if (length(HFENplusi) == 0) HFENplusi = -1
   if (length(ENi) == 0) ENi = -1
-  if (length(anglei) == 0) anglei = -1
+  #   if (length(anglei) == 0) anglei = -1
   #===============================================
   # Extract features from the imputed data
   qcheck = r5long
@@ -167,7 +154,9 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     QUAN = qlevels_names = c()
     ML5AD = ML5AD_names = c()
     for (quani in 1:ncol(averageday)) {
-      if (colnames(M$metashort)[(quani+1)] != "angle") {
+      if (colnames(M$metashort)[(quani+1)] != "anglex" &
+            colnames(M$metashort)[(quani+1)] != "angley" &
+            colnames(M$metashort)[(quani+1)] != "anglez") {
         #--------------------------------------
         # quantiles
         QUANtmp =  quantile(averageday[((t_TWDI[1]*(3600/ws3))+1):(t_TWDI[2]*(3600/ws3)),quani],probs=qlevels,na.rm=T,type=quantiletype)
@@ -217,9 +206,9 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       endatmidnight = 1
       print("measurement ends at midnight or there is no midnight")
     }
-    if (lastmidnighti == firstmidnighti) {
-      tooshort = 1
-    }
+#     if (lastmidnighti == firstmidnighti) { #turned off 11 may 2015, because for some projects one night may be still useful
+#       tooshort = 1
+#     }
     daysummary = matrix("",ceiling(ndays),nfeatures)
     ds_names = rep("",nfeatures)
     #===============================================
@@ -259,7 +248,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       }
       vari = as.matrix(metashort[qqq1:qqq2,])
       val = qcheck[qqq1:qqq2]
-      
       #--------------------------------
       val = as.numeric(val)
       nvalidhours = length(which(val == 0))/ (3600/ws3) #valid hours per day (or half a day)
@@ -279,7 +267,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       ds_names[fi] = "id";      fi = fi + 1
       daysummary[di,fi] = fname
       ds_names[fi] = "filename";  fi = fi + 1
-      
       #-----------------------------------
       calenderdate = unlist(strsplit(as.character(vari[1,1])," "))[1]
       daysummary[di,fi] = calenderdate               
@@ -301,7 +288,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       daysummary[di,(fi+1)] = di #day number relative to start of measurement
       ds_names[fi:(fi+1)] = c("weekday","measurmentday")
       fi = fi + 2
-      
       if (tooshort == 0) {
         #--------------------------------------      
         # extract time spent in activity levels (there are possibly many more features that can be extracted from this)
@@ -314,15 +300,13 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
               difference = length(which(is.na(varnum) == FALSE)) - length(IMP$averageday[,(mi-1)])
               if (di == 1) {
                 varnum = c(IMP$averageday[1:abs(difference),(mi-1)],varnum)
-                #print("expanded at the beginning")
               } else {
                 a56 = length(IMP$averageday[,(mi-1)]) - abs(difference)
                 a57 = length(IMP$averageday[,(mi-1)])
                 varnum = c(varnum,IMP$averageday[a56:a57,(mi-1)])
-                #print("expanded at the end")
               }
             }
-            if (mi == ENMOi) { #currently intensity/activity level features are based on metric ENMO, but by copy-pasting this to another metric this should work the same.
+            if (mi == ENMOi | mi == LFENMOi | mi == BFENi | mi == ENi | mi == HFENi | mi == HFENplusi) { #currently intensity/activity level features are based on metric ENMO, but by copy-pasting this to another metric this should work the same.
               ML5 = g.getM5L5(varnum,ws3,t0_LFMF,t1_LFMF,M5L5res,winhr)
               if (length(ML5$DAYL5HOUR) > 0) {
                 daysummary[di,fi] = ML5$DAYL5HOUR; ds_names[fi] = paste("L5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
@@ -331,45 +315,53 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                 daysummary[di,fi] = ML5$DAYM5VALUE;  ds_names[fi] = paste("M5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
                 daysummary[di,fi] = ML5$V5NIGHT;  ds_names[fi] = paste("mean_",colnames(metashort)[mi],"_mg_1-6am",sep=""); fi=fi+1
               }
-              keepindex_0 = fi
-              daysummary[di,fi] = mean(varnum)* 1000; ds_names[fi] = "mean_ENMO_mg_24hr"; fi=fi+1 #ENMO 
+              if (mi == ENMOi) {
+                daysummary[di,fi] = mean(varnum)* 1000; ds_names[fi] = "mean_ENMO_mg_24hr"; fi=fi+1 #ENMO 
+              } else if (mi == LFENMOi) {
+                daysummary[di,fi] = mean(varnum) * 1000; ds_names[fi] = "mean_LFENMO_mg_24hr"; fi=fi+1 #LFENMO 
+              } else if (mi == BFENi) {
+                daysummary[di,fi] = mean(varnum) * 1000; ds_names[fi] = "mean_BFEN_mg_24hr"; fi=fi+1 #BFEN
+              } else if (mi == ENi) {
+                daysummary[di,fi] = mean(varnum) * 1000; ds_names[fi] = "mean_EN_mg_24hr"; fi=fi+1 #EN
+              } else if (mi == HFENi) {
+                daysummary[di,fi] = mean(varnum) * 1000;  ds_names[fi] = "mean_HFEN_mg_24hr"; fi=fi+1 #HFEN
+              } else if (mi == HFENplusi) {
+                daysummary[di,fi] = mean(varnum) * 1000;  ds_names[fi] = "mean_HFENplus_mg_24hr"; fi=fi+1 #HFEN+
+              }
               if (doquan == TRUE) {
                 #newly added on 9-7-2013, percentiles of acceleration in the specified window:
                 q46 = quantile(varnum[((qwindow[1]*60*(60/ws3))+1):(qwindow[2]*60*(60/ws3))],probs=qlevels,na.rm=T,type=quantiletype) * 1000 #times 1000 to convert to mg
                 keepindex_46 = c(fi,(fi+(length(qlevels)-1)))
-                
                 namesq46 = rep(0,length(rownames(as.matrix(q46))))
                 for (rq46i in 1:length(rownames(as.matrix(q46)))) {
                   tmp1 = rownames(as.matrix(q46))[rq46i]
                   tmp2 = as.character(unlist(strsplit(tmp1,"%")))
-                  namesq46[rq46i] = paste("p",tmp2,"_ENMO_mg_",t_TWDI[1],"-",t_TWDI[2],"h",sep="")
+                  namesq46[rq46i] = paste("p",tmp2,"_mg_",t_TWDI[1],"-",t_TWDI[2],"h",sep="")
                 }
-                
-                daysummary[di,fi:(fi+(length(qlevels)-1))] = q46; ds_names[fi:(fi+(length(qlevels)-1))] = namesq46;fi = fi+length(qlevels)
+                daysummary[di,fi:(fi+(length(qlevels)-1))] = q46
+                ds_names[fi:(fi+(length(qlevels)-1))] = paste(namesq46,"_",colnames(metashort)[mi],sep="")
+                fi = fi+length(qlevels)
               }
               if (doilevels == TRUE) {
                 breaks = ilevels
                 q47 = cut((varnum[((qwindow[1]*60*(60/ws3))+1):(qwindow[2]*60*(60/ws3))]*1000),breaks,right=FALSE)
                 q47 = table(q47)
                 q48  = (as.numeric(q47) * ws3)/60 #converting to minutes
-                
                 keepindex_48 = c(fi,(fi+(length(q48)-1)))
                 namesq47 = rep(0,length(rownames(q47)))
                 for (rq47i in 1:length(rownames(q47))) {
-                  namesq47[rq47i] = paste(rownames(q47)[rq47i],"_ENMO_mg_",t_TWDI[1],"-",t_TWDI[2],"h",sep="")
+                  namesq47[rq47i] = paste(rownames(q47)[rq47i],"_mg_",t_TWDI[1],"-",t_TWDI[2],"h",sep="")
                 }
-                daysummary[di,fi:(fi+(length(q48)-1))] = q48; ds_names[fi:(fi+(length(q48)-1))] = namesq47; fi = fi+length(q48)
+                daysummary[di,fi:(fi+(length(q48)-1))] = q48
+                ds_names[fi:(fi+(length(q48)-1))] = paste(namesq47,"_",colnames(metashort)[mi],sep="")
+                fi = fi+length(q48)
               }
-              
               #=========================================
               # newly added on 28/02/2014
               if (domvpa == TRUE) {
-                
                 for (mvpai in 1:length(mvpathreshold)) {
-                  
                   # METHOD 1: time spent above threhold based on 5 sec epoch
                   mvpa1 = length(which(varnum*1000 >= mvpathreshold[mvpai])) / (60/ws3) #time spent MVPA in minutes
-                  
                   # METHOD 2: time spent above threshold based on 1minute epoch
                   varnum2 = cumsum(c(0,varnum))
                   select = seq(1,length(varnum2),by=60/ws3)
@@ -468,135 +460,24 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                   if (is.nan(mvpa4) == TRUE) mvpa4 = 0
                   if (is.nan(mvpa5) == TRUE) mvpa5 = 0
                   if (is.nan(mvpa6) == TRUE) mvpa6 = 0
-                  
-                  
                   mvpanames[,mvpai] = c( paste("MVPA_E",ws3,"S_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E1M_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E5M_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E",ws3,"S_B1M",(boutcriter * 100),"%_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E",ws3,"S_B5M",(boutcriter * 100),"%_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E",ws3,"S_B10M",(boutcriter * 100),"%_T",mvpathreshold[mvpai],sep=""))
-                  daysummary[di,fi] = mvpa1;  ds_names[fi] = mvpanames[1,mvpai]; fi=fi+1
-                  daysummary[di,fi] = mvpa2;  ds_names[fi] = mvpanames[2,mvpai]; fi=fi+1
-                  daysummary[di,fi] = mvpa3;  ds_names[fi] = mvpanames[3,mvpai]; fi=fi+1
-                  daysummary[di,fi] = mvpa4;  ds_names[fi] = mvpanames[4,mvpai]; fi=fi+1
-                  daysummary[di,fi] = mvpa5;  ds_names[fi] = mvpanames[5,mvpai]; fi=fi+1
-                  daysummary[di,fi] = mvpa6;  ds_names[fi] = mvpanames[6,mvpai]; fi=fi+1
-                  
-                  
+                  daysummary[di,fi] = mvpa1;  ds_names[fi] = paste(mvpanames[1,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa2;  ds_names[fi] = paste(mvpanames[2,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa3;  ds_names[fi] = paste(mvpanames[3,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa4;  ds_names[fi] = paste(mvpanames[4,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa5;  ds_names[fi] = paste(mvpanames[5,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa6;  ds_names[fi] = paste(mvpanames[6,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
                 }
               }
             }
-            if (mi == LFENMOi) {
-              ML5 = g.getM5L5(varnum,ws3,t0_LFMF,t1_LFMF,M5L5res,winhr)
-              if (length(ML5$DAYL5HOUR) > 0) {
-                daysummary[di,fi] = ML5$DAYL5HOUR; ds_names[fi] = paste("L5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYL5VALUE; ds_names[fi] = paste("L5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5HOUR; ds_names[fi] = paste("M5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5VALUE;  ds_names[fi] = paste("M5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$V5NIGHT;  ds_names[fi] = paste("mean_",colnames(metashort)[mi],"_mg_1-6am",sep=""); fi=fi+1
-              }                
-              daysummary[di,fi] = mean(varnum) * 1000; ds_names[fi] = "mean_LFENMO_mg_24hr"; fi=fi+1 #LFENMO 
-            }
-            if (mi == BFENi) {
-              ML5 = g.getM5L5(varnum,ws3,t0_LFMF,t1_LFMF,M5L5res,winhr)
-              if (length(ML5$DAYL5HOUR) > 0) {
-                daysummary[di,fi] = ML5$DAYL5HOUR; ds_names[fi] = paste("L5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYL5VALUE; ds_names[fi] = paste("L5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5HOUR; ds_names[fi] = paste("M5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5VALUE;  ds_names[fi] = paste("M5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$V5NIGHT;  ds_names[fi] = paste("mean_",colnames(metashort)[mi],"_mg_1-6am",sep=""); fi=fi+1
-              }
-              daysummary[di,fi] = mean(varnum) * 1000; ds_names[fi] = "mean_BFEN_mg_24hr"; fi=fi+1 #BFEN
-            }
-            if (mi == ENi) {
-              ML5 = g.getM5L5(varnum,ws3,t0_LFMF,t1_LFMF,M5L5res,winhr)
-              if (length(ML5$DAYL5HOUR) > 0) {
-                daysummary[di,fi] = ML5$DAYL5HOUR; ds_names[fi] = paste("L5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYL5VALUE; ds_names[fi] = paste("L5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5HOUR; ds_names[fi] = paste("M5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5VALUE;  ds_names[fi] = paste("M5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$V5NIGHT;  ds_names[fi] = paste("mean_",colnames(metashort)[mi],"_mg_1-6am",sep=""); fi=fi+1
-              }
-              daysummary[di,fi] = mean(varnum) * 1000; ds_names[fi] = "mean_EN_mg_24hr"; fi=fi+1 #EN
-            }
-            if (mi == HFENi) {
-              ML5 = g.getM5L5(varnum,ws3,t0_LFMF,t1_LFMF,M5L5res,winhr)
-              if (length(ML5$DAYL5HOUR) > 0) {
-                daysummary[di,fi] = ML5$DAYL5HOUR; ds_names[fi] = paste("L5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYL5VALUE; ds_names[fi] = paste("L5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5HOUR; ds_names[fi] = paste("M5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5VALUE;  ds_names[fi] = paste("M5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$V5NIGHT;  ds_names[fi] = paste("mean_",colnames(metashort)[mi],"_mg_1-6am",sep=""); fi=fi+1
-                
-              }
-              daysummary[di,fi] = mean(varnum) * 1000;  ds_names[fi] = "mean_HFEN_mg_24hr"; fi=fi+1 #HFEN
-            }
-            if (mi == HFENplusi) {
-              ML5 = g.getM5L5(varnum,ws3,t0_LFMF,t1_LFMF,M5L5res,winhr)
-              if (length(ML5$DAYL5HOUR) > 0) {
-                daysummary[di,fi] = ML5$DAYL5HOUR; ds_names[fi] = paste("L5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYL5VALUE; ds_names[fi] = paste("L5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5HOUR; ds_names[fi] = paste("M5hr_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$DAYM5VALUE;  ds_names[fi] = paste("M5_",colnames(metashort)[mi],"_mg_",L5M5window[1],"-",L5M5window[2],"h",sep=""); fi=fi+1
-                daysummary[di,fi] = ML5$V5NIGHT;  ds_names[fi] = paste("mean_",colnames(metashort)[mi],"_mg_1-6am",sep=""); fi=fi+1
-                
-              }
-              daysummary[di,fi] = mean(varnum) * 1000;  ds_names[fi] = "mean_HFENplus_mg_24hr"; fi=fi+1 #HFEN+
-            }
-            if (mi == anglei) { #characteristation of angle (experimental, not finished)
-#               if (get.TAC.vars == TRUE) {
-#                 print("========================================================================================")
-#                 print("WARNING - You selected 'get.TAC.vars = TRUE', this will extract variables which")
-#                 print("are not described in a publication yet and currently only provided for beta-testing")
-#                 print("========================================================================================")
-#                 require(ineq)
-#                 difangle = abs(diff(varnum[((qwindow[1]*60*(60/ws3))+1):(qwindow[2]*60*(60/ws3))])) #absolute change in angle
-#                 armanglechange = rep(0,length(difangle))
-#                 armanglechange[which(difangle > anglethreshold)] = 1
-#                 pc1 = c(0,armanglechange,0) #to find absense of arm angle change (TAC) periods
-#                 pc2 = c(1,armanglechange,1) #to find non-absense of arm angle change (TAC) periods
-#                 pc1up = which(diff(pc1) == 1)
-#                 pc1down = which(diff(pc1) == -1)
-#                 pc2up = which(diff(pc2) == 1)
-#                 pc2down = which(diff(pc2) == -1)
-#                 pc3 = pc1down - pc1up # duration of arm angle change periods
-#                 pc4 = pc2up - pc2down # duration of absense of arm angle change periods
-#                 
-#                 minTACdur = round(minTACdur / 5) * 5 #to protect against accidentilly filling in strange number
-#                 select23 = which(pc4 >= minTACdur/ws3)
-#                 if (length(select23) >= minTACcount) { #check that there are enough periods left
-#                   TAC_dur = (pc4* 5) / 60 # duration of absense of arm angle change periods (minutes)
-#                   TAC_dur15 = (pc4[select23]* 5) / 60 #select only those lasting at least minTACdur
-#                   pc4b = pc4[select23]
-#                   meanposdur = mean(TAC_dur)
-#                   meanposdur15 = mean(TAC_dur15)
-#                   gini_temp = ineq(TAC_dur,type="Gini")
-#                   gini_temp15 = ineq(TAC_dur15,type="Gini")
-#                 } else {
-#                   print("not enough TAC periods")
-#                   pc4b = c()
-#                   meanposdur = meanposdur15 = ""
-#                   gini_temp = gini_temp15 = ""
-#                 }
-#                 
-#                 daysummary[di,fi] = length(pc4); ds_names[fi] = "N.TAC.periods_perday"; fi =fi + 1
-#                 daysummary[di,fi] = length(pc4b); ds_names[fi] = paste("N.TAC.periods_perday_>=",minTACcount,"x",minTACdur,"sec",sep=""); fi =fi + 1
-#                 daysummary[di,fi] = meanposdur; ds_names[fi] = "mean.dur.TAC.periods_min"; fi =fi + 1
-#                 daysummary[di,fi] = meanposdur15; ds_names[fi] = paste("mean.dur.TAC.periods_>=",minTACcount,"x",minTACdur,"sec",sep=""); fi =fi + 1
-#                 daysummary[di,fi] = gini_temp; ds_names[fi] = "TAC.dur.gini"; fi =fi + 1
-#                 daysummary[di,fi] = gini_temp15; ds_names[fi] = paste("TAC.dur.gini_>=",minTACcount,"x",minTACdur,"sec",sep=""); fi =fi + 1
-#               }
-            }
           }
         }
-        #       #features based on multiple metrics
-        #       if (BFENi != -1)       BFEN = as.numeric(vari[,BFENi])
-        #       if (anglei != -1)      angle = as.numeric(vari[,anglei])
-        #       val = as.numeric(val)
         rm(val); rm(vari)
-      } else { #day did not have any valid data
-        #				print("no valid hours in the day")
       }
     }
   }
@@ -616,10 +497,12 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   # Summary per individual, not per day:
   #------------------------------
   # Extract the average 24 hr
-  lookat = c(2:ncol(metashort))
-  #   if (length(which(colnames(metashort) == "angle")) > 0) {
-  #     lookat = lookat[-c(which(colnames(metashort) == "angle")-1)]
-  #   }
+  lookattmp = which(colnames(metashort) != "angle" &
+                      colnames(metashort) != "anglex" &
+                      colnames(metashort) != "angley" &
+                      colnames(metashort) != "anglez")
+  lookat = lookattmp[which(lookattmp > 1)] #]c(2:ncol(metashort[,lookattmp]))
+  
   colnames_to_lookat = colnames(metashort)[lookat]
   
   MA = matrix(NA,length(lookat),1)
@@ -672,15 +555,12 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   } else if (snloc == 2) {
     summary[(vi+1)] = unlist(strsplit(fname,"_"))[2]
   }
-  
-  
   s_names[vi:(vi+1)] = c("ID","device_sn")
   vi = vi+2
   #-----------------------------------
   summary[vi] = BL
   summary[(vi+1)] = fname
   summary[(vi+2)] = startt # starttime of measurement
-  
   s_names[vi:(vi+2)] = c("bodylocation","filename","start_time")
   vi = vi+3
   #-----------------------------------
@@ -707,9 +587,11 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   summary[vi] = C$cal.error.end #CALIBRATE
   summary[vi+1] = C$QCmessage #CALIBRATE
   for (la in 1:length(lookat)) {
-    if (colnames(metashort)[lookat[la]] != "angle") {
+#     if (colnames(metashort)[lookat[la]] != "angle" & colnames(metashort)[lookat[la]] != "anglez" &
+#           colnames(metashort)[lookat[la]] != "angley" & 
+#           colnames(metashort)[lookat[la]] != "anglex") {
       MA[la] = 	MA[la] * 1000
-    }
+#     }
   }
   q0 = length(MA) + 1
   summary[(vi+2):(vi+q0)] = MA
@@ -745,71 +627,41 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     vi = vi + 2
     #############################################################
     #metrics - summarise with stratification to weekdays and weekend days
-    mvpaindeces = c()
+    indeces = c()
     if (length(mvpathreshold) > 0) {
       for (mvpai in 1:length(mvpathreshold)) {
         #if mvpa is not done then this will look in the dummy variable and replace by c()
-        mvpaindeces = c(mvpaindeces,which(ds_names == mvpanames[1,mvpai]),
-                        which(ds_names == mvpanames[2,mvpai]),
-                        which(ds_names == mvpanames[3,mvpai]),
-                        which(ds_names == mvpanames[4,mvpai]),
-                        which(ds_names == mvpanames[5,mvpai]),
-                        which(ds_names == mvpanames[6,mvpai]))
+        for (mi in 2:ncol(metashort)) {
+          if (mi == ENMOi | mi == LFENMOi | mi == BFENi | mi == ENi | mi == HFENi | mi == HFENplusi) {
+            indeces = c(indeces,which(ds_names == paste(mvpanames[1,mvpai],"_",colnames(metashort)[mi],sep="")),
+                        which(ds_names == paste(mvpanames[2,mvpai],"_",colnames(metashort)[mi],sep="")),
+                        which(ds_names == paste(mvpanames[3,mvpai],"_",colnames(metashort)[mi],sep="")),
+                        which(ds_names == paste(mvpanames[4,mvpai],"_",colnames(metashort)[mi],sep="")),
+                        which(ds_names == paste(mvpanames[5,mvpai],"_",colnames(metashort)[mi],sep="")),
+                        which(ds_names == paste(mvpanames[6,mvpai],"_",colnames(metashort)[mi],sep="")),
+                        which(ds_names == paste("L5 ",colnames(metashort)[mi]," (mg)",sep="")),
+                        which(ds_names == paste("M5 ",colnames(metashort)[mi]," (mg)",sep="")),
+                        which(ds_names == paste("mean_",colnames(metashort)[mi],"_mg_1to6am",sep="")))
+          }
+        }
       }
     }
-    daytoweekvar = c(which(ds_names == "L5 ENMO (mg)"),
-                     which(ds_names == "M5 ENMO (mg)"),
-                     mvpaindeces,
-                     which(ds_names == "mean_ENMO_mg_1to6am"),
+    daytoweekvar = c(indeces,
+#                      which(ds_names == "mean_ENMO_mg_1to6am"),
                      which(ds_names == "mean_ENMO_mg_24hr"),
                      which(ds_names == "mean_LFENMO_mg_24hr"),
                      which(ds_names == "mean_BFEN_mg_24hr"),
                      which(ds_names == "mean_EN_mg_24hr"),
                      which(ds_names == "mean_HFEN_mg_24hr"),
                      which(ds_names == "mean_HFENplus_mg_24hr")
-                     
-#                      which(ds_names == "N.TAC.periods_perday"),
-#                      which(ds_names ==  paste("N.TAC.periods_perday_>=",minTACcount,"x",minTACdur,"sec",sep="")),
-#                      which(ds_names == "mean.dur.TAC.periods_min"),
-#                      which(ds_names == paste("mean.dur.TAC.periods_>=",minTACcount,"x",minTACdur,"sec",sep="")),
-#                      which(ds_names == "TAC.dur.gini"),
-#                      which(ds_names == paste("TAC.dur.gini_>=",minTACcount,"x",minTACdur,"sec",sep="")) )
-    
-  
-#     listposvars = c(which(ds_names == "N.TAC.periods_perday"),
-#                     which(ds_names ==  paste("N.TAC.periods_perday_>=",minTACcount,"x",minTACdur,"sec",sep="")),
-#                     which(ds_names == "mean.dur.TAC.periods_min"),
-#                     which(ds_names == paste("mean.dur.TAC.periods_>=",minTACcount,"x",minTACdur,"sec",sep="")),
-#                     which(ds_names == "TAC.dur.gini"),
-#                     which(ds_names == paste("TAC.dur.gini_>=",minTACcount,"x",minTACdur,"sec",sep="")) 
-                )
-    
-    ndayscut = 0
+    )
     dtwtel = 0
     if (length(daytoweekvar) >= 1) {
       sp = length(daytoweekvar) + 1
       for (dtwi in daytoweekvar) {
-        
-        #==================================================
-        # if arm angle variable is assessed then delete days with abnormal low number of TACc periods
-#         if (length(which(listposvars == dtwi)) > 0) { #is this a TAC variable?
-#           #leave out a day when it has less than the number of TAC periods lasting for at least minTACdur is minTACcount
-#           nposi = which(ds_names == paste("N.TAC.periods_perday_>=",minTACdur,"sec",sep=""))
-#           nposperday_all = as.numeric(daysummary[,nposi]) #get list of number of TACs per day
-#           if (length(which(is.na(nposperday_all) == F)) >= 3) { #only do this if there are at least 3 days
-#             icut = which(nposperday_all < minTACcount) #leave out days with less than minTACcount TAC periods
-#             if (length(icut) > 0) {
-#               daysummary = daysummary[-icut,]
-#               ndayscut = length(icut)
-#             }
-#           } 
-#         }
-        
-        #           print("store mvpa per day")
         v4 = mean(as.numeric(daysummary[,dtwi]),na.rm=TRUE) #plain average of available days
         summary[(vi+1+(dtwtel*sp))] = v4 # #average all availabel days
         s_names[(vi+1+(dtwtel*sp))] = paste("AD_",ds_names[daytoweekvar[dtwtel+1]],sep="") 
-        
         #========================================================================
         # attempt to stratify to week and weekend days
         # Average of available days
@@ -838,11 +690,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
         dtwtel = dtwtel + 1
       }
       vi = vi+6+((dtwtel*sp)-1)
-#       if (get.TAC.vars==TRUE) {
-#         summary[vi] = ndayscut
-#         s_names[vi] = "N.days.removed.for.TAC.vars"
-#         vi = vi + 1
-#       }
       #===========================================================================
       # SUMMARISE Percentiles (q46)
       if (doquan == TRUE) {
@@ -945,9 +792,9 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     summary[(vi+4)] = windowsizes[1]
     #get GGIR version
     SI = sessionInfo()
-	GGIRversion = c()
+    GGIRversion = c()
     GGIRversion = SI$otherPkgs$GGIR$Version
-	if (length(GGIRversion) == 0) GGIRversion = "GGIR not used"
+    if (length(GGIRversion) == 0) GGIRversion = "GGIR not used"
     summary[(vi+5)] = GGIRversion #"2014-03-14 12:14:00 GMT"
     s_names[vi:(vi+5)] = c("data exclusion stategy (value=1, ignore specific hours; value=2, ignore all data before the first midnight and after the last midnight)",
                            "n hours ignored at start of meas (if strategy=1)",
@@ -987,6 +834,5 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   }
   summary = data.frame(value=t(summary),stringsAsFactors=FALSE) #needs to be t() because it will be a column otherwise
   names(summary) = s_names
-  
   invisible(list(summary=summary,daysummary=daysummary))
 }

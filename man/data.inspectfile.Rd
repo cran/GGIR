@@ -5,8 +5,7 @@
 Example output from g.inspectfile
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
-C is example output from g.inspectfile
+data.inspectfile is example output from \link{g.inspectfile}
 }
 \usage{data(data.inspectfile)}
 \format{

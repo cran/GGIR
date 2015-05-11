@@ -20,15 +20,14 @@ that allows for operating g.part1 and g.part2.
 \usage{
 g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3600),
                    desiredtz = "Europe/London",chunksize=c(),studyname=c(),
-                   do.enmo = TRUE,do.angle = FALSE,
-                   do.lfenmo = FALSE,do.en = FALSE,
-                   do.bfen = FALSE,do.hfen=FALSE,
-                   do.hfenplus = FALSE,
+                   do.enmo = TRUE,do.lfenmo = FALSE,do.en = FALSE,
+                   do.bfen = FALSE,do.hfen=FALSE,do.hfenplus = FALSE,
                    do.teLindert2013=FALSE,do.anglex=FALSE,do.angley=FALSE,
                    do.anglez=FALSE,do.enmoa=FALSE,do.cal = TRUE,
                    lb = 0.2, hb = 15,  n = 4,
                    use.temp=TRUE,spherecrit=0.3,minloadcrit=72,
-                   printsummary=FALSE,print.filename=FALSE)
+                   printsummary=TRUE,print.filename=FALSE,overwrite=FALSE,
+                   backup.cal.coef)
 }
 \arguments{
   \item{datadir}{
@@ -67,9 +66,6 @@ g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3600),
   }
   \item{do.enmo}{
   if TRUE (default), calculate metric ENMO, see \link{g.getmeta}
-  }
-  \item{do.angle}{
-  if TRUE, calculate metric angle using only the y-axis
   }
   \item{do.lfenmo}{
   if TRUE, calculate metric LFENMO with low-pass filter configuration set by
@@ -141,9 +137,29 @@ g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3600),
   Printing the filename can be useful to investigate problems (e.g. to verify that
   which file is being read).
   }
+   \item{overwrite}{
+    Overwrite previously generated milestone data by this function for this
+    particular dataset. If FALSE then it will skip the previously processed files
+    (default = FALSE).
+  }
+  \item{backup.cal.coef}{
+  If the auto-calibration fails then the user has the option to provide back-up
+  calibration coefficients via this argument. The value of the argument needs to
+  be the name and directory of a csv-spreadsheet with the following column names
+  and subsequent values: 'filename' with the names of accelerometer files on which
+  the calibration coefficients need to be applied in case auto-calibration fails;
+  'scale.x', 'scale.y', and 'scale.z' with the scaling coefficients; 'offset.x',
+  'offset.y', and 'offset.z' with the offset coefficients, and; 
+  'temperature.offset.x', 'temperature.offset.y', and 'temperature.offset.z'
+  with the temperature offset coefficients. The argument is intended for analysing
+  short lasting laboratory experiments with insufficient sphere data, but for which
+  calibration coefficients can be derived in an alternative way.
+  It is the users responsibility to compile the csv-spreadsheet.
+  }
+  
 }
 \value{
- The function provides no values, it only stores ensures that the output from other
+ The function provides no values, it only ensures that the output from other
  functions is stored in .RData(one file per accelerometer file) in folder structure
 }
 \examples{
@@ -154,7 +170,7 @@ g.part1(datadir,outputdir)
 }
 }
 \author{
-  Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+  Vincent T van Hees <vincentvanhees@gmail.com>
 }
 \references{
 \itemize{

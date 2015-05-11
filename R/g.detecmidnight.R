@@ -12,20 +12,9 @@ g.detecmidnight = function(ND,time) {
       midnights[countmidn] = as.character(time[cnt])
       midnightsi[countmidn] = cnt
       countmidn = countmidn + 1
-      #       if (countmidn >2) { #added on 9-5-2013
-      #         midleng = abs(midnightsi[countmidn-1]-midnightsi[(countmidn-2)])
-      #         if (midleng != 96) {
-      #           print(paste("Day length is ",midleng," long time windows",sep=""))
-      #         }
-      #       }
     }
     pr = nr
   }
-  #   dt = diff(midnightsi) #added 9-5-2013
-  #   dtw = which(dt !=96)
-  #   if (length(dtw) > 0) {
-  #     
-  #   }
   if (countmidn == 1) {
     tooshort = 1
     lastmidnight = time[length(time)]

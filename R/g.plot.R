@@ -1,10 +1,4 @@
-g.plot <-
-function(IMP,M,I,durplot) {
-  
-  # durplot = number of days to plot relative to start of measurement
-  
-  
-  
+g.plot = function(IMP,M,I,durplot) {
   r1 = IMP$rout[,1]
   r2 = IMP$rout[,2]
   r3 = IMP$rout[,3]
@@ -29,16 +23,11 @@ function(IMP,M,I,durplot) {
   s0 = cd1$x0; 	s1 = cd1$x1
   b0 = cd2$x0; 	b1 = cd2$x1
   g0 = cd3$x0; 	g1 = cd3$x1
-  w0 = cd4$x0; 	w1 = cd4$x1
-  
+  w0 = cd4$x0; 	w1 = cd4$x1  
   dens = 30
   #cutting out those silly "___" trains in some of the filenames (especially for Genea)
   fname2 = unlist(strsplit(fname,"_______"))
-  if (length(fname2) > 1) {
-    fname = paste(fname2[1],fname2[2],sep="")
-    
-  }
-  
+  if (length(fname2) > 1) fname = paste(fname2[1],fname2[2],sep="")
   plot.new()	
   par(fig=c(0,1,0,1),new=T)
   plot(seq(0,durplot),seq(0,durplot),col="white",type="l",axes=F,xlab="",ylab="",main=paste("device: ",monn," | filename: ",fname,sep=""),cex.main=0.6)#dummy plot
@@ -65,9 +54,7 @@ function(IMP,M,I,durplot) {
       rect(w0[ri],Y0,w1[ri],Y1,border = colors()[24],col=colors()[24],density=dens)
     }
   }
-  
   abline(v=timeline[length(timeline)],col="blue",lwd=1)	
-  
   if (length(which(colnames(M$metashort) == "ENMO")) > 0) {
     accel = as.numeric(as.matrix(M$metashort[,which(colnames(M$metashort) == "ENMO")]))
   } else {
@@ -76,22 +63,16 @@ function(IMP,M,I,durplot) {
   accel2 =cumsum(c(0,accel))
   select = seq(1,length(accel2),by=ws2/ws3)
   var1 = diff(accel2[round(select)]) / abs(diff(round(select[1:(length(select))])))
-  
-  
   if (length(timeline) > length(var1)) {
     timeline = timeline[1:length(var1)]
   }
-  # print(length(timeline))
-  #   print(length(var1))
   MEND = length(timeline)
   if (mon == 2) { #for measurement without temperature
     par(fig=c(0,1,0,0.65),new=T)
     plot(timeline,var1,type="l",xlab="Day",ylab="Acceleration (g)",bty="l",lwd=0.1,xlim=c(0,durplot),ylim=c(0,0.6))
-    
     par(fig=c(0,1,0.45,0.80),new=T) #0.55 1 -- 0.35 0.8
     plot(timeline,as.numeric(as.matrix(M$metalong[1:MEND,which(colnames(M$metalong) == "nonwearscore")])),type="s",xlab="",ylab="Non-wear score",axes=F,lwd=0.1,xlim=c(0,durplot),ylim=c(0,3))
     axis(side = 2,at=c(0,1,2,3))
-    
     par(fig=c(0,1,0.60,1),new=T) #0.55 --1
     plot(timeline,as.numeric(as.matrix(M$metalong[1:MEND,which(colnames(M$metalong) == "temperaturemean")])),type="l",xlab="",ylab="Temp. (C)",axes=F,lwd=0.1,xlim=c(0,durplot),ylim=c(20,35))
     abline(h=20,col="black",lwd=1,lty=2)
@@ -100,7 +81,6 @@ function(IMP,M,I,durplot) {
   } else { #for measurement without temperature
     par(fig=c(0,1,0,0.80),new=T)
     plot(timeline,var1,type="l",xlab="Day",ylab="Acceleration (g)",bty="l",lwd=0.1,xlim=c(0,durplot),ylim=c(0,0.6))
-    
     par(fig=c(0,1,0.60,1),new=T) #0.55 1 -- 0.35 0.8
     plot(timeline,as.numeric(as.matrix(M$metalong[1:MEND,which(colnames(M$metalong) == "nonwearscore")])),type="s",xlab="",ylab="Non-wear score",axes=F,lwd=0.1,xlim=c(0,durplot),ylim=c(0,3))
     axis(side = 2,at=c(0,1,2,3))

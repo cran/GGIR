@@ -9,9 +9,10 @@ descriptive summary for each accelerometer data file. Analyses include: Average
 acceleration per day, per measurement, L5M5 analyses (assessment of the five
 hours with lowest acceleration and with highest acceleration). Further, the 
 traditionally popular variable MVPA is automatically extracted in six variants:
-without bout criteria in combination with epoch length = 'ws3' seconds, 1 minute,
-and 5 minutes, and for bout durations 1 minute, 5 minutes or 10 minutes in combination
-with a 5 sec epoch.
+without bout criteria in combination with epoch = epoch length as defined in
+g.getmeta (first value of the input argument windowsizes), 1 minute,
+and 5 minutes, and for bout durations 1 minute, 5 minutes or 10 minutes in
+combination with the epoch length as defined in g.getmeta.
 
 }
 \usage{
@@ -42,7 +43,7 @@ winhr = 5, idloc = 1,snloc=1,mvpathreshold = c(),boutcriter=c())
   }
   \item{qwindow}{
   start and end time, in 24 hour clock hours, over which distribution in metric 
-  values need to be extracted. Value = c(0,24) will consider all 24 hours.
+  values need to be extracted. Default value = c(0,24) will consider all 24 hours.
   }
   \item{quantiletype}{
   type of quantile function to use (default recommended). For details, see 
@@ -50,7 +51,7 @@ winhr = 5, idloc = 1,snloc=1,mvpathreshold = c(),boutcriter=c())
   }
   \item{L5M5window}{
     start and end time, in 24 hour clock hours, over which L5M5 needs to be
-    calculated. The calculation is done based on the average day
+    calculated.
   }
   \item{M5L5res}{
 resoltion of L5 and M5 analysis in minutes (default: 10 minutes)
@@ -59,7 +60,7 @@ resoltion of L5 and M5 analysis in minutes (default: 10 minutes)
     minimum required number of valid hours in day specific analysis
     (NOTE: there is no minimum required number of hours per day in the summary
     of an entire measurement, every available hour is used to make the best possible
-    inference on average metric value per week)
+    inference on average metric value per average day)
   }
   \item{ilevels}{
     Levels for acceleration value frequency distribution in mg, e.g. c(0,100,200)
@@ -79,10 +80,9 @@ resoltion of L5 and M5 analysis in minutes (default: 10 minutes)
     the first and second character '_' in the filename as the serial number
   }
   \item{mvpathreshold}{
-    Threshold for MVPA estimation. Threshold needs to be based on metric ENMO.
-    This can be a single number or an array of numbers, e.g. c(100,120). In the 
-    later case the code will estimate MVPA seperately for each threshold. If 
-    this variable is left blank c() then MVPA is not estimated
+    Threshold for MVPA estimation. This can be a single number or an array of numbers,
+    e.g. c(100,120). In the later case the code will estimate MVPA seperately for
+    each threshold. If this variable is left blank c() then MVPA is not estimated
   }
     \item{boutcriter}{
     The variable boutcriter is a number between 0 and 1 and defines what fraction
@@ -104,7 +104,7 @@ The value \code{summary} is a dataframe and comes with the following variables:\
 \item \code{ID} Participant id extracted from file header
 \item \code{device_sn} Device serial number extracted from file header
 \item \code{dodylocation} Body location extracted from file header
-\item \code{filename} Name of the binary file
+\item \code{filename} Name of the accelerometer file
 \item \code{start_time} Timestamp when experiment started
 \item \code{startday} Name of day when experiment started
 \item \code{samplefreq}Sample frequency (Hz)
@@ -193,8 +193,8 @@ active five hours calculated with metric ENMO. Within the time window as specifi
  14.5 means 14:30. Within the time window as specified
 \item \code{mean_ENMO_mg_1-6am} Mean acceleration between 1am and 6am
 \item \code{mean_ENMO_mg_24hr} Mean acceleration over 24 hour period
-\item \code{pX_ENMO_mg_0-24h} Percentile in the short epoch distribution (ws3)
-with invalid data imputed.  Within the time window as specified
+\item \code{pX_ENMO_mg_0-24h} Percentile in the short epoch distribution with
+invalid data imputed.  Within the time window as specified
 \item \code{[A,B)_ENMO_mg_0-24h} Time spent in minutes between (and including)
 acceleration value A in mg and (excluding) acceleration value B in mg. This is
 only done for metric ENMO at the moment, and only done if ilevels is not left blank
@@ -205,23 +205,21 @@ only done for metric ENMO at the moment, and only if mvpathreshold is not left b
 }
 
 \examples{
+data(data.getmeta)
+data(data.inspectfile)
+data(data.calibrate)
 \dontrun{
   #inspect file:
   I = g.inspectfile(datafile)
   
   #autocalibration:
-  C = g.calibrate(datafile, use.temp = TRUE, spherecrit = 0.3, minloadcrit = 72, 
+  C = g.calibrate(datafile) 
   
   #get meta-data:
   M = g.getmeta(datafile, desiredtz = "Europe/London", windowsizes = c(5, 900, 3600),
-  daylimit = FALSE, offset = c(0, 0, 0), scale = c(1, 1, 1), tempoffset = c(0, 0, 0),
-  do.bfen = FALSE, do.enmo = TRUE, do.angle = FALSE, do.lfenmo = FALSE, do.en = FALSE,
-  do.hfen = FALSE, do.hfenplus = FALSE, lb = 0.2, hb = 15, n = 4)
+  daylimit = FALSE, offset = c(0, 0, 0), scale = c(1, 1, 1), tempoffset = c(0, 0, 0))
 }
 
-data(data.getmeta)
-data(data.inspectfile)
-data(data.calibrate)
 
 #impute meta-data:
 IMP = g.impute(M = data.getmeta, I = data.inspectfile)
@@ -231,5 +229,5 @@ A = g.analyse(I = data.inspectfile, C = data.calibrate, M = data.getmeta, IMP)
 
 }
 \author{
-Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+Vincent T van Hees <vincentvanhees@gmail.com>
 }

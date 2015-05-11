@@ -37,6 +37,6 @@ If only \code{start} is defined then \code{g.binread} will read all data beyond
   \item{\code{batt.voltage}}{matrix with battery voltage and corresponding timestamps}
 }
 \author{
-Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+Vincent T van Hees <vincentvanhees@gmail.com>
 Jing Hua Zhao <jinghua.zhao@mrc-epid.cam.ac.uk>
 }

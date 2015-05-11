@@ -4,18 +4,18 @@
 function to estimate calibration error and make recommendation for addressing it
 }
 \description{
-Functions starts by identifying ten second windows of non-movement. Next, the
+Function starts by identifying ten second windows of non-movement. Next, the
 average acceleration per axis per window is used to estimate calibration error 
 (offset and scaling) per axis. The function provides recommended correction factors
 to address the calibration error and a summary of the callibration procedure.
 }
 \usage{
 g.calibrate(datafile, use.temp = TRUE, spherecrit = 0.3, minloadcrit = 72, 
-printsummary = FALSE,chunksize=c())
+printsummary = TRUE,chunksize=c(),windowsizes=c(5,900,3600))
 }
 \arguments{
   \item{datafile}{
-  name of binary file
+  name of accelerometer file
   }
   \item{use.temp}{
   use temperature sensor data if available (Geneactive only)
@@ -28,7 +28,7 @@ for each axis. Used to judge whether the sphere is sufficiently populated
   the minimum number of hours the code needs to read for the
 autocalibration procedure to be effective (only sensitive to multitudes of 12 hrs, 
 other values will be ceiled). After loading these hours only extra data is loaded 
-if calibration error has not be reduced to under 0.01 g.
+if calibration error has not been reduced to under 0.01 g.
   }
   \item{printsummary}{
   if TRUE will print a summary when done
@@ -37,6 +37,10 @@ if calibration error has not be reduced to under 0.01 g.
 loaded as a fraction of a 12 hour period, e.g. 0.5 equals 6 hour chunks.
 The default is 1 (12 hrs). For machines with less than 4Gb of RAM memory a value
 below 1 is recommended.
+}
+  
+ \item{windowsizes}{
+  see \link{g.getmeta}
 }
 }
 \value{
@@ -69,7 +73,7 @@ print(C$offset)
 }
 }
 \author{
-  Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+  Vincent T van Hees <vincentvanhees@gmail.com>
   Zhou Fang
 }
 \references{

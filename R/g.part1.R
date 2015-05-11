@@ -1,13 +1,13 @@
 g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3600),
                    desiredtz = "Europe/London",chunksize=c(),studyname=c(),
-                   do.enmo = TRUE,do.angle = FALSE,
-                   do.lfenmo = FALSE,do.en = FALSE,
-                   do.bfen = FALSE,do.hfen=FALSE,
-                   do.hfenplus = FALSE,do.teLindert2013=FALSE,do.anglex=FALSE,do.angley=FALSE,do.anglez=FALSE,
+                   do.enmo = TRUE,do.lfenmo = FALSE,do.en = FALSE,
+                   do.bfen = FALSE,do.hfen=FALSE,do.hfenplus = FALSE,
+                   do.teLindert2013=FALSE,do.anglex=FALSE,do.angley=FALSE,do.anglez=FALSE,
                    do.enmoa = FALSE,
                    do.cal = TRUE,
-                   lb = 0.2, hb = 15,  n = 4,
-                   use.temp=TRUE,spherecrit=0.3,minloadcrit=72,printsummary=FALSE,print.filename=FALSE) {
+                   lb = 0.2, hb = 15,  n = 4,use.temp=TRUE,spherecrit=0.3,
+                   minloadcrit=72,printsummary=TRUE,print.filename=FALSE,overwrite=FALSE,
+                   backup.cal.coef=c()) {
   if (length(datadir) == 0 | length(outputdir) == 0) {
     if (length(datadir) == 0) {
       print("Variable datadir is not defined")
@@ -17,18 +17,15 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
     }
   }
   if (f1 == 0) print("Warning: f1 = 0 is not a meaningful value")
-  path1 = datadir
-  path2 = outputdir
   filelist = FALSE
-  #   verify whether path1 is a directory or a list of files
-  if (length(path1) == 1) { #could be a directory or one file
-    if (length(unlist(strsplit(path1,"[.]bi")))>1) filelist = TRUE
-    if (length(unlist(strsplit(path1,"[.]cs")))>1) filelist = TRUE
+  #   verify whether datadir is a directory or a list of files
+  if (length(datadir) == 1) { #could be a directory or one file
+    if (length(unlist(strsplit(datadir,"[.]bi")))>1) filelist = TRUE
+    if (length(unlist(strsplit(datadir,"[.]cs")))>1) filelist = TRUE
   } else { #multiple files
     filelist = TRUE    
   }
   # create output directory if it does not exist
-  mainDir = path2
   if (filelist == TRUE) {
     if (length(studyname) == 0) {
       studyname = "mystudy"
@@ -37,44 +34,66 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
       outputfolder = paste("/output_",studyname,sep="")
     }
   } else {
-    outputfolder = unlist(strsplit(path1,"/"))
+    outputfolder = unlist(strsplit(datadir,"/"))
     outputfolder = paste("/output_",outputfolder[length(outputfolder)],sep="")
   }
-  if (file.exists(paste(mainDir,outputfolder,sep=""))) {
+  if (file.exists(paste(outputdir,outputfolder,sep=""))) {
   } else {
-    dir.create(file.path(mainDir,outputfolder))
-    dir.create(file.path(mainDir,outputfolder,"meta"))
-    dir.create(file.path(mainDir,paste(outputfolder,"/meta",sep=""),"basic"))
-    dir.create(file.path(mainDir,outputfolder,"results"))
-    dir.create(file.path(mainDir,paste(outputfolder,"/results",sep=""),"QC"))
+    dir.create(file.path(outputdir,outputfolder))
+    dir.create(file.path(outputdir,outputfolder,"meta"))
+    dir.create(file.path(outputdir,paste(outputfolder,"/meta",sep=""),"basic"))
+    dir.create(file.path(outputdir,outputfolder,"results"))
+    dir.create(file.path(outputdir,paste(outputfolder,"/results",sep=""),"QC"))
   }
-  path3 = paste(path2,outputfolder,sep="") #where is output stored?
+  path3 = paste(outputdir,outputfolder,sep="") #where is output stored?
   use.temp = TRUE; 
   daylimit = FALSE
-  #   dohfenplus = FALSE
-  #=================================================================
-  # loading required functions and packages
-  library(MASS)
-  require(bitops)
-  require(signal)
-  require(matlab)
-  require(mmap)
-  require(GENEAread)
-#   require(GGIR)
-  if (do.angle == TRUE | do.anglex == TRUE | do.angley == TRUE | do.anglez == TRUE) {
-    require(zoo)
-  }
   #=================================================================
   # Other parameters:
   # list of all csv and bin files
   if (filelist == FALSE) {
-    fnames = c(dir(path1,recursive=TRUE,pattern="csv"),dir(path1,recursive=TRUE,pattern="bin"))
+    fnames = c(dir(datadir,recursive=TRUE,pattern="[.]csv"),dir(datadir,recursive=TRUE,pattern="[.]bin"))
   } else {
-    fnames = path1
+    fnames = datadir
+  }
+  #--------------------------------
+  # get file path if requested:
+  #   if (storefolderstructure == TRUE) {
+  filelist = FALSE
+  if (length(datadir) == 1) { #could be a directory or one file
+    if (length(unlist(strsplit(datadir,"[.]bi")))>1) filelist = TRUE
+    if (length(unlist(strsplit(datadir,"[.]cs")))>1) filelist = TRUE
+  } else { #multiple files
+    filelist = TRUE    
+  }
+  if (filelist == FALSE) {
+    fnamesfull = c(dir(datadir,recursive=TRUE,pattern="[.]csv"),dir(datadir,recursive=TRUE,pattern="[.]bin"))
+  } else {
+    fnamesfull = datadir
+  }
+  f16 = function(X) {
+    out = unlist(strsplit(X,"/"))
+    f16 = out[length(out)]
+  }
+  f17 = function(X) {
+    out = unlist(strsplit(X,"/"))
+    f17 = out[(length(out)-1)]
+  }
+  tmp5 = tmp6 = rep(0,length(fnamesfull))
+  if (length(fnamesfull) > 0) {
+    fnamesshort = apply(X=as.matrix(fnamesfull),MARGIN=1,FUN=f16)
+    phase = apply(X=as.matrix(fnamesfull),MARGIN=1,FUN=f17)
+    for (i in 1:length(fnames)) {
+      ff = unlist(strsplit(fnames[i],"/"))
+      ff = ff[length(ff)]
+      if (length(which(fnamesshort == ff)) > 0) {
+        tmp5[i] = fnamesfull[which(fnamesshort == ff)]
+        tmp6[i] = phase[which(fnamesshort == ff)]
+      }
+    }
   }
   if (length(f0) ==  0) f0 = 1
   if (length(f1) ==  0) f1 = length(fnames)
-
   if (is.na(fnames[1]) == TRUE) {
     print("Error: File path not clearly identified. Check path name")
   }
@@ -83,7 +102,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   #========================================================================
   # check which files have already been processed, such that no double work is done
   # ffdone a matrix with all the binary filenames that have been processed
-  ffdone = fdone = dir(paste(path2,outputfolder,"/meta/basic",sep=""))
+  ffdone = fdone = dir(paste(outputdir,outputfolder,"/meta/basic",sep=""))
   if (length(fdone) > 0) {
     for (ij in 1:length(fdone)) {
       tmp = unlist(strsplit(fdone[ij],".RData"))
@@ -107,9 +126,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
     if (filelist == TRUE) {
       datafile = as.character(fnames[j])
     } else {
-      datafile = paste(path1,"/",fnames[j],sep="")
+      datafile = paste(datadir,"/",fnames[j],sep="")
     }
-    print(paste("File ",j,sep=""))
     #=========================================================
     #check whether file has already been processed
     #by comparing filename to read with list of processed files
@@ -144,14 +162,16 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
     options(warn=-1) #turn off warnings
     I = g.inspectfile(datafile) 
     options(warn=0) #turn on warnings
+    if (overwrite == TRUE) skip = 0
     if (skip == 0) { #if skip = 1 then skip the analysis as you already processed this file
-      
+      print(paste("P1 file",j,sep=""))
       if (do.cal ==TRUE) {
         print("---------------------------------------------")
         print("investigate calibration of the sensors...")
-       C = g.calibrate(datafile,use.temp=use.temp,spherecrit=spherecrit,
-                       minloadcrit=minloadcrit,printsummary=printsummary,chunksize=chunksize)
-       } else {
+        C = g.calibrate(datafile,use.temp=use.temp,spherecrit=spherecrit,
+                        minloadcrit=minloadcrit,printsummary=printsummary,chunksize=chunksize,
+                        windowsizes=windowsizes)
+      } else {
         C = list(cal.error.end=0,cal.error.start=0)
         C$scale=c(1,1,1)
         C$offset=c(0,0,0)
@@ -163,25 +183,46 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
       }
       cal.error.end = C$cal.error.end
       cal.error.start = C$cal.error.start
-      
       if (length(cal.error.start) == 0) {
         #file too shortcorrupt to even calculate basic calibration value
         cal.error.start = NA
-      }    
+      }
+      check.backup.cal.coef = FALSE
       if (is.na(cal.error.start) == T | length(cal.error.end) == 0) {
         C$scale = c(1,1,1); C$offset = c(0,0,0);       C$tempoffset=  c(0,0,0)
+        check.backup.cal.coef = TRUE
       } else {
         if (cal.error.start < cal.error.end) {
           C$scale = c(1,1,1); C$offset = c(0,0,0);       C$tempoffset=  c(0,0,0)
+          check.backup.cal.coef = TRUE
         }
       }
-      #       print(windowsizes)
+      #if calibration fails then check whether calibration coefficients are provided in a separate csv-spreadsheet
+      # this csv spreadhseet needs to be created by the end-user and should contain:
+      # column with names of the accelerometer files
+      # three columns respectively named scale.x, scale.y, and scale.z
+      # three columns respectively named offset.x, offset.y, and offset.z
+      # three columns respectively named temperature.offset.x, temperature.offset.y, and temperature.offset.z
+      # the end-user can generate this document based on calibration analysis done with the same accelerometer device.
+      if (length(backup.cal.coef) > 0 & check.backup.cal.coef == TRUE) { 
+        bcc.data = read.csv(backup.cal.coef)
+        if (length(which(bcc.data$filename == fnames[j])) > 0) {
+          bcc.i = which(bcc.data$filename == fnames[j])
+          bcc.scalei = which(colnames(bcc.data) == "scale.x" | colnames(bcc.data) == "scale.y" | colnames(bcc.data) == "scale.z")
+          bcc.offseti = which(colnames(bcc.data) == "offset.x" | colnames(bcc.data) == "offset.y" | colnames(bcc.data) == "offset.z")
+          bcc.temp.offseti = which(colnames(bcc.data) == "temperature.offset.x" | colnames(bcc.data) == "temperature.offset.y" | colnames(bcc.data) == "temperature.offset.z")
+          C$scale = bcc.data[bcc.i[1],bcc.scalei]
+          C$offset = bcc.data[bcc.i[1],bcc.offseti]
+          C$tempoffset=  bcc.data[bcc.i[1],bcc.temp.offseti]
+        }
+      }
+      
+      
       #------------------------------------------------
       print("get meta data...")
       M = g.getmeta(datafile,                  
                     do.bfen=do.bfen,
                     do.enmo=do.enmo,
-                    do.angle=do.angle,
                     do.lfenmo=do.lfenmo,
                     do.en=do.en,
                     do.hfen=do.hfen,
@@ -202,7 +243,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
       } else {
         filename = fnames[j]
       }
-      save(M,I,C,file = paste(path3,"/meta/basic/meta_",filename,".RData",sep=""))
+      filename_dir=tmp5[j];filefoldername=tmp6[j]
+      save(M,I,C,filename_dir,filefoldername,file = paste(path3,"/meta/basic/meta_",filename,".RData",sep=""))
       SI = sessionInfo()  
       save(SI,file=paste(path3,"/results/QC/sessioninfo_part1.RData",sep=""))
       rm(M); rm(I); rm(C)
@@ -210,7 +252,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
       #  print("file skipped because it was analysed before")
     }
     if(length(filelocationkey) > 0) {
-      filelocationkey[,3] = datadir
+      filelocationkey[,3] = datadir[j]
       filelocationkey = rbind(c("Filename with full path","Filename","data directory"),filelocationkey)
       write.csv(filelocationkey,paste(path3,"/results/QC/filelocationkey.csv",sep=""),row.names=FALSE)
     }

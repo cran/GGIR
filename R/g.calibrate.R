@@ -1,4 +1,5 @@
-g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,printsummary=FALSE,chunksize=c()) {
+g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,printsummary=TRUE,
+                       chunksize=c(),windowsizes=c(5,900,3600)) {
   if (length(chunksize) == 0) chunksize = 1
   if (chunksize > 1) chunksize = 1
   if (chunksize < 0.4) chunksize = 0.4
@@ -6,8 +7,8 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   filename = filename[length(filename)]
   # set parameters
   ws4 = 10 #epoch for recalibration, don't change
-  ws2 = 900 #dummy variable
-  ws =  3600 # window size for assessing non-wear time (seconds)
+  ws2 = windowsizes[2] #dummy variable
+  ws =  windowsizes[3] # window size for assessing non-wear time (seconds)
   i = 1 #counter to keep track of which binary block is being read
   count = 1 #counter to keep track of the number of seconds that have been read
   LD = 2 #dummy variable used to identify end of file and to make the process stop
@@ -17,33 +18,27 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   npoints=c()
   scale = c(1,1,1)
   offset = c(0,0,0)
-  
+  bsc_cnt = 0
+  bsc_qc = data.frame(time=c(),size=c())
   #inspect file  
   options(warn=-1) #turn off warnings
   INFI = g.inspectfile(datafile)  # Check which file type and monitor brand it is
   options(warn=0) #turn off warnings
-  
   mon = INFI$monc
   dformat = INFI$dformc
   sf = INFI$sf
   if (sf == 0) sf = 80 #assume 80Hertz in the absense of any other info
-  header = INFI$header
-  
   options(warn=-1) #turn off warnings
-  suppressWarnings(expr={
-    decn = g.dotorcomma(datafile,dformat,mon) #detect dot or comma dataformat
-  })
+  suppressWarnings(expr={decn = g.dotorcomma(datafile,dformat,mon)}) #detect dot or comma dataformat
   options(warn=0) #turn off warnings
-
   #creating matrixes for storing output
   S = matrix(0,0,4) #dummy variable needed to cope with head-tailing succeeding blocks of data
   NR = ceiling((90*10^6) / (sf*ws4)) + 1000 #NR = number of 'ws4' second rows (this is for 10 days at 80 Hz) 
   if (mon == 2) {
     meta = matrix(99999,NR,8) #for meta data
-  } else {
+  } else if (mon == 1 | mon == 3){
     meta = matrix(99999,NR,7)
   }
-  
   # setting size of blocks that are loaded (too low slows down the process)
   # the setting below loads blocks size of 12 hours (modify if causing memory problems)
   blocksize = round((14512 * (sf/50)) * (chunksize*0.5)) 
@@ -51,7 +46,6 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   if (mon == 1) {
     blocksize = blocksizegenea
   }
-  
   #===============================================
   # Read file
   switchoffLD = 0 #dummy variable part of "end of loop mechanism"
@@ -99,7 +93,6 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       }
     } else if (mon == 2 & dformat == 2) {
       try(expr={P = read.csv(datafile,nrow = (blocksize*300), skip=(100+(blocksize*300*(i-1))),dec=decn)},silent=TRUE)
-    
       if (length(P) > 1) {
         P = as.matrix(P)
         if (nrow(P) < ((sf*ws*2)+1) & i == 1) {
@@ -144,82 +137,98 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       #store data that could not be used for this block, but will be added to next block
       use = (floor(LD / (ws*sf))) * (ws*sf) #number of datapoint to use
       if (length(use) > 0) {
-        if (use != LD) {
-          S = as.matrix(data[(use+1):LD,]) #store left over
-        }
-        data = as.matrix(data[1:use,])
-        LD = nrow(data) #redefine LD because there is less data
-        ##==================================================
-        dur = nrow(data)	#duration of experiment in data points
-        durexp = nrow(data) / (sf*ws)	#duration of experiment in hrs
-        # Initialization of variables
-        if (mon == 1) {
-          Gx = as.numeric(data[,1]); Gy = as.numeric(data[,2]); Gz = as.numeric(data[,3])
-          use.temp = FALSE
-        } else if (mon == 2 & dformat == 1) {
-          Gx = as.numeric(data[,2]); Gy = as.numeric(data[,3]); Gz = as.numeric(data[,4]); temperaturre = as.numeric(data[,7])
-          temperature = as.numeric(data[,7])
-        } else if (dformat == 2) {
-          data2 = matrix(NA,nrow(data),3)
-          if (ncol(data) == 3) extra = 0
-          if (ncol(data) == 4) extra = 1
-          for (jij in 1:3) {
-            data2[,jij] = as.numeric(data[,(jij+extra)])
+        if (use > 0) {
+          if (use != LD) {
+            S = as.matrix(data[(use+1):LD,]) #store left over
           }
-          Gx = as.numeric(data2[,1]); Gy = as.numeric(data2[,2]); Gz = as.numeric(data2[,3])
-          if (mon == 2) {
+          data = as.matrix(data[1:use,])
+          LD = nrow(data) #redefine LD because there is less data
+          ##==================================================
+          dur = nrow(data)	#duration of experiment in data points
+          durexp = nrow(data) / (sf*ws)	#duration of experiment in hrs
+          # Initialization of variables
+          if (mon == 1) {
+            Gx = as.numeric(data[,1]); Gy = as.numeric(data[,2]); Gz = as.numeric(data[,3])
+            use.temp = FALSE
+          } else if (mon == 2 & dformat == 1) {
+            Gx = as.numeric(data[,2]); Gy = as.numeric(data[,3]); Gz = as.numeric(data[,4]); temperaturre = as.numeric(data[,7])
             temperature = as.numeric(data[,7])
-          } else {
-            use.temp = FALSE
+          } else if (dformat == 2) {
+            data2 = matrix(NA,nrow(data),3)
+            if (ncol(data) == 3) extra = 0
+            if (ncol(data) >= 4) extra = 1
+            for (jij in 1:3) {
+              data2[,jij] = as.numeric(data[,(jij+extra)])
+            }
+            Gx = as.numeric(data2[,1]); Gy = as.numeric(data2[,2]); Gz = as.numeric(data2[,3])
+            if (mon == 2) {
+              temperature = as.numeric(data[,7])
+            } else if (mon == 1 | mon == 3) {
+              use.temp = FALSE
+            }
+          }
+          if (mon == 2 & use.temp == TRUE) { #also ignore temperature for GENEActive if temperature values are unrealisticly high or NA
+            if (length(which(is.na(mean(as.numeric(data[1:10,7]))) == T)) > 0) {
+              print("temperature is NA")
+              use.temp = FALSE
+            } else if (length(which(mean(as.numeric(data[1:10,7])) > 40)) > 0) {
+              print("temperature is too high")
+              use.temp = FALSE
+            }
+          }
+          #=============================================
+          # non-integer sample frequency is a pain for deriving epoch based sd
+          # however, with an epoch of 10 seconds it is an integer number of samples per epoch
+          EN = sqrt(Gx^2 + Gy^2 + Gz^2)
+          D1 = g.downsample(EN,sf,ws4,ws2)
+          EN2 = D1$var2
+          #mean acceleration
+          D1 = g.downsample(Gx,sf,ws4,ws2); 	GxM2 = D1$var2
+          D1 = g.downsample(Gy,sf,ws4,ws2); 	GyM2 = D1$var2
+          D1 = g.downsample(Gz,sf,ws4,ws2); 	GzM2 = D1$var2
+          if (use.temp == TRUE) {
+            D1 = g.downsample(temperature,sf,ws4,ws2);
+            TemperatureM2 = D1$var2
+          }
+          #sd acceleration
+          dim(Gx) = c(sf*ws4,ceiling(length(Gx)/(sf*ws4))); 	GxSD2 = apply(Gx,2,sd)
+          dim(Gy) = c(sf*ws4,ceiling(length(Gy)/(sf*ws4))); 	GySD2 = apply(Gy,2,sd)
+          dim(Gz) = c(sf*ws4,ceiling(length(Gz)/(sf*ws4))); 	GzSD2 = apply(Gz,2,sd)
+          #-----------------------------------------------------
+          #expand 'out' if it is expected to be too short
+          if (count > (nrow(meta) - (2.5*(3600/ws4) *24))) {  
+            extension = matrix(" ",((3600/ws4) *24),ncol(meta))
+            meta = rbind(meta,extension)
+            print("variabel meta extended")
+          }
+          #storing in output matrix
+          meta[count:(count-1+length(EN2)),1] = EN2
+          meta[count:(count-1+length(EN2)),2] = GxM2
+          meta[count:(count-1+length(EN2)),3] = GyM2
+          meta[count:(count-1+length(EN2)),4] = GzM2
+          meta[count:(count-1+length(EN2)),5] = GxSD2
+          meta[count:(count-1+length(EN2)),6] = GySD2
+          meta[count:(count-1+length(EN2)),7] = GzSD2
+          if (use.temp == TRUE) {
+            meta[count:(count-1+length(EN2)),8] = TemperatureM2
+          }
+          count = count + length(EN2) #increasing "count": the indicator of how many seconds have been read
+          rm(Gx); rm(Gy); rm(Gz)
+          # reduce blocksize if memory is getting higher
+          gco = gc()
+          memuse = gco[2,2] #memuse in mb
+          bsc_qc = rbind(bsc_qc,c(memuse,Sys.time()))
+          if (memuse > 4000) {
+            if (bsc_cnt < 5) {
+              if ((chunksize * (0.8 ^ bsc_cnt)) > 0.2) {
+                blocksize = round(blocksize * 0.8)
+                
+                bsc_cnt = bsc_cnt + 1
+              }
+            }
           }
         }
-        if (mon == 2 & use.temp == TRUE) { #also ignore temperature for GENEActive if temperature values are unrealisticly high or NA
-          if (is.na(as.numeric(mean(data[1:10,7]))) == T) {
-            print("temperature is NA")
-            use.temp = FALSE
-          } else if (as.numeric(mean(data[1:10,7])) > 40) {
-            print("temperature is too high")
-            use.temp = FALSE
-          }
-        }
-        #=============================================
-        # non-integer sample frequency is a pain for deriving epoch based sd
-        # however, with an epoch of 10 seconds it is an integer number of samples per epoch
-        EN = sqrt(Gx^2 + Gy^2 + Gz^2)
-        D1 = g.downsample(EN,sf,ws4,ws2)
-        EN2 = D1$var2
-        #mean acceleration
-        D1 = g.downsample(Gx,sf,ws4,ws2); 	GxM2 = D1$var2
-        D1 = g.downsample(Gy,sf,ws4,ws2); 	GyM2 = D1$var2
-        D1 = g.downsample(Gz,sf,ws4,ws2); 	GzM2 = D1$var2
-        if (use.temp == TRUE) {
-          D1 = g.downsample(temperature,sf,ws4,ws2);
-          TemperatureM2 = D1$var2
-        }
-        #sd acceleration
-        dim(Gx) = c(sf*ws4,ceiling(length(Gx)/(sf*ws4))); 	GxSD2 = apply(Gx,2,sd)
-        dim(Gy) = c(sf*ws4,ceiling(length(Gy)/(sf*ws4))); 	GySD2 = apply(Gy,2,sd)
-        dim(Gz) = c(sf*ws4,ceiling(length(Gz)/(sf*ws4))); 	GzSD2 = apply(Gz,2,sd)
-        #-----------------------------------------------------
-        #expand 'out' if it is expected to be too short
-        if (count > (nrow(meta) - (2.5*(3600/ws4) *24))) {  
-          extension = matrix(" ",((3600/ws4) *24),ncol(meta))
-          meta = rbind(meta,extension)
-          print("variabel meta extended")
-        }
-        #storing in output matrix
-        meta[count:(count-1+length(EN2)),1] = EN2
-        meta[count:(count-1+length(EN2)),2] = GxM2
-        meta[count:(count-1+length(EN2)),3] = GyM2
-        meta[count:(count-1+length(EN2)),4] = GzM2
-        meta[count:(count-1+length(EN2)),5] = GxSD2
-        meta[count:(count-1+length(EN2)),6] = GySD2
-        meta[count:(count-1+length(EN2)),7] = GzSD2
-        if (use.temp == TRUE) {
-          meta[count:(count-1+length(EN2)),8] = TemperatureM2
-        }
-        count = count + length(EN2) #increasing "count": the indicator of how many seconds have been read
-        rm(Gx); rm(Gy); rm(Gz)
+        #--------------------------------------------
       }
     } else {
       LD = 0 #once LD < 1 the analysis stops, so this is a trick to stop it
@@ -234,7 +243,6 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
     if (length(cut) > 0) {
       meta_temp = as.matrix(meta_temp[-cut,])
     }
-    
     nhoursused = (nrow(meta_temp) * 10)/3600
     if (nrow(meta_temp) > 51) {  # enough data for the sphere?
       meta_temp = as.matrix(meta_temp[-1,])
@@ -250,8 +258,6 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
                            abs(as.numeric(meta_temp[,2])) < 2 & abs(as.numeric(meta_temp[,3])) < 2 &
                            abs(as.numeric(meta_temp[,4])) < 2) #the latter three are to reduce chance of including clipping periods
       meta_temp = as.matrix(meta_temp[nomovement,])
-      
-      
       if (min(dim(meta_temp)) > 1) {
         meta_temp = as.matrix(meta_temp[(is.na(meta_temp[,4]) == F & is.na(meta_temp[,1]) == F),])
         npoints = nrow(meta_temp)
@@ -278,19 +284,19 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
     } else {
       QC = "recalibration not done because not enough data in the file or because file is corrupt"
     }
-    
     if (spherepopulated == 1) { #only try to improve calibration if there are enough datapoints around the sphere
       #---------------------------------------------------------------------------
       # START of Zhou Fang's code (slightly edited by vtv21 to use matrix meta_temp from above
       # instead the similar matrix generated by Zhou Fang's original code. This to allow for
       # more data to be used as meta_temp can now be based on 10 or more days of raw data
       input = meta_temp[,2:4] #as.matrix()
-      if (mon == 2 & use.temp == TRUE) { #at the moment i am always using temperature if mon == 2
+      if (use.temp == TRUE) { #at the moment i am always using temperature if mon == 2
+        # mon == 2 & removed 19-11-2014 because it is redundant and would not allow for newer monitors to use it
         inputtemp = cbind(as.numeric(meta_temp[,8]),as.numeric(meta_temp[,8]),as.numeric(meta_temp[,8])) #temperature
       } else {
         inputtemp = matrix(0, nrow(input), ncol(input)) #temperature, here used as a dummy variable
       }
-      meantemp = mean(as.numeric(inputtemp[,1]))
+      meantemp = mean(as.numeric(inputtemp[,1]),na.rm=TRUE)
       inputtemp = inputtemp - meantemp
       offset = rep(0, ncol(input))
       scale = rep(1, ncol(input))
@@ -307,6 +313,19 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
         scalech = rep(1,ncol(input))
         toffch = rep(0, ncol(inputtemp))
         for (k in 1:ncol(input)){
+          #-----------------------------------------------------------------
+          # Next few lines added 23 on april 2015 to deal with NaN values in
+          # some of the sphere data for Actigraph monitor brand
+          if (mon == 3 & length(which(is.na(closestpoint[,k, drop = F]) == TRUE)) > 0 &
+                length(which(is.na(closestpoint[,k, drop = F]) == FALSE)) > 10) { #needed for some Actigraph data
+            invi = which(is.na(closestpoint[,k, drop = F]) == TRUE)
+            closestpoint = closestpoint[-invi,]
+            curr = curr[-invi,]
+            inputtemp = inputtemp[-invi,]
+            input = input[-invi,]
+            weights = weights[-invi]
+          }
+          #------------------------------------------------
           fobj = lm.wfit(cbind(1, curr[,k],inputtemp[,k]) , closestpoint[,k, drop = F], w = weights)
           offsetch[k] = fobj$coef[1]
           scalech[k] = fobj$coef[2]
@@ -330,16 +349,16 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
         yy = as.matrix(cbind(as.numeric(meta_temp[,8]),as.numeric(meta_temp[,8]),as.numeric(meta_temp[,8])))
         meta_temp2 = scale(as.matrix(meta_temp[,2:4]),center = -offset, scale = 1/scale) +
           scale(yy, center = rep(meantemp,3), scale = 1/tempoffset)
-      }      #equals: D2[,axis] = (D[,axis] + offset[axis]) / (1/scale[axis])
+      }     #equals: D2[,axis] = (D[,axis] + offset[axis]) / (1/scale[axis])
       # END of Zhou Fang's code
       #-------------------------------------------
       cal.error.end = sqrt(meta_temp2[,1]^2 + meta_temp2[,2]^2 + meta_temp2[,3]^2)
       cal.error.end = mean(abs(cal.error.end-1))
       # assess whether calibration error has sufficiently been improved
       if (cal.error.end < cal.error.start & cal.error.end < 0.01 & nhoursused > minloadcrit) { #do not change scaling if there is no evidence that calibration improves
-        if (use.temp == TRUE & mon == 2) {
+        if (use.temp == TRUE & (mon == 2 | mon == 4)) {
           QC = "recalibration done, no problems detected"
-        } else if (use.temp == FALSE & mon == 2)  {
+        } else if (use.temp == FALSE & (mon == 2 | mon == 4))  {
           QC = "recalibration done, but temperature values not used"
         } else if (mon != 2)  {
           QC = "recalibration done, no problems detected"
@@ -360,10 +379,8 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       QC = "recalibration not done because recalibration does not decrease error"
     }
   }
-  
   if (length(ncol(meta_temp)) != 0) {
     spheredata = data.frame(A = meta_temp)
-
     if (use.temp == TRUE) {
       names(spheredata) = c("Euclidean Norm","meanx","meany","meanz","sdx","sdy","sdz","temperature")
     } else {
@@ -396,13 +413,17 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
     print(tempoffset)
     cat("\n----------------------------------------\n")
   }
-  if (mon == 2) {
-    meantempcal = mean(spheredata[,8],na.rm=TRUE)
+  if (use.temp==TRUE) {
+    if (length(spheredata) > 0) {
+      meantempcal = mean(spheredata[,8],na.rm=TRUE)
+    } else {
+      meantempcal = c()
+    }
   } else {
     meantempcal = c()
   }
   invisible(list(scale=scale,offset=offset,tempoffset=tempoffset,
                  cal.error.start=cal.error.start,cal.error.end=cal.error.end,
                  spheredata=spheredata,npoints=npoints,nhoursused=nhoursused,
-                 QCmessage=QCmessage,use.temp=use.temp,meantempcal=meantempcal))
+                 QCmessage=QCmessage,use.temp=use.temp,meantempcal=meantempcal,bsc_qc=bsc_qc))
 }

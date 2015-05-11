@@ -1,5 +1,4 @@
-g.weardec <-
-function(M,wearthreshold,ws2) {
+g.weardec = function(M,wearthreshold,ws2) {
   metalong = M$metalong
   eni = which(colnames(metalong) == "en")
   nsi = which(colnames(metalong) == "nonwearscore")
@@ -11,10 +10,8 @@ function(M,wearthreshold,ws2) {
   LC = length(which(clipsig > 0.05)) #fraction of 15 minute windows with potential clipping
   LC2 = length(which(clipsig > 0.8)) #fraction of 15 minute windows with potential clipping
   turnoffclip = which(clipsig > 0.8)
-  
   turnoffnonw = which(as.numeric(as.matrix(metalong[,nsi])) >= wearthreshold) #modified wearthreshold on 22nd of August 2012 vtv21
   turnoffzerog = which(as.numeric(as.matrix(metalong[,eni])) < 0.9) #some files have zero g when battery drios
-  
   # step 1: identify islands
   r1 = r2 = r3 = matrix(0,nrow(metalong),1) 
   r1[turnoffnonw] = 1 #non-weartime
@@ -24,7 +21,6 @@ function(M,wearthreshold,ws2) {
   r3 = c(0,r3,0)
   ch1 = which(diff(r1) == 1) + 1 #variable holding indexes of diff(r1) which increase (start wear)
   ch2 = which(diff(r1) == -1) + 1 #variable holding indexes of diff(r1) which decrease (start non-wear)
-  
   if (length(ch1) > 1) { #there are at least 2 non-wear periods
     wear = matrix(0,(length(ch1)-1),3) #characteristics of all wear period in between non-wear periods
     for (weari in 1:(length(ch1)-1)) {
@@ -68,7 +64,6 @@ function(M,wearthreshold,ws2) {
     r3b = c(0,r3,0)
     ch1 = which(diff(r1b) == 1) + 1 #variable holding indexes of diff(r1) which increase (start wear)
     ch2 = which(diff(r1b) == -1) + 1 #variable holding indexes of diff(r1) which decrease (start non-wear)
-    
     if (length(ch1) > 1) { #there are at least 2 non-wear periods
       wear = matrix(0,(length(ch1)-1),3) #characteristics of all wear period in between non-wear periods
       for (weari in 1:(length(ch1)-1)) {

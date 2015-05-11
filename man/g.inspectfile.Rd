@@ -1,10 +1,10 @@
 \name{g.inspectfile}
 \alias{g.inspectfile}
 \title{
-function to inspect binary accelerometer file for brand, sample frequency and header
+function to inspect accelerometer file for brand, sample frequency and header
 }
 \description{
-Inspects binary accelerometer file for key information, including: monitor brand, sample frequency and file header
+Inspects accelerometer file for key information, including: monitor brand, sample frequency and file header
 }
 \usage{
 g.inspectfile(datafile)
@@ -26,5 +26,5 @@ name of data file
 }
 
 \author{
-Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+Vincent T van Hees <vincentvanhees@gmail.com>
 }

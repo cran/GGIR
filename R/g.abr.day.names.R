@@ -1,5 +1,4 @@
 g.abr.day.names = function(daynames) {
-  
   tmp =rep(0,length(daynames))
   daynamesnew =rep("",length(daynames))
   tmp[which(daynames=="Monday")] = 1
@@ -9,9 +8,6 @@ g.abr.day.names = function(daynames) {
   tmp[which(daynames=="Friday")] = 5
   tmp[which(daynames=="Saturday")] = 6
   tmp[which(daynames=="Sunday")] = 7
-  
-  
-  
   daynamesnew[which(tmp == 1)] = "MON"
   daynamesnew[which(tmp == 2)] = "TUE"
   daynamesnew[which(tmp == 3)] = "WED"
@@ -19,7 +15,5 @@ g.abr.day.names = function(daynames) {
   daynamesnew[which(tmp == 5)] = "FRI"
   daynamesnew[which(tmp == 6)] = "SAT"
   daynamesnew[which(tmp == 7)] = "SUN"
-  
   g.convert.day.names= daynamesnew
-  
 }

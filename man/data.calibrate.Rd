@@ -5,8 +5,7 @@
 Example output from g.calibrate
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
-C is example output from g.calibrate
+data.calibrate is example output from \link{g.calibrate}
 }
 \usage{data(data.calibrate)}
 \format{

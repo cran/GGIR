@@ -7,7 +7,7 @@ days of the measurement
 }
 \description{
 Functions takes the output from \link{g.getmeta} and information about the study
-protocol to impute the data.
+protocol to label impute invalid time segments in the data.
 }
 \usage{
 g.impute(M, I, strategy = 1, hrs.del.start = 0, hrs.del.end = 0, maxdur = 0,
@@ -26,7 +26,7 @@ ndayswindow = 7)
     based on \code{hrs.del.start}, \code{hrs.del.end}, and \code{maxdur}.
     Value = 2 makes that only the data between the first midnight and the last
     midnight is used for imputation. Value = 3 only selects the most active X days
-    in the files. X is specified by arguement \code{ndayswindow}
+    in the files. X is specified by argument \code{ndayswindow}
   }
   \item{hrs.del.start}{
     how many HOURS after start of experiment did wearing of monitor start?
@@ -75,5 +75,5 @@ IMP = g.impute(M=data.getmeta, I=data.inspectfile)
 }
 
 \author{
-  Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+  Vincent T van Hees <vincentvanhees@gmail.com>
 }

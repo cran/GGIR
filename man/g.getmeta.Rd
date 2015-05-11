@@ -1,14 +1,14 @@
 \name{g.getmeta}
 \alias{g.getmeta}
 \title{
-function to extract meta-data (features) from data in binary file
+function to extract meta-data (features) from data in accelerometer file
 }
 \description{
-Reads a binary file in blocks, extracts various features and stores average  feature
+Reads a accelerometer file in blocks, extracts various features and stores average  feature
 value per short or long epoch. Acceleration and angle metrics are stored at short
 epoch length. The non-wear indication score, the clipping score, temperature
 (if available), light (if available), and Euclidean norm are stored at long epoch
-length. The function has been designed and thoroughly tested with binary files 
+length. The function has been designed and thoroughly tested with accelerometer files 
 from GENEA and GENEActiv. Further, the function should be able to cope with csv-format
 data procuded by GENEActiv and Actigraph
 }
@@ -17,14 +17,14 @@ g.getmeta(datafile, desiredtz = "Europe/London",
 windowsizes = c(5, 900, 3600),daylimit = FALSE, 
 offset = c(0,0,0), scale = c(1,1,1),
 tempoffset = c(0,0,0),do.bfen = FALSE, do.enmo = TRUE,
-do.angle = FALSE, do.lfenmo = FALSE, do.en = FALSE,
+do.lfenmo = FALSE, do.en = FALSE,
 do.hfen = FALSE, do.hfenplus = FALSE,
 do.teLindert2013=FALSE,do.anglex=FALSE,do.angley=FALSE,do.anglez=FALSE,
 do.enmoa = FALSE,
 lb = 0.2,hb = 15, n = 4,meantempcal=c(),chunksize=c())
 }
 \arguments{
-  \item{datafile}{name of binary file
+  \item{datafile}{name of accelerometer file
 }
   \item{desiredtz}{desired timezone: see also http://en.wikipedia.org/wiki/Zone.tab
 }
@@ -49,8 +49,6 @@ lb = 0.2,hb = 15, n = 4,meantempcal=c(),chunksize=c())
 }
   \item{do.enmo}{if TRUE (default), calculate metric ENMO with negative values
   rounded to zero
-}
-  \item{do.angle}{if TRUE, calculate metric angle using only the y-axis
 }
   \item{do.lfenmo}{if TRUE, calculate metric LFENMO with low-pass filter
   configuration set by \code{hb}
@@ -89,15 +87,15 @@ lb = 0.2,hb = 15, n = 4,meantempcal=c(),chunksize=c())
   \item{n}{order of the frequency filter
 }
   \item{meantempcal}{mean temperature corresponding to the data as used for 
-autocalibration. Only applies to data collected with GENEActiv monitor. If
-autocalibration is not done or if temperature was not available then leave
-blank (default)
+autocalibration. If autocalibration is not done or if temperature was not
+available then leave blank (default)
 }
 \item{chunksize}{number between 0.2 and 1 to specificy the size of chunks to be 
 loaded as a fraction of a 24 hour period, e.g. 0.5 equals 12 hour chunks.
 The default is 1 (24 hrs). For machines with less than 4Gb of RAM memory a value
 below 1 is recommended.
 }
+
 }
 \value{
   \item{metalong}{dataframe with long epoch meta-data: EN, non-wear score,
@@ -128,5 +126,5 @@ e61691. doi:10.1371/journal.pone.0061691
 }
 
 \author{
-Vincent T van Hees <vincent.van-hees@newcastle.ac.uk>
+Vincent T van Hees <vincentvanhees@gmail.com>
 }
