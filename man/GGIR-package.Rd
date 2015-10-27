@@ -3,7 +3,7 @@
 \alias{GGIR}
 \docType{package}
 \title{
-a package to process multi-day raw accelerometer data
+A package to process multi-day raw accelerometer data
 }
 \description{
 GGIR is an R-package to process multi-day raw accelerometer data. It was developed
@@ -55,16 +55,24 @@ So, function g.shell.GGIR basically is the central point for operating both g.pa
 g.part2 and most users should not really need to interact with g.part1 or g.part2
 directly.\cr
 \cr
+More recently I expanded the package with g.part3 and g.part4 which 
+provide functionality for estimating sleep and sustained inactivity bouts.\cr
+\cr
 If you want to use this package for a different data format (e.g. from a different
 accelerometer brand) then please provide me with: the R-code to read the data and
-example files for testing purposes.
+example files for testing purposes.\cr
+\cr
+You can thank me for sharing the code in this package and for developing 
+it as a generic purpose tool by citing the package name and by
+citing the supporting publications in your own scientific
+journal/conference publications. 
 }
 \details{
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.1-5\cr
-Date: \tab 2015-05-11\cr
+Version: \tab 1.2-0\cr
+Date: \tab 2015-10-27\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 Discussion group: \tab https://groups.google.com/forum/#!forum/rpackageggir\cr
 }
@@ -80,17 +88,14 @@ Discussion group: \tab https://groups.google.com/forum/#!forum/rpackageggir\cr
   #get meta-data:
   M = g.getmeta(datafile)
 }
-
 data(data.getmeta)
 data(data.inspectfile)
 data(data.calibrate)
 
 #impute meta-data:
 IMP = g.impute(M = data.getmeta, I = data.inspectfile)
-
 #analyse and produce summary:
 A = g.analyse(I = data.inspectfile, C = data.calibrate, M = data.getmeta, IMP)
-
 #plot data
 g.plot(IMP, M = data.getmeta, I = data.inspectfile, durplot=4)
 }
@@ -112,5 +117,8 @@ doi:10.1371/journal.pone.0061691
 White T, Wareham NJ, Brage S. Auto-calibration of accelerometer data for
 free-living physical activity assessment using local gravity and temperature: 
 an evaluation on four continents. J Appl Physiol (1985). 2014 Aug 7
+\item van Hees VT, Sabia S, et al. (2015) A novel, open access
+method to assess sleep duration using a wrist-worn accelerometer, 
+PLoS ONE, accepted for publication October 2015
 }
 }

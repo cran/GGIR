@@ -1,4 +1,4 @@
-g.part2.report = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
+g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
   ms2.out = "/meta/ms2.out"
   if (file.exists(paste(metadatadir,ms2.out,sep=""))) {
     if (length(dir(paste(metadatadir,ms2.out,sep=""))) == 0) {
@@ -148,8 +148,8 @@ g.part2.report = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),maxdur = 7) 
       #---------------------------------------------------------------
       if (pdfpagecount == 100 | pdfpagecount == 200 | pdfpagecount == 300) {
         #store matrix temporarily to keep track of process
-        write.csv(SUMMARY,paste(path1,outputfolder,"/results/summary.csv",sep=""),row.names=F)
-        write.csv(daySUMMARY,paste(path1,outputfolder,"/results/daysummary.csv",sep=""),row.names=F)
+        write.csv(SUMMARY,paste(path1,outputfolder,"/results/part2_summary.csv",sep=""),row.names=F)
+        write.csv(daySUMMARY,paste(path1,outputfolder,"/results/part2_daysummary.csv",sep=""),row.names=F)
         write.csv(QCout,paste(path1,outputfolder,"/results/QC/data_quality_report.csv",sep=""),row.names=F)
       }
       pdfpagecount = pdfpagecount + 1

@@ -1,6 +1,12 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+
+\section{Changes in version 1.2-0 (release date: 27-10-2015)}{
+\itemize{
+  \item Package expanded with functions for detecting sleep (g.part3 and g.part4)
+}
+}
 \section{Changes in version 1.1-5 (release date: 11-05-2015)}{
 \itemize{
   \item Additional bugs fixs related to dealing with csv-format data from the Actigraph accelerometer brand

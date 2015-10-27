@@ -1,6 +1,7 @@
 g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M5window = c(0,24),M5L5res=10,
                       includedaycrit = 16,ilevels=c(),winhr=5,idloc=1,snloc=1,
                       mvpathreshold = c(),boutcriter=c()) {
+  winhr = winhr[1]
   fname=I$filename
   averageday = IMP$averageday
   strategy = IMP$strategy
