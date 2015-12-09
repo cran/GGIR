@@ -2,12 +2,14 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
                         do.report=c(2),overwrite=FALSE,visualreport=FALSE,...) {
   #get input variables
   input = list(...)
-  for (i in 1:length(names(input))) {
-    txt = paste(names(input)[i],"=",input[i],sep="")
-    if (class(unlist(input[i])) == "character") {
-      txt = paste(names(input)[i],"='",unlist(input[i]),"'",sep="")
+  if (length(input) > 0) {
+    for (i in 1:length(names(input))) {
+      txt = paste(names(input)[i],"=",input[i],sep="")
+      if (class(unlist(input[i])) == "character") {
+        txt = paste(names(input)[i],"='",unlist(input[i]),"'",sep="")
+      }
+      eval(parse(text=txt))
     }
-    eval(parse(text=txt))
   }
   if (length(which(ls() == "timewindow")) != 0) timewindow = input$timewindow
   # verify whether datadir is a directory or a list of files
@@ -40,11 +42,13 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
     dopart2 = TRUE
     dopart3 = TRUE
     dopart4 = TRUE
+    # dopart5 = TRUE
   } else {
     if (length(which(mode == 1)) > 0) dopart1 = TRUE
     if (length(which(mode == 2)) > 0) dopart2 = TRUE
     if (length(which(mode == 3)) > 0) dopart3 = TRUE; do.anglez = TRUE
     if (length(which(mode == 4)) > 0) dopart4 = TRUE
+    # if (length(which(mode == 5)) > 0) dopart5 = TRUE
   }
   if (filelist == TRUE) {
     metadatadir = paste(outputdir,"/output_",studyname,sep="")
@@ -108,11 +112,25 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
   if (length(which(ls() == "dofirstpage")) == 0)  dofirstpage = TRUE
   if (length(which(ls() == "visualreport")) == 0)  visualreport = FALSE
   if (length(which(ls() == "print.filename")) == 0)  print.filename = FALSE
+  if (length(which(ls() == "backup.cal.coef")) == 0)  backup.cal.coef = c()
   
-  #-----------------------------------------------------------------
+#   # specific for part 5
+#   if (length(which(ls() == "boutcriter.in")) == 0)  boutcriter.in = 0.9
+#   if (length(which(ls() == "boutcriter.lig")) == 0)  boutcriter.lig = 0.8
+#   if (length(which(ls() == "boutcriter.mvpa")) == 0)  boutcriter.mvpa = 0.8
+#   if (length(which(ls() == "threshold.lig")) == 0)  threshold.lig = 40
+#   if (length(which(ls() == "threshold.mod")) == 0)  threshold.mod = 100
+#   if (length(which(ls() == "threshold.vig")) == 0)  threshold.vig = 400
+#   if (length(which(ls() == "timewindow")) == 0)  timewindow = c("MM","WW")
+#   if (length(which(ls() == "boutdur.mvpa")) == 0)  boutdur.mvpa = c(1,5,10)
+#   if (length(which(ls() == "boutdur.in")) == 0)  boutdur.in = c(10,20,30)
+#   if (length(which(ls() == "boutdur.lig")) == 0)  boutdur.lig = c(1,5,10)
+  
+  cat("\n   g.shell.GGIR {GGIR} by Vincent van Hees\n")
   if (dopart1 == TRUE) {
-    print("=======================================================")
-    print("Running g.shell: Part 1...")
+    cat('\n')
+    cat(paste0(rep('_',options()$width),collapse=''))
+    cat("\nPart 1\n")
     g.part1(datadir=datadir,outputdir=outputdir,f0=f0,f1=f1,windowsizes = windowsizes, 
             desiredtz = desiredtz,chunksize=chunksize,studyname=studyname,
             do.enmo = do.enmo,
@@ -123,11 +141,12 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
             do.anglex=do.anglex,do.angley=do.angley,do.anglez=do.anglez,
             do.enmoa = do.enmoa,printsummary=printsummary,
             do.cal = do.cal,print.filename=print.filename,
-            overwrite=overwrite)
+            overwrite=overwrite,backup.cal.coef=backup.cal.coef)
   }
   if (dopart2 == TRUE) {
-    print("=======================================================")
-    print("Running g.shell: Part 2...")
+    cat('\n')
+    cat(paste0(rep('_',options()$width),collapse=''))
+    cat("\nPart 2\n")
     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/basic",sep="")))
     g.part2(datadir =datadir ,metadatadir=metadatadir,f0=f0,f1=f1,strategy = strategy, 
             hrs.del.start = hrs.del.start,hrs.del.end = hrs.del.end,
@@ -139,16 +158,18 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
             storefolderstructure=storefolderstructure,overwrite=overwrite)
   }
   if (dopart3 == TRUE) {
-    print("=======================================================")
-    print("Running g.shell: Part 3...")
+    cat('\n')
+    cat(paste0(rep('_',options()$width),collapse=''))
+    cat("\nPart 3\n")
     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/basic",sep="")))
     g.part3(metadatadir=metadatadir,f0=f0,
             f1=f1,anglethreshold=anglethreshold,timethreshold=timethreshold,
             ignorenonwear=ignorenonwear,overwrite=overwrite)
   }
   if (dopart4 == TRUE) {
-    print("=======================================================")
-    print("Running g.shell: Part 4...")
+    cat('\n')
+    cat(paste0(rep('_',options()$width),collapse=''))
+    cat("\nPart 4\n")
     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/ms3.out",sep="")))
     g.part4(datadir=datadir,metadatadir=metadatadir,loglocation = loglocation,
             f0=f0,f1=f1,idloc=idloc, colid = colid,coln1 = coln1,nnights = nnights,
@@ -158,13 +179,40 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
             sleeplogidnum=sleeplogidnum,def.noc.sleep=def.noc.sleep,do.visual = do.visual, #
             storefolderstructure=storefolderstructure,overwrite=overwrite)
   }
+#   if (dopart5 == TRUE) {
+#     cat('\n')
+#     cat(paste0(rep('_',options()$width),collapse=''))
+#     cat("\nPart 5\n")
+#     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
+#     g.part5(datadir=datadir,metadatadir=metadatadir,f0=f0,f1=f1,strategy=strategy,maxdur=maxdur,
+#             hrs.del.start=hrs.del.start,
+#             hrs.del.end=hrs.del.end,
+#             loglocation=loglocation,excludefirstlast=excludefirstlast,
+#             windowsizes=windowsizes,boutcriter.in=boutcriter.in,boutcriter.lig=boutcriter.lig,
+#             boutcriter.mvpa=boutcriter.mvpa,storefolderstructure=storefolderstructure,
+#             threshold.lig = threshold.lig,
+#             threshold.mod = threshold.mod,
+#             threshold.vig = threshold.vig,timewindow=timewindow,
+#             boutdur.mvpa = boutdur.mvpa,
+#             boutdur.in = boutdur.in,
+#             boutdur.lig = boutdur.lig,
+#             winhr = winhr,M5L5res = M5L5res,
+#             overwrite=overwrite,desiredtz=desiredtz)
+#   }
   #==========================
   # Report generation:
-  # check a few basic assumptions before continuoing
-  if (length(which(do.report==4)) > 0 | visualreport==TRUE) {
+  # check a few basic assumptions before continuing
+#   if (length(which(do.report==4 | do.report==5)) > 0 | visualreport==TRUE) {
+#     if (file.exists(paste(metadatadir,"/meta/ms4.out",sep=""))) {
+#     } else {
+#       cat("ERROR: First run g.shell.GGIR with mode = 4 to generate required milestone data\n")
+#       stop()
+#     }
+#   }  
+    if (length(which(do.report==4)) > 0 | visualreport==TRUE) {
     if (file.exists(paste(metadatadir,"/meta/ms4.out",sep=""))) {
     } else {
-      print("ERROR: First run g.shell.GGIR with mode = 4 to generate required milestone data")
+      cat("ERROR: First run g.shell.GGIR with mode = 4 to generate required milestone data\n")
       stop()
     }
   }  
@@ -175,26 +223,37 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
     }
   }  
   if (length(which(do.report == 2)) > 0) {
-    print("=======================================================")
-    print("Generate report for part 2...")
+    cat('\n')
+    cat(paste0(rep('_',options()$width),collapse=''))
+    cat("\nReport part 2\n")
     N.files.ms2.out = length(dir(paste(metadatadir,"/meta/ms2.out",sep="")))
     if (N.files.ms2.out < f1) f1 = N.files.ms2.out
     if (f1 == 0) f1 = N.files.ms2.out
     g.report.part2(metadatadir=metadatadir,f0=f0,f1=f1,maxdur=maxdur)
   }
   if (length(which(do.report == 4)) > 0) {
-    print("=======================================================")
-    print("Generate report for part 4...")
+    cat('\n')
+    cat(paste0(rep('_',options()$width),collapse=''))
+    cat("\nReport part 4\n")
     N.files.ms4.out = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
     if (N.files.ms4.out < f1) f1 = N.files.ms4.out
     if (f1 == 0) f1 = N.files.ms4.out
     g.report.part4(datadir=datadir,metadatadir=metadatadir,loglocation =loglocation,f0=f0,f1=f1,
                    storefolderstructure=storefolderstructure)
   }
-  
+#   if (length(which(do.report == 5)) > 0) {
+#     cat('\n')
+#     cat(paste0(rep('_',options()$width),collapse=''))
+#     cat("\nReport part 5\n")
+#     N.files.ms5.out = length(dir(paste(metadatadir,"/meta/ms5.out",sep="")))
+#     if (N.files.ms5.out < f1) f1 = N.files.ms5.out
+#     if (f1 == 0) f1 = N.files.ms5.out
+#     g.part5.report(metadatadir=metadatadir,f0=f0,f1=f1,loglocation=loglocation)
+#   }
   if (visualreport == TRUE) {
-    print("=======================================================")
-    print("Generate visual reports...")
+    cat('\n')
+    cat(paste0(rep('_',options()$width),collapse=''))
+    cat("\nGenerate visual reports\n")
     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
     g.plot5(metadatadir=metadatadir,dofirstpage=dofirstpage,
             viewingwindow=viewingwindow,f0=f0,f1=f1,overwrite=overwrite)

@@ -57,7 +57,9 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
     }
     if (overwrite == TRUE) skip = 0
     if (skip ==0) {
-      print(paste("P2 file ",i,sep=""))
+      cat(paste(" ",i,sep=""))
+      
+      
       M = c()
       filename_dir = c()
       filefoldername = c()

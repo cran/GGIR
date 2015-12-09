@@ -206,18 +206,29 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
       # the end-user can generate this document based on calibration analysis done with the same accelerometer device.
       if (length(backup.cal.coef) > 0 & check.backup.cal.coef == TRUE) { 
         bcc.data = read.csv(backup.cal.coef)
-        if (length(which(bcc.data$filename == fnames[j])) > 0) {
+        cat("\nTry to retrieve back-up calibration coefficients as provided by argument backup.cal.coef:\n")
+        if (length(which(as.character(bcc.data$filename) == fnames[j])) > 0) {
+          cat("\nMatching filename found in backup.cal.coef\n")
           bcc.i = which(bcc.data$filename == fnames[j])
           bcc.scalei = which(colnames(bcc.data) == "scale.x" | colnames(bcc.data) == "scale.y" | colnames(bcc.data) == "scale.z")
           bcc.offseti = which(colnames(bcc.data) == "offset.x" | colnames(bcc.data) == "offset.y" | colnames(bcc.data) == "offset.z")
           bcc.temp.offseti = which(colnames(bcc.data) == "temperature.offset.x" | colnames(bcc.data) == "temperature.offset.y" | colnames(bcc.data) == "temperature.offset.z")
-          C$scale = bcc.data[bcc.i[1],bcc.scalei]
-          C$offset = bcc.data[bcc.i[1],bcc.offseti]
-          C$tempoffset=  bcc.data[bcc.i[1],bcc.temp.offseti]
+          C$scale = as.numeric(bcc.data[bcc.i[1],bcc.scalei])
+          C$offset = as.numeric(bcc.data[bcc.i[1],bcc.offseti])
+          C$tempoffset=  as.numeric(bcc.data[bcc.i[1],bcc.temp.offseti])
+          cat("\nNew offset correction:\n")
+          print(C$offset)
+          cat("\nNew scale correction:\n")
+          print(C$scale)
+          cat("\nNew tempoffset correction:\n")
+          print(C$tempoffset)
+          cat("\n----------------------------------------\n")
+        } else {
+          cat("\nNo matching filename found in backup.cal.coef\n")
+          cat(paste0("\nCheck that filename ",fnames[j]," exists in the csv-file\n"))
         }
       }
-      
-      
+    
       #------------------------------------------------
       print("get meta data...")
       M = g.getmeta(datafile,                  

@@ -71,8 +71,8 @@ journal/conference publications.
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.2-0\cr
-Date: \tab 2015-10-27\cr
+Version: \tab 1.2-1\cr
+Date: \tab 2015-12-9\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 Discussion group: \tab https://groups.google.com/forum/#!forum/rpackageggir\cr
 }
@@ -117,8 +117,7 @@ doi:10.1371/journal.pone.0061691
 White T, Wareham NJ, Brage S. Auto-calibration of accelerometer data for
 free-living physical activity assessment using local gravity and temperature: 
 an evaluation on four continents. J Appl Physiol (1985). 2014 Aug 7
-\item van Hees VT, Sabia S, et al. (2015) A novel, open access
-method to assess sleep duration using a wrist-worn accelerometer, 
-PLoS ONE, accepted for publication October 2015
+\item van Hees VT, Sabia S, et al. (2015) A novel, open access method to
+assess sleep duration using a wrist-worn accelerometer, PLoS ONE, November 2015
 }
 }

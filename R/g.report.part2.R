@@ -36,7 +36,7 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
     #-----------------------------
     # Loop through all the files
     for (i in f0:f1) {
-      print(paste("Report P2 file ",i,sep=""))
+      cat(paste(" ",i,sep=""))
       if (pdfpagecount == 301) { # generate new pdf for every 300 plots
         pdfpagecount = 1
         pdffilenumb = pdffilenumb + 1

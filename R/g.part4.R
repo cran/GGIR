@@ -8,25 +8,18 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
   # possibly aided by sleep log/diary information (if available and provided by end-user)
   nnpp = 40
   #-------------------------------------------------
-  # if output folders for mile-stone data
   ms3.out = "/meta/ms3.out"
   if (file.exists(paste(metadatadir,ms3.out,sep=""))) {
   } else {
-    print("Error: First run g.part3 (mode = 3) before running g.part4 (mode = 4)")
+    cat("Error: First run g.part3 (mode = 3) before running g.part4 (mode = 4)")
   }
-  
   ms4.out = "/meta/ms4.out"
   if (file.exists(paste(metadatadir,ms4.out,sep=""))) {
   } else {
     dir.create(file.path(metadatadir,ms4.out))
   }
   meta.sleep.folder = paste(metadatadir,"/meta/ms3.out",sep="")
-  if (length(loglocation) > 0) { #do you want to fall back on generic assumptions about sleep if sleep log is not available?
-    only.use.sleeplog = TRUE
-  } else {
-    only.use.sleeplog = FALSE
-  }
-  #=============================================
+  #------------------------------------------------
   # Get sleeplog data
   reloadlog = TRUE
   if (length(loglocation) > 0) {
@@ -43,11 +36,11 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
       load(file=paste(metadatadir,"/meta/sleeplog.RData",sep=""))
     }
   }
-  #============================================================================
-  # get list of milestone data from sleep (g.part3)
+  #------------------------------------------------
+  # get list of accelerometer milestone data files from sleep (produced by g.part3)
   fnames = dir(meta.sleep.folder)
   if (f1 > length(fnames)) {
-    print(paste("f1 changed from, ",f1," to ",length(fnames),sep=""))
+    # cat(paste("File index f1 automatically changed from, ",f1,"to",length(fnames)," ",sep=""))
     f1 = length(fnames)
   }
   logdur = rep(0,length(fnames))
@@ -55,10 +48,9 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
   idlabels = rep(0,nnpp)
   if (f1 == 0 | length(f1) == 0 | f1 > length(fnames))  f1 = length(fnames)
   pagei = 1
-  
   #-----------------------------------------------------
-  nightsummary = as.data.frame(matrix(0,0,29)) 
   # specify output variable names
+  nightsummary = as.data.frame(matrix(0,0,29)) 
   colnames(nightsummary) = c("id", "night","acc_onset", "acc_wake", "acc_timeinbed", "acc_def", 
                              "sleeplog_onset", "sleeplog_wake", "sleeplog_timeinbed",
                              "error_onset", "error_wake", "error_dur",
@@ -67,12 +59,6 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                              "acc_onset_ts","acc_wake_ts","sleeplog_onset_ts", "sleeplog_wake_ts",
                              "page","daysleeper","weekday","calendardate","filename",
                              "cleaningcode","sleeplog_used","acc_available")
-  if (storefolderstructure == TRUE) {
-    nightsummary2 = as.data.frame(matrix(0,0,31))
-    colnames(nightsummary2) = c(as.character(colnames(nightsummary)),"filename_dir","foldername")
-    rm(nightsummary)
-    nightsummary = nightsummary2
-  }
   colnamesnightsummary = colnames(nightsummary)
   sumi = 1
   sleeplog_used = rep(" ",((f1-f0)+1))
@@ -122,7 +108,11 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
     }
   }
   cnt67 = 1
-  for (i in f0:f1) {   # length(fnames) #go through id's
+  #=================================================================
+  #=================================================================
+  # start of loop through the participants
+  for (i in f0:f1) {
+    # decide whether file was processed before
     if (length(ffdone) > 0) {
       if (length(which(ffdone == fnames[i])) > 0) { 
         skip = 1 #skip this file because it was analysed before")
@@ -132,8 +122,9 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
     } else {
       skip = 0
     }
-    if (overwrite == TRUE) skip = 0
+    if (overwrite == TRUE) skip = 0 # this will make that analyses is done regardless of whether it was done before
     if (skip ==0) {
+      cat(paste(" ",i,sep=""))
       if (cnt67 == 1) { #only create new pdf if there is actually new plots to be generated
         if (do.visual == TRUE) { # keep pdf for QC purposes
           pdf(file=paste(metadatadir,"/results/visualisation_sleep.pdf",sep=""),width=8.27,height=11.69)
@@ -146,19 +137,15 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
         }
         cnt67 = 2
       }
-      
-      
       if (storefolderstructure == FALSE) {
         nightsummary = as.data.frame(matrix(0,0,29)) 
-        colnames(nightsummary) = colnamesnightsummary
-        sumi = 1
-      } else if (storefolderstructure == TRUE) {
+      } else {
         nightsummary = as.data.frame(matrix(0,0,31)) 
-        colnames(nightsummary) = colnamesnightsummary
-        sumi = 1
       }
-      print(paste("P4 file ",i,sep=""))
+      colnames(nightsummary) = colnamesnightsummary
+      sumi = 1
       L5list = sib.cla.sum = c()
+      # load data, check whether there is data, identify id numbers...
       load(paste(meta.sleep.folder,"/",fnames[i],sep=""))
       if (nrow(sib.cla.sum) != 0) { #there needs to be some information
         if (idloc == 2) {
@@ -175,7 +162,7 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
             accid[h] = as.character(unlist(strsplit(accid[h],letter[h]))[1])
           } 
           accid = as.numeric(accid)
-        } else {
+        } else { # get id from filename
           tmp = fnames[i]
           if (length(unlist(strsplit(tmp,"_"))) > 1) tmp = unlist(strsplit(tmp,"_"))[1]
           if (length(unlist(strsplit(tmp,"[.]RDa"))) > 1) tmp = unlist(strsplit(tmp,"[.]RDa"))[1]
@@ -192,6 +179,7 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
           wi = 1
         } 
         qq_temp = sib.cla.sum #sib.cla.sum is the output from g.part3
+        # create clear overview of which nights need to be procecess
         if (max(qq_temp$night) < nnights) {
           nnightlist = 1:max(qq_temp$night)
         } else {
@@ -210,10 +198,11 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
         daysleeper = rep(FALSE,length(nnights.list))
         ###########################################################
         nightj = 1
-        for (j in nnights.list) { #go throught the nights
+        for (j in nnights.list) { #go through the nights
           ######################################
           # get default onset and wake
-          # use default assumption if no other info is available
+          # use default assumption if no other info is available (def.noc.sleep is an input argument people can use
+          # to specify assumed time in bed in the absense of sleep diary in a study)
           if (length(def.noc.sleep) != 2) { #has a default nocturnal sleep window defined? if not, do this part:
             # NOW USE L5 to replace defaulttmp3 and tmp6 if L5 is a number
             if (length(L5list) > 0) {
@@ -245,7 +234,6 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
             sleeplog_used[i] = "FALSE"
             cleaningcode = 1
           }
-          
           nightj = nightj + 1
           #############################################
           acc_available = "TRUE" #default assumption
@@ -254,7 +242,7 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
           wi2 = which(sleeplog.t$night == j)
           sleeplog.t2 = sleeplog.t[wi2,]
           #-----------------------
-          # get sleep log timestamps and assess whether ti is a nightworker
+          # get sleep log timestamps and assess whether it is a nightworker
           ###################################
           # SLEEP DIARY BLOCK
           # onset
@@ -305,6 +293,7 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
             logdur[i] = tmp6 - tmp3
             cleaningcode = 1 # no diary available for this night
           }
+          #-----------------------------------------
           #plan analysis according to knowledge about whether it is a daysleeper or not
           if (excludefirstlast==FALSE) { #if you are not excluding the last day
             if (daysleeper[j] == TRUE & j != max(nnights.list)) { #and is a daysleeper and not the last night
@@ -327,7 +316,6 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
           }
           #################################################################################
           # START ANALYSIS OF NIGHT SLEEPERS (defined as people for whom sleep window does not overlap with noon)
-          #       print(daysleeper[j])
           if (daysleeper[j] == FALSE & loaddays == 1) {
             # now get accelerometer sleep detection
             qq = sib.cla.sum #$output
@@ -435,12 +423,15 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                   spo[1,3] = 0
                   spo[1,4] = 0
                   spo[1,5] = k
+                  tmpCmd = paste("spo_day",k,"= c()",sep="")
+                  eval(parse(text = tmpCmd))
                 } else {
                   DD = g.create.sp.mat(nsp,spo,sleepdet.t,daysleep=daysleeper[j])
-                  wdayname[j] = DD$wdayname
-                  calendardate[j] = DD$calendardate
+                  if (loaddaysi == 1) { # newly added 25/11/2015
+                    wdayname[j] = DD$wdayname
+                    calendardate[j] = DD$calendardate
+                  }
                   spo = DD$spo
-                  
                   #================================================
                   if (daysleeper[j] == TRUE & loaddaysi == 1) {
                     w1 = which(spo[,3] >= 18) #only use periods ending after 6pm
@@ -527,7 +518,7 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
           if (do.visual ==  TRUE) {
             # PLOT
             if (cnt == (nnpp+1)) {
-              print("NEW")
+              cat(" NEW ")
               pagei = pagei + 1
               # add y-axis before starting new page
               axis(side=2, at = 1:nnpp,labels = idlabels,las=1,cex.axis=0.6)
@@ -691,9 +682,9 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                 if (defi == undef[1]) { #only decide whether to plot the first time
                   if (outliers.only == TRUE) {
                     if (abs(nightsummary$error_onset[sumi]) > criterror | abs(nightsummary$error_wake[sumi]) > criterror |
-                          abs(nightsummary$error_dur[sumi]) > (criterror * 2)) {
+                        abs(nightsummary$error_dur[sumi]) > (criterror * 2)) {
                       doplot = TRUE
-                      print("plot")
+                      cat(" PLOT ")
                     } else {
                       doplot = FALSE
                     }
@@ -749,6 +740,8 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                 nightsummary[sumi,30] = ffd[i] #full filename structure
                 nightsummary[sumi,31] = ffp[i] #use the lowest foldername as foldername name
               }
+              
+              
               sumi = sumi + 1
             } #run through definitions
             if (do.visual == TRUE) {
@@ -789,5 +782,6 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
       axis(side=2, at = 1:nnpp,labels = idlabels,las=1,cex.axis=0.5)
     }
     dev.off()
+    cnt67 = 1
   }
 }

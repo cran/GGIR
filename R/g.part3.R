@@ -33,8 +33,8 @@ g.part3 = function(metadatadir=c(),f0,f1,anglethreshold = 5,
     FI = file.info(paste(metadatadir,"/meta/basic/",fnames[i],sep=""))
     if (is.na(FI$size) == TRUE) FI$size = 0
     if (FI$size == 0 | is.na(FI$size) == TRUE | length(FI$size) == 0) {
-      print(paste("P3 file ",fnames[i],sep=""))
-      print("Filename not recognised")
+      cat(paste("P3 file ",fnames[i],sep=""))
+      cat("Filename not recognised")
     }
     fname = unlist(strsplit(fnames[i],".RData"))[1]
     fname = unlist(strsplit(fname,"eta_"))[2]
@@ -53,7 +53,8 @@ g.part3 = function(metadatadir=c(),f0,f1,anglethreshold = 5,
     if (overwrite == TRUE) skip = 0
     if (skip == 0) {  
       # Load previously stored meta-data from part1.R
-      print(paste("P3 file ",i,sep=""))
+      cat(paste(" ",i,sep=""))
+      # flush.console()
       M = c()
       load(paste(metadatadir,"/meta/basic/",fnames[i],sep=""))
       if (M$filecorrupt == FALSE & M$filetooshort == FALSE) {

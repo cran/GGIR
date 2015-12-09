@@ -1,7 +1,16 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-
+\section{Changes in version 1.2-1 (release date: 9-12-2015)}{
+\itemize{
+  \item Literature reference for sleep detection updated
+  \item Argument backup.cal.coef now with improved feedback if something goes wrong
+  \item Report generation for part 4 much faster now
+  \item Bug fixed in part 4 in assignment of dayname when a person sleeps during the day
+  \item g.shell.GGIR now capable of handling minimal input argument specifications
+  \item Console output from part 3 and 4 more compact now
+}
+}
 \section{Changes in version 1.2-0 (release date: 27-10-2015)}{
 \itemize{
   \item Package expanded with functions for detecting sleep (g.part3 and g.part4)

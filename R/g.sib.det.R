@@ -33,7 +33,7 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
     time = as.character(D[1:nD,1])
     # angle
     if (length(which(colnames(D)=="anglez")) == 0) {
-      print("metric anglez was not extracted, please make sure that anglez  is extracted")
+      cat("metric anglez was not extracted, please make sure that anglez  is extracted")
     }
     angle = as.numeric(as.matrix(D[1:nD,which(colnames(D)=="anglez")]))
     ENMO = as.numeric(as.matrix(D[1:nD,which(colnames(D)=="ENMO")]))
@@ -155,7 +155,7 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
         detection.failed = FALSE      
       }
     } else {
-      print("No midnights found")
+      cat("No midnights found")
       detection.failed = TRUE
     }
     metatmp = data.frame(time,invalid,night=night,sleep = sleep)

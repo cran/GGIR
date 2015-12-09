@@ -11,7 +11,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
   nmetrics = sum(c(do.bfen,do.enmo,do.lfenmo,do.en,do.hfen,do.hfenplus,
                    do.teLindert2013,do.anglex,do.angley,do.anglez,do.enmoa))
   if (length(nmetrics) == 0) {
-    print("WARNING: No metrics selected")
+    cat("\nWARNING: No metrics selected\n")
   }
   filename = unlist(strsplit(as.character(datafile),"/"))
   filename = filename[length(filename)]
@@ -19,15 +19,15 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
   ws3 = windowsizes[1] ; ws2 = windowsizes[2]; ws = windowsizes[3]  #window sizes
   if ((ws2/300) != round(ws2/300)) {
     ws2 = as.numeric(300 * round(ws2/300))
-    print("WARNING: The long windowsize needs to be a multitude of five minutes periods. The")
-    print(paste("long windowsize has now been automatically adjusted to: ",ws2," seconds in order to meet this criteria.",sep=""))
+    cat("\nWARNING: The long windowsize needs to be a multitude of five minutes periods. The\n")
+    cat(paste("\nlong windowsize has now been automatically adjusted to: ",ws2," seconds in order to meet this criteria.\n",sep=""))
   }
   if ((ws2/ws3) != round(ws2/ws3)) {
     def = c(1,5,10,15,20,30,60)
     def2 = abs(def - ws3)
     ws3 = as.numeric(def[which(def2 == min(def2))])
-    print("WARNING: The long windowsize needs to be a multitude of short windowsize. The ")
-    print(paste("short windowsize has now been automatically adjusted to: ",ws3," seconds in order to meet this criteria.",sep=""))
+    cat("\nWARNING: The long windowsize needs to be a multitude of short windowsize. The \n")
+    cat(paste("\nshort windowsize has now been automatically adjusted to: ",ws3," seconds in order to meet this criteria.\n",sep=""))
   }
   windowsizes = c(ws3,ws2,ws)
   start_meas = ws2/60 #ensures that first window starts at logical timepoint relative to its size (15,30,45 or 60 minutes of each hour) 
@@ -94,7 +94,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
   switchoffLD = 0 #dummy variable part "end of loop mechanism"
   while (LD > 1) {
     P = c()
-    print(paste("Loading block: ",i,sep=""))
+    cat(paste("\nLoading block: ",i,"\n",sep=""))
     options(warn=-1) #turn off warnings (code complains about unequal rowlengths
     #when trying to read files of a different format)
     if (mon == 1 & dformat == 1) {
@@ -102,7 +102,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
       if (length(P) > 1) {
         if (nrow(P$rawxyz) < ((sf*ws*2)+1) & i == 1) {
           P = c() ; switchoffLD = 1 #added 30-6-2012
-          print("Error: data too short for doing non-wear detection 1")		
+          cat("\nError: data too short for doing non-wear detection 1\n")		
           filetooshort = TRUE
         }
       } else {
@@ -110,25 +110,25 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
         if (i == 1) {
           filecorrupt = TRUE
         }
-        print("End of file reached")
+        cat("\nEnd of file reached\n")
       }
     } else if (mon == 2 & dformat == 1) {
       try(expr={P = GENEAread::read.bin(binfile=datafile,start=(blocksize*(i-1)),
                                         end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
       if (length(P) <= 2) {
-        print("initial attempt to read data unsuccessful, try again with mmap turned on:")
+        cat("\ninitial attempt to read data unsuccessful, try again with mmap turned on:\n")
         #try again but now with mmap.load turned on
         try(expr={P = GENEAread::read.bin(binfile=datafile,start=(blocksize*(i-1)),
                                           end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=TRUE)},silent=TRUE)
         if (length(P) != 0) {
-          print("data read succesfully")
+          cat("\ndata read succesfully\n")
         } else {
           switchoffLD = 1
         }
       }
       if (length(P) > 0) {
         if (nrow(P$data.out) < (blocksize*300)) { #last block
-          print("last block")
+          cat("\nlast block\n")
           switchoffLD = 1
         }
       }
@@ -137,36 +137,36 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
           #try to read without specifying blocks (file too short)
           try(expr={P = GENEAread::read.bin(binfile=datafile,calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
           if (length(P) == 0) {
-            print("Error: file possibly corrupt")
+            cat("\nError: file possibly corrupt\n")
             P= c(); switchoffLD = 1
             filecorrupt = TRUE
           } #if not then P is now filled with data
         } else {
           P= c() #just no data in this last block
-          print("not enough data in this block 3")
+          cat("\nnot enough data in this block 3\n")
         }
       }
       if (length(P) > 0) { #check whether there is enough data
         if (nrow(P$data.out) < ((sf*ws*2)+1) & i == 1) {
           P = c();  switchoffLD = 1
-          print("Error code 2: data too short for doing non-wear detection")
+          cat("\nError code 2: data too short for doing non-wear detection\n")
           filetooshort = TRUE
         }
       }
       #===============
     } else if (mon == 2 & dformat == 2) {
-      print("Geneactiv in csv-format")
+      cat("\nGeneactiv in csv-format\n")
       try(expr={P = read.csv(datafile,nrow = (blocksize*300), skip=(100+(blocksize*300*(i-1))),header = FALSE,dec=decn)},silent=TRUE)
       if (length(P) > 1) {
         P = as.matrix(P)
         if (nrow(P) < ((sf*ws*2)+1) & i == 1) {
           P = c() ; switchoffLD = 1 #added 30-6-2012
-          print("Error code 1: data too short for doing non-wear detection")		
+          cat("\nError code 1: data too short for doing non-wear detection\n")		
           filetooshort = TRUE
         }
       } else {
         P = c()
-        print("End of file reached")
+        cat("\nEnd of file reached\n")
       }
     } else if (mon == 3 & dformat == 2) {
       try(expr={P = read.csv(datafile,nrow = (blocksize*300), skip=(10+(blocksize*300*(i-1))),dec=decn)},silent=TRUE)
@@ -174,12 +174,12 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
         P = as.matrix(P)
         if (nrow(P) < ((sf*ws*2)+1) & i == 1) {
           P = c() ; switchoffLD = 1 #added 30-6-2012
-          print("Error code 1: data too short for doing non-wear detection")
+          cat("\nError code 1: data too short for doing non-wear detection\n")
           filetooshort = TRUE
         }
       } else {
         P = c()
-        print("End of file reached")
+        cat("\nEnd of file reached\n")
       }
     }
     options(warn=0) #turn on warnings
@@ -200,10 +200,10 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
       if (mon == 2) {
         meantemp = mean(as.numeric(data[,7]),na.rm=TRUE)
         if (is.na(meantemp) == T) { #mean(as.numeric(data[1:10,7]))
-          print("temperature is NA")
+          cat("\ntemperature is NA\n")
           meantemp = 0
         } else if (mean(as.numeric(data[1:10,7])) > 50) {
-          print("temperature value is unreaslistically high (> 50 Celcius)")
+          cat("\ntemperature value is unreaslistically high (> 50 Celcius)\n")
           meantemp = 0
         }
       }
@@ -355,7 +355,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
               if (is.na(starttime_d) == FALSE) {
                 starttime = starttime_d
               } else {
-                print("date not recognized")
+                cat("\ndate not recognized\n")
               }
             }
           }
@@ -363,7 +363,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
       }
       LD = nrow(data)
       if (LD < (ws*sf)) {
-        print("Error: data too short for doing non-wear detection 3")
+        cat("\nError: data too short for doing non-wear detection 3\n")
         switchoffLD = 1
         LD = 0 #ignore rest of the data and store what has been loaded so far.
       }
@@ -508,7 +508,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
         if (count > (nrow(metashort) - (2.5*(3600/ws3) *24))) {  
           extension = matrix(" ",((3600/ws3) *24),ncol(metashort)) #add another day to metashort once you reach the end of it
           metashort = rbind(metashort,extension)
-          print("variabel metashort extended")
+          cat("\nvariabel metashort extended\n")
         }
         col_msi = 2
         if (do.bfen == TRUE) {
@@ -576,7 +576,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
         }
         ##==================================================
         # MODULE 2 - non-wear time & clipping
-        #print("module 2") #notice that windows overlap for non-wear detecting
+        #cat("\nmodule 2\n") #notice that windows overlap for non-wear detecting
         window2 = ws2 * sf #window size in samples
         window = ws * sf #window size in samples
         nmin = floor(LD/(window2)) #nmin = minimum number of windows that fit in this block of data
@@ -687,7 +687,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
       } #end of section which is skipped when switchoff == 1
     } else {
       LD = 0 #once LD < 1 the analysis stops, so this is a trick to stop it
-      print("stop reading because there is not enough data in this block")
+      cat("\nstop reading because there is not enough data in this block\n")
     }
     if (switchoffLD == 1) {
       LD = 0
@@ -695,7 +695,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
     if (ceiling(daylimit) != FALSE) {
       if (i == ceiling(daylimit)) { #to speed up testing only read first 'i' blocks of data
         LD = 0 #once LD < 1 the analysis stops, so this is a trick to stop it
-        print(paste("stopped reading data because this analysis is limited to ",ceiling(daylimit)," days",sep=""))
+        cat(paste("\nstopped reading data because this analysis is limited to ",ceiling(daylimit)," days\n",sep=""))
       }
     }
     i = i + 1 #go to next block

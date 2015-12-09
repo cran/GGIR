@@ -57,7 +57,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   n_ws2_perday = (1440*60) / ws2
   n_ws3_perday = (1440*60) / ws3
   if (((nrow(metalong)/((1440*60)/ws2)*10) - (nrow(metashort)/((60/ws3)*1440)) * 10) > 1) {
-    print("Matrices 'metalong' and 'metashort' are not compatible")
+    cat("Matrices 'metalong' and 'metashort' are not compatible")
   }  
   #----------------------
   # Pelotas specific
@@ -138,7 +138,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   ndays = length(midnights) + 1 #ceiling(nfulldays + 2) # ceiling to cope with days with 23 hours
   
   if (ndays != round(ndays)) { #day saving time causing trouble?
-    print("One day in this measurement is longer or shorter than 24 hours (probably related to day saving time)")
+    cat("One day in this measurement is longer or shorter than 24 hours (probably related to day saving time)")
   }    
   #--------------------------------------
   # derivation of distribution characteristics of the average day: quantiles (percentiles) and L5M5 method
@@ -199,13 +199,13 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     if (firstmidnighti == 1) {  #new 28-11-2012 #if measurement starts at midnight
       ndays = ndays - 1  #new 28-11-2012
       startatmidnight =  1   #new 28-11-2012
-      print("measurement starts at midnight or there is no midnight")  #new 28-11-2012
+      cat("measurement starts at midnight or there is no midnight")  #new 28-11-2012
     }
     endatmidnight = 0
     if (lastmidnight == time[length(time)] ) {	#if measurement ends at midnight
       ndays = ndays - 1
       endatmidnight = 1
-      print("measurement ends at midnight or there is no midnight")
+      cat("measurement ends at midnight or there is no midnight")
     }
 #     if (lastmidnighti == firstmidnighti) { #turned off 11 may 2015, because for some projects one night may be still useful
 #       tooshort = 1
@@ -533,7 +533,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       MA[h] = mean(average24h) #average acceleration in an average 24 hour cycle
     }
   } else {
-    print("file skipped for general average caculation because not enough data")
+    cat("file skipped for general average caculation because not enough data")
   }
   id[which(id == "NA")] =iid[which(id == "NA")]
   id2[which(id2 == "NA")] =iid2[which(id2 == "NA")]

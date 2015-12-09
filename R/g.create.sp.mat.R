@@ -1,4 +1,5 @@
 g.create.sp.mat = function(nsp,spo,sleepdet.t,daysleep=FALSE) {
+  
   if (daysleep == FALSE) {
     th2 = 12
   } else {
@@ -9,14 +10,22 @@ g.create.sp.mat = function(nsp,spo,sleepdet.t,daysleep=FALSE) {
   for (sp in 1:nsp) {
     spo[sp,1] = sp
     tmp7 = as.character(sleepdet.t$sib.onset.time[which(sleepdet.t$sib.period == sp)])
+    tmp7w = as.character(sleepdet.t$sib.onset.time[which(sleepdet.t$sib.period == sp)])
     if (length(tmp7) > 0) {
       if (tmp7 != "") {
         tmp8 = unlist(strsplit(tmp7," "))
+        tmp8w = unlist(strsplit(tmp7w," "))
         tmp9 = unlist(strsplit(tmp8[2],":"))
+        tmp9w = unlist(strsplit(tmp8w[2],":"))
         if (length(tmp8) == 1) {
           tmp10 = 0
         } else {
           tmp10 = as.numeric(tmp9[1]) + (as.numeric(tmp9[2])/60) + (as.numeric(tmp9[3])/3600)
+        }
+        if (length(tmp8w) == 1) {
+          tmp10w = 0
+        } else {
+          tmp10w = as.numeric(tmp9w[1]) + (as.numeric(tmp9w[2])/60) + (as.numeric(tmp9w[3])/3600)
         }
         # get weekday
         if (sp == 1) { #first sleep period
@@ -26,8 +35,8 @@ g.create.sp.mat = function(nsp,spo,sleepdet.t,daysleep=FALSE) {
           wday_safe = wday + 1 #change to 1-7 number
           calendardate_safe = paste(soso$mday,"/",(soso$mon+1),"/",(soso$year+1900),sep="")
         }
-        if (sp == nsp)   { #last sleep period
-          soso = unclass(as.POSIXlt(tmp7))
+        if (sp == nsp)   { #waking up of last sleep period
+          soso = unclass(as.POSIXlt(tmp7w))
           wday = soso$wday #day of the week 0-6 and 0 is Sunday
           wday = wday + 1 #change to 1-7 number
           # check whether both beginning and end of the night are on the same day
@@ -35,7 +44,7 @@ g.create.sp.mat = function(nsp,spo,sleepdet.t,daysleep=FALSE) {
             wdayname = weekdays[wday_safe]
             calendardate = calendardate_safe
           } else { #start and end at the same day
-            if (tmp10 > th2) { #sleep period starts at first day
+            if (tmp10w > th2) { #end of last sleep period starts at first day (end of night is before midnight)
               wdayname = weekdays[wday_safe]
               calendardate = paste(soso$mday,"/",(soso$mon+1),"/",(soso$year+1900),sep="")
             } else { #second day
@@ -47,8 +56,8 @@ g.create.sp.mat = function(nsp,spo,sleepdet.t,daysleep=FALSE) {
               calendardate = paste(soso$mday,"/",(soso$mon+1),"/",(soso$year+1900),sep="")
             }
           }
-          #           print(paste(wdayname," ",calendardate,sep=""))
         }
+
         # wake
         tmp11 = as.character(sleepdet.t$sib.end.time[which(sleepdet.t$sib.period == sp)])
         tmp12 = unlist(strsplit(tmp11," "))

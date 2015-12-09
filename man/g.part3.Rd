@@ -80,7 +80,6 @@ g.part3(metadatadir=metadatadir,anglethreshold=5,timethreshold=5,overwrite=FALSE
 \references{
 \itemize{
 \item van Hees VT, Sabia S, et al. (2015) A novel, open access method to
-assess sleep duration using a wrist-worn accelerometer, PLoS ONE, accepted
-for publication October 2015
+assess sleep duration using a wrist-worn accelerometer, PLoS ONE, November 2015
 }
 }

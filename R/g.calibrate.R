@@ -70,7 +70,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       try(expr={P = GENEAread::read.bin(binfile=datafile,start=(blocksize*(i-1)),end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
       if (length(P) > 0) {
         if (nrow(P$data.out) < blocksize*300) { #last block
-          print("last block")
+          cat("\nlast block\n")
           switchoffLD = 1 #this section is not needed for mon = 1 as genea script deals with file-ends automatically
         }
       }
@@ -97,12 +97,12 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
         P = as.matrix(P)
         if (nrow(P) < ((sf*ws*2)+1) & i == 1) {
           P = c() ; switchoffLD = 1 #added 30-6-2012
-          print("Error code 1: data too short for doing non-wear detection")  	
+          cat("\nError code 1: data too short for doing non-wear detection\n")  	
           filetooshort = TRUE
         }
       } else {
         P = c()
-        print("End of file reached")
+        cat("\nEnd of file reached\n")
       }
     } else if (mon == 3 & dformat == 2) {
       try(expr={P = read.csv(datafile,nrow = (blocksize*300), skip=(10+(blocksize*300*(i-1))),dec=decn)},silent=TRUE)
@@ -111,12 +111,12 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
         P = as.matrix(P)
         if (nrow(P) < ((sf*ws*2)+1) & i == 1) {
           P = c() ; switchoffLD = 1 #added 30-6-2012
-          print("Error code 1: data too short for doing non-wear detection")
+          cat("\nError code 1: data too short for doing non-wear detection\n")
           filetooshort = TRUE
         }
       } else {
         P = c()
-        print("End of file reached")
+        cat("\nEnd of file reached\n")
       }
     }
     options(warn=0) #turn on warnings
@@ -169,10 +169,10 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
           }
           if (mon == 2 & use.temp == TRUE) { #also ignore temperature for GENEActive if temperature values are unrealisticly high or NA
             if (length(which(is.na(mean(as.numeric(data[1:10,7]))) == T)) > 0) {
-              print("temperature is NA")
+              cat("\ntemperature is NA\n")
               use.temp = FALSE
             } else if (length(which(mean(as.numeric(data[1:10,7])) > 40)) > 0) {
-              print("temperature is too high")
+              cat("\ntemperature is too high\n")
               use.temp = FALSE
             }
           }
@@ -199,7 +199,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
           if (count > (nrow(meta) - (2.5*(3600/ws4) *24))) {  
             extension = matrix(" ",((3600/ws4) *24),ncol(meta))
             meta = rbind(meta,extension)
-            print("variabel meta extended")
+            cat("\nvariabel meta extended\n")
           }
           #storing in output matrix
           meta[count:(count-1+length(EN2)),1] = EN2
@@ -232,7 +232,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       }
     } else {
       LD = 0 #once LD < 1 the analysis stops, so this is a trick to stop it
-      print("stop reading because there is not enough data in this block")
+      cat("\nstop reading because there is not enough data in this block\n")
     }
     spherepopulated = 0
     if (switchoffLD == 1) {
@@ -277,7 +277,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
           QC = "recalibration not done because not enough points on all sides of the sphere"
         }
       } else {
-        print("no non-movement found")
+        cat("\nno non-movement found\n")
         QC = "recalibration not done because no non-movement data available"
         meta_temp = c()
       }
