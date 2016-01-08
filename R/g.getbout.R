@@ -2,7 +2,7 @@ g.getbout = function(rr,boutdur2,boutcriter=100,p) {
   rrt = rr # zeros as long as there are epochs in the timewindow
   jmvpa = 1
   LRR = length(rr)
-  while(jmvpa <= length(p)) { # go thourgh all epochs that are possibly part of a bout
+  while(jmvpa <= length(p)) { # go through all epochs that are possibly part of a bout
     endi = p[jmvpa]+boutdur2
     if (endi <= LRR) { #does bout fall without measurement?
       if (sum(rr[p[jmvpa]:endi]) > (boutdur2*boutcriter)) {

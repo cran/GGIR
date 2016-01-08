@@ -110,7 +110,7 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
         if (I$dformn == "csv") { #if it was stored in csv-format then underscores were replaced by spaces (by company)
           SN = hvalues[which(hnames == "Device Unique Serial Code")] #serial number  		
         }
-      } else if (mon == "actigraph") { #todo: create automatic extraction of information from actigraph fileheader
+      } else if (mon == "actigraph" | mon == "axivity") { #todo: create automatic extraction of information from actigraph fileheader
         SN = "not extracted" #gender
       }
       if (length(C$offset) == 0) {

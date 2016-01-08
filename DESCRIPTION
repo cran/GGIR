@@ -1,8 +1,8 @@
 Package: GGIR
 Type: Package
 Title: Raw Accelerometer Data Analysis
-Version: 1.2-1
-Date: 2015-12-9
+Version: 1.2-2
+Date: 2016-01-7
 Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                   email="vincentvanhees@gmail.com"),
                   person("Zhou","Fang",role="ctb"),
@@ -14,10 +14,10 @@ License: LGPL (>= 2.0, < 3)
 Suggests: MASS, signal, zoo, mmap, bitops, matlab, GENEAread
 Depends: stats, utils, R (>= 2.10)
 NeedsCompilation: no
-Packaged: 2015-12-09 06:42:54 UTC; vincent
+Packaged: 2016-01-07 23:08:14 UTC; vincent
 Author: Vincent T van Hees [aut, cre],
   Zhou Fang [ctb],
   Jing Hua Zhao [ctb],
   Severine Sabia [ctb]
 Repository: CRAN
-Date/Publication: 2015-12-09 08:12:34
+Date/Publication: 2016-01-08 00:21:13

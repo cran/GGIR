@@ -692,7 +692,14 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                     doplot = TRUE
                   }
                 }
-                if (doplot == TRUE & cleaningcode < 2) {
+                # upcoming 5 lines added to avoid ending up with meaningless visualisations of nights
+                # for which no sleep log entry was available, and for which L5 method provided estimates
+                if (length(loglocation) > 0) { 
+                  cleaningcriterion = 1
+                } else {
+                   cleaningcriterion = 2
+                }
+                if (doplot == TRUE & cleaningcode < cleaningcriterion) {
                   idlabels[cnt] = paste("id",accid," night",j,sep="")
                   den = 20
                   defii = which(undef == defi)              
@@ -745,7 +752,7 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
               sumi = sumi + 1
             } #run through definitions
             if (do.visual == TRUE) {
-              if (cleaningcode < 2 & doplot == TRUE) { #only increase count if there was bar plotted
+              if (cleaningcode < cleaningcriterion & doplot == TRUE) { #only increase count if there was bar plotted
                 lines(x=c(12,36),y=c(cnt,cnt),lwd=0.2,lty=2)  #abline(h=cnt,lwd=0.2,lty=2)
                 if (daysleeper[j] == TRUE) {
                   lines(x=c(18,18),y=c((cnt-0.3),(cnt+0.3)),lwd=2,lty=2,col="black")

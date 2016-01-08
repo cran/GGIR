@@ -3,6 +3,7 @@ g.inspectfile = function(datafile) {
     sf = c(); isitageneactive = c();  isitagenea = c();  mon = c();dformat = c() #generating empty variables
     tmp1 = unlist(strsplit(filename,"[.]c"))
     tmp2 = unlist(strsplit(filename,"[.]b"))
+    tmp3 = unlist(strsplit(filename,"[.]w"))
     if (tmp1[length(tmp1)] == "sv") { #this is a csv file
       dformat = 2 #2 = csv
       testcsv = read.csv(paste(datafile,sep=""),nrow=10,skip=10)
@@ -13,6 +14,9 @@ g.inspectfile = function(datafile) {
       }
     } else if (tmp2[length(tmp2)] == "in") { #this is a bin file
       dformat = 1 #1 = binary
+    } else if (tmp3[length(tmp3)] == "av") { #this is a wav file
+      dformat = 3 #3 = wav
+      mon = 4
     }
     if (dformat == 1) {
       # try read the file as if it is a geneactiv and store output in variable 'isitageneactive'
@@ -107,6 +111,9 @@ g.inspectfile = function(datafile) {
           sf = as.numeric(tmp3[1])			
         }
       }
+    } else if (dformat == 3) { # wav
+      # H = readWave(datafile,from = 1, to = 10,units = c("seconds"), header = TRUE)
+      # sf = H$sample.rate
     }
     invisible(list(dformat=dformat,mon=mon,sf=sf))
   }
@@ -114,8 +121,8 @@ g.inspectfile = function(datafile) {
   # main script
   filename = unlist(strsplit(as.character(datafile),"/"))
   filename = filename[length(filename)]
-  monnames = c("genea","geneactive","actigraph") #monitor names
-  fornames = c("bin","csv") #monitor names
+  monnames = c("genea","geneactive","actigraph","axivity") #monitor names
+  fornames = c("bin","csv","wav") #monitor names
   if (length(filename) == 0) {
     print("no files to analyse")
   }
@@ -136,6 +143,19 @@ g.inspectfile = function(datafile) {
     } else if (mon == 3) { #geneactive
       H = read.csv(datafile,nrow=9,skip=0)
     }
+
+  } else if (dformat == 3) { #wav data
+    header = rownames(read.csv(datafile,skipNul=TRUE,nrow=13,header=TRUE))
+  H = sapply(as.character(header),function(x) {
+    tmp = unlist(strsplit(x,": "))
+    if (length(tmp) == 1) {
+      tmp = c(tmp, NA)
+    }
+    tmp
+  })
+  H = as.data.frame(t(H))
+  names(H) = c("hnames","hvalues")
+      # H = read.csv(datafile,nrow=20,skip=0) #note that not the entire header is copied
   }
   H = as.matrix(H)
   if (ncol(H) == 1 & dformat == 2) {

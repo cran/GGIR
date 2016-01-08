@@ -31,7 +31,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
   }
   windowsizes = c(ws3,ws2,ws)
   start_meas = ws2/60 #ensures that first window starts at logical timepoint relative to its size (15,30,45 or 60 minutes of each hour) 
-  monnames = c("genea","geneactive","actigraph") #monitor names
+  monnames = c("genea","geneactive","actigraph","axivity") #monitor names
   filecorrupt = FALSE
   filetooshort = FALSE
   i = 1 #counter to keep track of which binary block is being read
@@ -61,7 +61,10 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
   }
   if (mon == 1) {
     blocksize = blocksizegenea
-  } 
+  }
+  if (mon == 4) {
+    blocksize = round(1440 * chunksize)
+  }
   if (dformat == 1) {
     if (mon == 1) { #reading the binary file
       id = as.character(header[which(header[,1] == "Volunteer_Number"),2])
@@ -74,31 +77,50 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
     } else if (mon == 3) {
       id = filename #id not stored in fileheader, but filename instead
     }
+  } else if (dformat == 3) {
+    id = filename # for now use filename as identifier
   }
   #creating matrixes for storing output
   S = matrix(0,0,4) #dummy variable needed to cope with head-tailing succeeding blocks of data
-  NR = ceiling((90*10^6) / (sf*ws3)) + 1000 #NR = number of 'ws3' second rows (this is for 10 days at 80 Hz) 
+  nev = 80*10^7 # number expected values
+  # NR = ceiling((90*10^6) / (sf*ws3)) + 1000 #NR = number of 'ws3' second rows (this is for 10 days at 80 Hz) 
+  NR = ceiling(nev / (sf*ws3)) + 1000 #NR = number of 'ws3' second rows (this is for 10 days at 80 Hz) 
   metashort = matrix(" ",NR,(1+nmetrics)) #generating output matrix for acceleration signal
-  if (mon == 1 | mon == 3) {
+  if (mon == 1 | mon == 3 | mon == 4) {
     temp.available = FALSE
   } else if (mon == 2){
     temp.available = TRUE
   }
   if (temp.available == FALSE) {
-    metalong = matrix(" ",(((90*10^6)/(sf*ws2))+100),4) #generating output matrix for 15 minutes summaries
+    metalong = matrix(" ",((nev/(sf*ws2))+100),4) #generating output matrix for 15 minutes summaries
   } else if (temp.available == TRUE){
-    metalong = matrix(" ",(((90*10^6)/(sf*ws2))+100),7) #generating output matrix for 15 minutes summaries
+    metalong = matrix(" ",((nev/(sf*ws2))+100),7) #generating output matrix for 15 minutes summaries
   }
   #===============================================
   # Read file
   switchoffLD = 0 #dummy variable part "end of loop mechanism"
   while (LD > 1) {
     P = c()
-    cat(paste("\nLoading block: ",i,"\n",sep=""))
+    cat(paste("\nLoading block: ",i,sep=""))
     options(warn=-1) #turn off warnings (code complains about unequal rowlengths
     #when trying to read files of a different format)
     if (mon == 1 & dformat == 1) {
       try(expr={P = g.binread(binfile=datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
+      if (length(P) > 1) {
+        if (nrow(P$rawxyz) < ((sf*ws*2)+1) & i == 1) {
+          P = c() ; switchoffLD = 1 #added 30-6-2012
+          cat("\nError: data too short for doing non-wear detection 1\n")		
+          filetooshort = TRUE
+        }
+      } else {
+        P = c()
+        if (i == 1) {
+          filecorrupt = TRUE
+        }
+        cat("\nEnd of file reached\n")
+      }
+    } else if (mon == 4 & dformat == 3) {
+      # try(expr={P = g.wavread(binfile=datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
       if (length(P) > 1) {
         if (nrow(P$rawxyz) < ((sf*ws*2)+1) & i == 1) {
           P = c() ; switchoffLD = 1 #added 30-6-2012
@@ -192,6 +214,8 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
         data = P$data.out
       } else if (dformat == 2) {
         data = P #as.matrix(P,dimnames = list(rownames(P),colnames(P)))
+      } else if (dformat == 3) {
+        data = P$rawxyz # no conversion to mg?
       }
       #add left over data from last time 
       if (nrow(S) > 0) {
@@ -212,6 +236,11 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
         if (mon  == 1 & dformat == 1) {
           starttime = P$timestamps2[1]
           lengthheader = nrow(header)
+          
+        } else if (dformat == 3) {
+          starttime = P$timestamp
+          lengthheader = nrow(header)
+          
         } else if (mon == 2 & dformat == 1) {
           starttime = P$page.timestamps[1]
           if (length(unlist(strsplit(as.character(starttime),":"))) < 2) {
@@ -330,11 +359,14 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
           newsec = newsec - 60
           newmin = newmin + 1
         }
+        remem2add24 = FALSE
         if (newmin >= 60) {
           newmin = newmin - 60
           start_hr = start_hr + 1
           if (start_hr == 24) { #if measurement is started in 15 minutes before midnight
-            starttime3 = as.character(starttime) # forget about timeshift for now, not plausible
+        #there used to be a nasty hack here for measurements that start in the 15 minutes before midnight, now fixed
+              start_hr = 0
+              remem2add24 = TRUE #remember to add 24 hours because this is now the wrong day
           }
         }
         starttime3 = paste(temp[1]," ",start_hr,":",newmin,":",newsec,sep="") #<<<====  changed 17-12-2013
@@ -360,7 +392,12 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
             }
           }
         }
+        if (remem2add24 == TRUE) {
+          starttime = as.POSIXlt(as.numeric(starttime) + (24*3600),origin="1970-01-01")
+        }
       }
+
+      
       LD = nrow(data)
       if (LD < (ws*sf)) {
         cat("\nError: data too short for doing non-wear detection 3\n")
@@ -387,6 +424,9 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
         data = as.matrix(data)
         # Initialization of variables
         if (mon == 1) {
+          data[,1:3] = scale(data[,1:3],center = -offset, scale = 1/scale) #rescale data
+          Gx = as.numeric(data[,1]); Gy = as.numeric(data[,2]); Gz = as.numeric(data[,3])
+        } else if (mon == 4 & dformat == 3) {
           data[,1:3] = scale(data[,1:3],center = -offset, scale = 1/scale) #rescale data
           Gx = as.numeric(data[,1]); Gy = as.numeric(data[,2]); Gz = as.numeric(data[,3])
         } else if (mon == 2 & dformat == 1) {
@@ -508,7 +548,10 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
         if (count > (nrow(metashort) - (2.5*(3600/ws3) *24))) {  
           extension = matrix(" ",((3600/ws3) *24),ncol(metashort)) #add another day to metashort once you reach the end of it
           metashort = rbind(metashort,extension)
-          cat("\nvariabel metashort extended\n")
+          extension2 = matrix(" ",((3600/ws2) *24),ncol(metalong)) #add another day to metashort once you reach the end of it
+          metalong = rbind(metalong,extension2)
+          
+          cat("\nvariable metashort extended\n")
         }
         col_msi = 2
         if (do.bfen == TRUE) {
@@ -609,6 +652,10 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
               sdwacc = sd(as.numeric(data[(1+hoc1):hoc2,(jj+extra)]),na.rm=TRUE)
               maxwacc = max(as.numeric(data[(1+hoc1):hoc2,(jj+extra)]),na.rm=TRUE)
               minwacc = min(as.numeric(data[(1+hoc1):hoc2,(jj+extra)]),na.rm=TRUE)
+            } else if (dformat == 3) {
+              sdwacc = sd(as.numeric(data[(1+hoc1):hoc2,jj]),na.rm=TRUE)
+              maxwacc = max(as.numeric(data[(1+hoc1):hoc2,jj]),na.rm=TRUE)
+              minwacc = min(as.numeric(data[(1+hoc1):hoc2,jj]),na.rm=TRUE)
             }
             #estimate number of data points of clipping based on raw data at about 87 Hz
             if (mon == 1) {
@@ -616,7 +663,9 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
             } else if (mon == 2) {
               clipthres = 7.5
             } else if (mon == 3) {
-              clipthres = 7.5 #ADJUSTMENT NEEDED FOR ACTIGRAPH???????????
+              clipthres = 7.5 # hard coded assumption that dynamic range is 8g
+            } else if (mon == 4) {
+              clipthres = 7.5 # hard coded assumption that dynamic range is 8g
             }
             if (dformat == 1) {
               CW[h,jj] = length(which(abs(as.numeric(data[(1+cliphoc1):cliphoc2,(jj+(mon-1))])) > clipthres))
@@ -624,6 +673,8 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
               if (ncol(data) == 3) extra = 0
               if (ncol(data) >= 4) extra = 1
               CW[h,jj] = length(which(abs(as.numeric(data[(1+cliphoc1):cliphoc2,(jj+extra)])) > clipthres))
+            } else if (dformat == 3) {
+              CW[h,jj] = length(which(abs(as.numeric(data[(1+cliphoc1):cliphoc2,jj])) > clipthres))
             }
             #non-wear criteria are monitor specific
             if (mon == 1) {
@@ -635,6 +686,9 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
             } else if (mon == 3) {
               sdcriter = 0.013 #ADJUSTMENT NEEDED FOR ACTIGRAPH???????????
               racriter = 0.15 #ADJUSTMENT NEEDED FOR ACTIGRAPH???????????
+            } else if (mon == 4) {
+              sdcriter = 0.013 #ADJUSTMENT NEEDED FOR Axivity???????????
+              racriter = 0.15 #ADJUSTMENT NEEDED FOR Axivity???????????
             }
             if (sdwacc < sdcriter) { 
               if (abs(maxwacc - minwacc) < racriter) { 
@@ -727,7 +781,7 @@ g.getmeta = function(datafile,desiredtz = "Europe/London",windowsizes = c(5,900,
                                                          do.teLindert2013,do.anglex,do.angley,do.anglez,do.enmoa)]) #
     metashort = data.frame(A = metashort)
     names(metashort) = metricnames_short
-    if (mon == 1 | mon == 3) {
+    if (mon == 1 | mon == 3 | mon == 4) {
       metricnames_long = c("timestamp","nonwearscore","clippingscore","en")
     } else if (mon == 2) {
       metricnames_long = c("timestamp","nonwearscore","clippingscore","lightmean","lightpeak","temperaturemean","EN")

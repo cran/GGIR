@@ -71,8 +71,8 @@ journal/conference publications.
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.2-1\cr
-Date: \tab 2015-12-9\cr
+Version: \tab 1.2-2\cr
+Date: \tab 2016-1-6\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 Discussion group: \tab https://groups.google.com/forum/#!forum/rpackageggir\cr
 }

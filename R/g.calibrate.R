@@ -36,7 +36,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   NR = ceiling((90*10^6) / (sf*ws4)) + 1000 #NR = number of 'ws4' second rows (this is for 10 days at 80 Hz) 
   if (mon == 2) {
     meta = matrix(99999,NR,8) #for meta data
-  } else if (mon == 1 | mon == 3){
+  } else if (mon == 1 | mon == 3 | mon == 4){
     meta = matrix(99999,NR,7)
   }
   # setting size of blocks that are loaded (too low slows down the process)
@@ -45,6 +45,9 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   blocksizegenea = round((20608 * (sf/80)) * (chunksize*0.5))
   if (mon == 1) {
     blocksize = blocksizegenea
+  }
+  if (mon == 4) {
+    blocksize = round(1440 * chunksize)
   }
   #===============================================
   # Read file
@@ -58,6 +61,17 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
     if (mon == 1 & dformat == 1) {
       use.temp = FALSE
       try(expr={P = g.binread(datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
+      if (length(P) > 1) {
+        if (nrow(P$rawxyz) < ((sf*ws)+1)) {
+          P = c()
+          switchoffLD = 1 #added 30-6-2012
+        }
+      } else {
+        P = c()
+      }
+    } else  if (mon == 4 & dformat == 3) {
+      use.temp = FALSE
+      # try(expr={P = g.wavread(datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
       if (length(P) > 1) {
         if (nrow(P$rawxyz) < ((sf*ws)+1)) {
           P = c()
@@ -124,6 +138,8 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
     if (length(P) > 0) { #would have been set to zero if file was corrupt or empty
       if (mon == 1) {
         data = P$rawxyz / 1000 #convert g output to mg for genea
+      } else if (mon == 4) {
+        data = P$rawxyz #change scalling for Axivity?
       } else if (mon == 2  & dformat == 1) {
         data = P$data.out
       } else if (dformat == 2) {
@@ -148,6 +164,9 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
           durexp = nrow(data) / (sf*ws)	#duration of experiment in hrs
           # Initialization of variables
           if (mon == 1) {
+            Gx = as.numeric(data[,1]); Gy = as.numeric(data[,2]); Gz = as.numeric(data[,3])
+            use.temp = FALSE
+          } else if (mon == 4) {
             Gx = as.numeric(data[,1]); Gy = as.numeric(data[,2]); Gz = as.numeric(data[,3])
             use.temp = FALSE
           } else if (mon == 2 & dformat == 1) {
@@ -253,6 +272,8 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
         sdcriter = 0.013 #0.0109 in rest test
       } else if (mon == 3) {
         sdcriter = 0.013 # NO IDEA WHAT REST NOISE IS FOR ACTIGRAPH....test needed
+      } else if (mon == 4) {
+        sdcriter = 0.013 # NO IDEA WHAT REST NOISE IS FOR AXIVITY....test needed
       }
       nomovement = which(meta_temp[,5] < sdcriter & meta_temp[,6] < sdcriter & meta_temp[,7] < sdcriter &
                            abs(as.numeric(meta_temp[,2])) < 2 & abs(as.numeric(meta_temp[,3])) < 2 &
@@ -317,7 +338,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
           # Next few lines added 23 on april 2015 to deal with NaN values in
           # some of the sphere data for Actigraph monitor brand
           if (mon == 3 & length(which(is.na(closestpoint[,k, drop = F]) == TRUE)) > 0 &
-                length(which(is.na(closestpoint[,k, drop = F]) == FALSE)) > 10) { #needed for some Actigraph data
+              length(which(is.na(closestpoint[,k, drop = F]) == FALSE)) > 10) { #needed for some Actigraph data
             invi = which(is.na(closestpoint[,k, drop = F]) == TRUE)
             closestpoint = closestpoint[-invi,]
             curr = curr[-invi,]
@@ -356,9 +377,9 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       cal.error.end = mean(abs(cal.error.end-1))
       # assess whether calibration error has sufficiently been improved
       if (cal.error.end < cal.error.start & cal.error.end < 0.01 & nhoursused > minloadcrit) { #do not change scaling if there is no evidence that calibration improves
-        if (use.temp == TRUE & (mon == 2 | mon == 4)) {
+        if (use.temp == TRUE & mon == 2) {
           QC = "recalibration done, no problems detected"
-        } else if (use.temp == FALSE & (mon == 2 | mon == 4))  {
+        } else if (use.temp == FALSE & mon == 2)  {
           QC = "recalibration done, but temperature values not used"
         } else if (mon != 2)  {
           QC = "recalibration done, no problems detected"

@@ -1,6 +1,12 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 1.2-2 (release date: 7-1-2016)}{
+\itemize{
+  \item Bug fixed in the loading of data files with (very) large amounts of data
+  \item Bug fixed in starttime allocation for measurements starting in the 15 minutes before midnight
+}
+}
 \section{Changes in version 1.2-1 (release date: 9-12-2015)}{
 \itemize{
   \item Literature reference for sleep detection updated

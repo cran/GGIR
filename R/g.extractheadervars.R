@@ -29,7 +29,7 @@ g.extractheadervars = function(I) {
       SX = hvalues[which(hnames == "Sex")] #gender
       SN = hvalues[which(hnames == "Device Unique Serial Code")] #serial number			
     }
-  } else if (mon == "actigraph") { #todo: create automatic extraction of information from actigraph fileheader
+  } else if (mon == "actigraph" | mon == "axivity") { #todo: create automatic extraction of information from actigraph fileheader
     id = "not extracted"	# volunteer ID as stored in binary file header
     iid = "not extracted" #investigator id
     HN = "not extracted" #handedness

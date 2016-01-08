@@ -47,7 +47,10 @@ sleeplogidnum=FALSE,do.visual=FALSE,outliers.only = FALSE,
   Location of the spreadsheet (csv) with sleep log information.
   The spreadsheet needs to have the following structure: one column
   for participant id, and then followed by alternatingly one column
-  for onset time and one column for waking time. Timestamps are to be
+  for onset time and one column for waking time. There can be multiple
+  sleeplogs in the same spreadsheet. The first raw of the spreadsheet
+  needs to be filled with column names, it does not matter what these
+  column names are. Timestamps are to be
   stored without date as in hh:mm:ss. If onset corresponds to lights
   out or intention to fall asleep, then it is the end-users
   responsibility to account for this in the interpretation of the results.
