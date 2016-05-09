@@ -1,5 +1,5 @@
 g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,printsummary=TRUE,
-                       chunksize=c(),windowsizes=c(5,900,3600)) {
+                       chunksize=c(),windowsizes=c(5,900,3600),selectdaysfile=c(),dayborder=0) {
   if (length(chunksize) == 0) chunksize = 1
   if (chunksize > 1) chunksize = 1
   if (chunksize < 0.4) chunksize = 0.4
@@ -69,25 +69,98 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       } else {
         P = c()
       }
-    } else  if (mon == 4 & dformat == 3) {
-      use.temp = FALSE
-      # try(expr={P = g.wavread(datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
-      if (length(P) > 1) {
-        if (nrow(P$rawxyz) < ((sf*ws)+1)) {
-          P = c()
-          switchoffLD = 1 #added 30-6-2012
-        }
-      } else {
-        P = c()
-      }
+#     } else  if (mon == 4 & dformat == 3) {
+#       use.temp = FALSE
+#       try(expr={P = g.wavread(datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
+#       if (length(P) > 1) {
+#         if (nrow(P$rawxyz) < ((sf*ws)+1)) {
+#           P = c()
+#           switchoffLD = 1 #added 30-6-2012
+#         }
+#       } else {
+#         P = c()
+#       }
     } else if (mon == 2 & dformat == 1) {
-      try(expr={P = GENEAread::read.bin(binfile=datafile,start=(blocksize*(i-1)),end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
+      ###
+      if (length(selectdaysfile) > 0) { # code to only read fragments of the data (Millenium cohort)
+        #===================================================================
+        # All of the below needed for Millenium cohort
+        SDF = read.csv(selectdaysfile)
+        I = g.inspectfile(datafile) #, useRDA = useRDA
+        hvars = g.extractheadervars(I)
+        SN = hvars$SN
+        SDFi = which(as.numeric(SDF$Monitor) == as.numeric(SN))
+        # print(SDF[SDFi,])
+        #==========================================================================
+        # STEP 1: now derive table with start and end times of intervals to load
+        # STEP 2: now (based on i and chunksize)  decide which section of these intervals needs to be loaded
+        # STEP 3: load data
+        # thoughts: maybe treat second day as continuation of first such that clock times can be continuous: 4am-4am & 4am-4am
+        tmp1 = unlist(strsplit(as.character(SDF[SDFi,2]),"/"))
+        nextday = as.numeric(tmp1[1]) + 1
+        nextday = paste0(nextday,"/",tmp1[2],"/",tmp1[3])
+        
+        tint = matrix(0,5,2)
+        if (dayborder > 0) {
+          fivebefore = paste0(" 0",dayborder-1,":55:00")
+          endday = paste0(" 0",dayborder,":00:00")
+        } else if (dayborder < 0) {
+          fivebefore = paste0(" ",24+dayborder-1,":55:00")
+          endday = paste0(" ",24+dayborder,":00:00")
+        } else if (dayborder == 0) {
+          fivebefore = paste0(" ",24+dayborder-1,":55:00")
+          endday = paste0(" 00:00:00")
+        }
+        tint[1,1] = paste0(SDF[SDFi,2],fivebefore) #" 03:55:00"
+        tint[1,2] =paste0(nextday,endday) #" ","04:00:00"
+        tmp2 = unlist(strsplit(as.character(SDF[SDFi,3]),"/"))
+        nextday = as.numeric(tmp2[1]) + 1
+        nextday = paste0(nextday,"/",tmp2[2],"/",tmp2[3])
+        tint[2,1] = paste0(SDF[SDFi,3],endday)
+        tint[2,2] =paste0(nextday,endday)
+        
+        if (i == nrow(tint)) {
+          #all data read now make sure that it does not try to re-read it with mmap on
+          switchoffLD = 1
+          P = c()
+        } else {
+          ## JH CHANGE #####	 # turned off because we only do g.calibrate once (before RDA file is created)
+          #           if(useRDA == TRUE) {
+          #             P <- getCalibrateData(datafile, tint[i,1], tint[i,2])
+          #           } else {
+          try(expr={P = GENEAread::read.bin(binfile=datafile,start=tint[i,1],
+                                            end=tint[i,2],calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
+          # }
+          ##################
+        }
+        # All of the above needed for Millenium cohort
+        #======================================================================
+      } else {
+        ###
+        try(expr={P = GENEAread::read.bin(binfile=datafile,start=(blocksize*(i-1)),end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
+      }
+      # try(expr={P = GENEAread::read.bin(binfile=datafile,start=(blocksize*(i-1)),end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
+      #       if (length(P) > 0) {
+      #         if (nrow(P$data.out) < blocksize*300) { #last block
+      #           cat("\nlast block\n")
+      #           switchoffLD = 1 #this section is not needed for mon = 1 as genea script deals with file-ends automatically
+      #         }
+      #       }
+      
       if (length(P) > 0) {
-        if (nrow(P$data.out) < blocksize*300) { #last block
-          cat("\nlast block\n")
-          switchoffLD = 1 #this section is not needed for mon = 1 as genea script deals with file-ends automatically
+        if (length(selectdaysfile) > 0) { 
+          if (tint[i,1] == "0") {
+            print("last block")
+            switchoffLD = 1
+          }
+        } else {
+          if (nrow(P$data.out) < blocksize*300) { #last block
+            print("last block")
+            switchoffLD = 1 #this section is not needed for mon = 1 as genea script deals with file-ends automatically
+          }
         }
       }
+      
       if (length(P) == 0) { #if first block doens't read then probably corrupt
         if (i == 1) {
           try(expr={P = GENEAread::read.bin(binfile=datafile,calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
@@ -263,7 +336,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
       meta_temp = as.matrix(meta_temp[-cut,])
     }
     nhoursused = (nrow(meta_temp) * 10)/3600
-    if (nrow(meta_temp) > 51) {  # enough data for the sphere?
+    if (nrow(meta_temp) > (minloadcrit-21)) {  # enough data for the sphere?
       meta_temp = as.matrix(meta_temp[-1,])
       #select parts with no movement
       if (mon == 1) {

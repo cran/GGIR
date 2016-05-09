@@ -4,7 +4,8 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
                    qwindow=c(0,24), qlevels = c(0.1),
                    ilevels = c(0,10), mvpathreshold = c(100),
                    boutcriter = 0.8,ndayswindow=7,idloc=1,do.imp=TRUE,storefolderstructure = FALSE,
-                   overwrite=FALSE,epochvalues2csv=FALSE) {
+                   overwrite=FALSE,epochvalues2csv=FALSE,mvpadur=c(1,5,10),selectdaysfile=c(),
+                   window.summary.size=10,dayborder=0,mvpa.2014=FALSE,closedbout=FALSE) {
   # verify whether path1 is a directory or a list of files
   outputfolder = unlist(strsplit(metadatadir,"/output_"))[2]
   outputfolder = paste("/output_",outputfolder,sep="")
@@ -58,8 +59,6 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
     if (overwrite == TRUE) skip = 0
     if (skip ==0) {
       cat(paste(" ",i,sep=""))
-      
-      
       M = c()
       filename_dir = c()
       filefoldername = c()
@@ -71,16 +70,16 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
           IMP$metashort = M$metashort
           IMP$metalong = M$metalong
         }
-        
-        
         SUM = g.analyse(I,C,M,IMP,qlevels=qlevels,qwindow=qwindow,L5M5window=L5M5window,M5L5res=M5L5res,
                         includedaycrit=includedaycrit,ilevels=ilevels,winhr=winhr,idloc=idloc,
-                        mvpathreshold =mvpathreshold ,boutcriter=boutcriter)
-        
+                        mvpathreshold =mvpathreshold ,boutcriter=boutcriter,mvpadur=mvpadur,selectdaysfile=selectdaysfile,
+                        window.summary.size=window.summary.size,dayborder=dayborder,mvpa.2014=mvpa.2014,closedbout=closedbout)
         
         if (storefolderstructure == TRUE) {
-          SUM$summary$filename_dir = filename_dir #full filename structure
-          SUM$summary$filefoldername = filefoldername  #filefoldername
+          SUMMARY = SUM$summary
+#           SUMMARY$pdffilenumb = pdffilenumb
+#           SUMMARY$pdfpagecount = pdfpagecount
+          SUM$summary = SUMMARY
         }
         name=as.character(unlist(strsplit(fnames[i],"eta_"))[2])
         if (epochvalues2csv==TRUE) {
@@ -91,13 +90,22 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
         if (M$filecorrupt == FALSE & M$filetooshort == FALSE) {
           if (i == 1 | i == f0 | cnt78 == 1) {
             SUMMARY = SUM$summary
-            SUM$summary$pdffilenumb = SUMMARY$pdffilenumb = pdffilenumb
-            SUM$summary$pdfpagecount = SUMMARY$pdfpagecount = pdfpagecount
+#             SUMMARY$pdffilenumb = pdffilenumb
+#             SUMMARY$pdfpagecount = pdfpagecount
+            SUM$summary = SUMMARY
             daySUMMARY = SUM$daysummary
+            if (length(selectdaysfile) > 0) {
+              winSUMMARY = SUM$windowsummary[,which(
+                is.na(colnames(SUM$windowsummary)) == FALSE)] # added for Millenium cohort
+            }
             cnt78 = 2
           } else {
-            SUM$summary$pdffilenumb = pdffilenumb
-            SUM$summary$pdfpagecount = pdfpagecount
+            SUMMARY = SUM$summary
+#             SUMMARY$pdffilenumb = pdffilenumb
+#             SUMMARY$pdfpagecount = pdfpagecount
+            SUM$summary = SUMMARY
+            
+            
             if (ncol(SUMMARY) == ncol(SUM$summary)) {
             } else {
               SUM$summary = cbind(SUM$summary[1:(ncol(SUM$summary)-8)],
@@ -114,6 +122,22 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
             if (length(which(colnames(daySUMMARY) != names(SUM$daysummary)) ) > 0) {
               names(SUM$daysummary) =   colnames(daySUMMARY)
             }
+            if (length(selectdaysfile) > 0) {
+              # windowsummary
+              winSUMMARY2 = SUM$windowsummary[,which(is.na(colnames(SUM$windowsummary)) == FALSE)]
+              if (ncol(winSUMMARY) == ncol(winSUMMARY2)) {
+              } else {
+                winSUMMARY2 = cbind(winSUMMARY2,matrix(" ",1,(ncol(winSUMMARY) - ncol(winSUMMARY2))))
+                colnames(winSUMMARY2) = colnames(winSUMMARY)
+              }
+              if (length(which(colnames(winSUMMARY) != names(winSUMMARY2)) ) > 0) {
+                names(winSUMMARY2) =   colnames(winSUMMARY)
+              }
+              if (length(which(colnames(daySUMMARY) != names(SUM$daysummary)) ) > 0) {
+              names(SUM$windowsummary) =   colnames(winSUMMARY2)
+              }
+            }
+            
           }
         }
         save(SUM,IMP,file=paste(metadatadir,ms2.out,"/",name,sep="")) #IMP is needed for g.plot in g.report.part2

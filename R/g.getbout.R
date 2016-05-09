@@ -1,27 +1,38 @@
-g.getbout = function(rr,boutdur2,boutcriter=100,p) {
+g.getbout = function(rr,boutdur2,boutcriter=100,p,closedbout=FALSE) {
+  # p are the indices for which the intensity criteria are met
   rrt = rr # zeros as long as there are epochs in the timewindow
+  boutcount = rep(0,length(rr)) # zeros as long as there are epochs in the timewindow
   jmvpa = 1
   LRR = length(rr)
   while(jmvpa <= length(p)) { # go through all epochs that are possibly part of a bout
     endi = p[jmvpa]+boutdur2
     if (endi <= LRR) { #does bout fall without measurement?
       if (sum(rr[p[jmvpa]:endi]) > (boutdur2*boutcriter)) {
-        #if boutcriter.mvpa = 0.9 then 90% of the bout needs to meet the criteria
-        select = p[jmvpa:max(which(p < endi))] # changed on 20-9-2015, now only the epochs with the acceleration value in the right range
-        # are labelled as part of the bout. as a result an MVPA bout, Light bout or inactivity bout can never become ambigous.
+        while(sum(rr[p[jmvpa]:endi]) > ((endi-p[jmvpa])*boutcriter) & endi <= LRR) {
+          endi = endi + 1
+        }
+        select = p[jmvpa:max(which(p < endi))]
+        # jump = (max(select) - min(select)) + 1
+        jump = length(select)
         rrt[select] = 2 #remember that this was a bout
+        boutcount[p[jmvpa]:p[max(which(p < endi))]] = 1
       } else {
-        select = 0
+        jump = 1
         rr[p[jmvpa]] = 0
-      }      
+      }
     } else { #bout does not fall within measurement
-      select = 0
+      jump = 1
       if (length(p) > 1 & jmvpa > 2) {
         rr[p[jmvpa]] = rr[p[jmvpa-1]]
       }        
     }
-    jmvpa = jmvpa + length(select)
+    jmvpa = jmvpa + jump
   }
   rr[which(rrt == 2)] = 1
-  g.getbout = rr
+  if (length(which(rrt == 1)) > 0) rr[which(rrt == 1)] = 0
+  
+  if (closedbout == TRUE) { #only difference is that bouts are closed
+    rr = boutcount
+  }
+  invisible(list(rr=rr,boutcount=boutcount))
 }

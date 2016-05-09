@@ -36,13 +36,20 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
       load(file=paste(metadatadir,"/meta/sleeplog.RData",sep=""))
     }
   }
+
   #------------------------------------------------
   # get list of accelerometer milestone data files from sleep (produced by g.part3)
   fnames = dir(meta.sleep.folder)
+
   if (f1 > length(fnames)) {
     # cat(paste("File index f1 automatically changed from, ",f1,"to",length(fnames)," ",sep=""))
     f1 = length(fnames)
   }
+    if (f0 > length(fnames)) {
+    # cat(paste("File index f1 automatically changed from, ",f1,"to",length(fnames)," ",sep=""))
+    f0 = 1
+  }
+
   logdur = rep(0,length(fnames))
   cnt = 1
   idlabels = rep(0,nnpp)
@@ -61,7 +68,12 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                              "cleaningcode","sleeplog_used","acc_available")
   colnamesnightsummary = colnames(nightsummary)
   sumi = 1
-  sleeplog_used = rep(" ",((f1-f0)+1))
+  if ((f1-f0) > 0) {
+    sleeplog_used = rep(" ",((f1-f0)+1))
+  } else {
+    sleeplog_used = " "
+  }
+
   ffdone = c()
   ms4.out = "/meta/ms4.out"
   fnames.ms4 = dir(paste(metadatadir,ms4.out,sep=""))
@@ -153,6 +165,7 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
           cave = function(x) as.character(unlist(strsplit(x,"_")))[1]
           x = as.matrix(as.character(fnames[i]))
           accid = apply(x,MARGIN=c(1),FUN=cave)
+          accid_bu = accid
           cave2 = function(x) {
             tmp = as.character(unlist(strsplit(x,"")))
             cave2 = tmp[length(tmp)]
@@ -162,6 +175,7 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
             accid[h] = as.character(unlist(strsplit(accid[h],letter[h]))[1])
           } 
           accid = as.numeric(accid)
+          if (is.na(accid) == TRUE) accid = accid_bu #catch for files with only id in filename and
         } else { # get id from filename
           tmp = fnames[i]
           if (length(unlist(strsplit(tmp,"_"))) > 1) tmp = unlist(strsplit(tmp,"_"))[1]
@@ -413,6 +427,7 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
               for (k in defs) {
                 ki = which(sleepdet$definition == k)
                 sleepdet.t = sleepdet[ki,]
+              
                 ####
                 # now get sleep periods
                 nsp = length(unique(sleepdet.t$sib.period)) #number of sleep periods
@@ -601,6 +616,8 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
               #------------------------------------
               # Other variables
               if (acc_available == "TRUE") {
+                
+                
                 nightsummary[sumi,13] = sleepdet.t$fraction.night.invalid[1]
                 if (sleepdet.t$fraction.night.invalid[1] > ((24-includenightcrit)/24)) {
                   cleaningcode = 2

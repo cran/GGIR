@@ -1,6 +1,8 @@
 g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M5window = c(0,24),M5L5res=10,
                       includedaycrit = 16,ilevels=c(),winhr=5,idloc=1,snloc=1,
-                      mvpathreshold = c(),boutcriter=c()) {
+                      mvpathreshold = c(),boutcriter=c(),mvpadur=c(1,5,10),selectdaysfile=c(),
+                      window.summary.size=10,
+                      dayborder=0,mvpa.2014 = FALSE,closedbout=FALSE) {
   winhr = winhr[1]
   fname=I$filename
   averageday = IMP$averageday
@@ -14,6 +16,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   rout = IMP$rout
   wdaycode = M$wday
   wdayname = M$wdayname
+  if (length(mvpadur) > 0) mvpadur = sort(mvpadur)
   LC2 = IMP$LC2
   LC = IMP$LC
   dcomplscore = IMP$dcomplscore
@@ -25,6 +28,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   ws3 = windowsizes[1]
   ws2 = windowsizes[2]
   vi = 1
+  
   # Time window for L5 & M5 analysis
   t0_LFMF = L5M5window[1] #start in 24 hour clock hours
   t1_LFMF = L5M5window[2]+(winhr-(M5L5res/60)) #end in 24 hour clock hours (if a value higher than 24 is chosen, it will take early hours of previous day to complete the 5 hour window
@@ -98,6 +102,10 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   lastmidnight=dmidn$lastmidnight;    lastmidnighti=dmidn$lastmidnighti
   midnights=dmidn$midnights;          midnightsi=dmidn$midnightsi
   
+  if (dayborder != 0) {
+    midnightsi = ((midnightsi + (dayborder * (3600/ws2))) -1) + (1/(ws2/ws3)) #shift the definition of midnight if required
+    # midnightsi = ((midnightsi + (dayborder * (3600/ws2))) -1) + 1 #shift the definition of midnight if required
+  }
   starttimei = 1
   endtimei = nrow(M$metalong)
   if (strategy == 2) {
@@ -213,6 +221,17 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
 #     }
     daysummary = matrix("",ceiling(ndays),nfeatures)
     ds_names = rep("",nfeatures)
+    #=============================
+    if (length(selectdaysfile) > 0) {   # Millenium cohort related:
+        ndays = ceiling(ndays)
+      if (ndays > 2) ndays = 2 # this is now hardcoded to be a maximum of two days
+      nwindows = 1440 / window.summary.size # now defining it as X windows per 24
+      windowsummary = matrix("",(ndays*nwindows),(ncol(metashort)*7)+5)
+      ws_names = rep("",ncol(windowsummary))
+      # Features per day (based on on single variables)
+      if (ndays > 2) ndays = 2
+      gikb = 0
+    }
     #===============================================
     # Features per day (based on on single variables)
     for (di in 1:ndays) { #run through days
@@ -266,11 +285,15 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       } else if (idloc == 3) {
         daysummary[di,fi] = id2
       }
+      idremember = daysummary[di,fi]
       ds_names[fi] = "id";      fi = fi + 1
       daysummary[di,fi] = fname
       ds_names[fi] = "filename";  fi = fi + 1
-      #-----------------------------------
-      calenderdate = unlist(strsplit(as.character(vari[1,1])," "))[1]
+      if (length(selectdaysfile) > 0) {
+        calenderdate = unlist(strsplit(as.character(vari[min(c(10,nrow(vari))),1])," "))[1] #adjusted for millenium cohort
+      } else {
+        calenderdate = unlist(strsplit(as.character(vari[1,1])," "))[1]
+      }
       daysummary[di,fi] = calenderdate               
       daysummary[di,(fi+1)] =BL
       daysummary[di,(fi+2)] = nvalidhours
@@ -290,6 +313,59 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       daysummary[di,(fi+1)] = di #day number relative to start of measurement
       ds_names[fi:(fi+1)] = c("weekday","measurmentday")
       fi = fi + 2
+      if (length(selectdaysfile) > 0) {
+        #---------------------------
+        # Description per timewindow for millenium cohort:
+        for (metrici in  2:ncol(vari)) {
+          Nfeatures = 7
+          #         print("--------------------------------------")
+          #         print(paste0("metric",metrici))
+          nhrs = (nrow(vari)/(3600/ws3))
+          windowL = 24/nwindows
+          if (ceiling(nhrs/windowL) < nwindows) nwindows = ceiling(nhrs/windowL)
+          for (gik in 1: nwindows) {
+            bbb1 = (windowL * (3600/ws3) * (gik-1)) +1
+            bbb2 = (windowL * (3600/ws3) * (gik))
+            if (bbb2 > length(val)) bbb2 = length(val)
+            windowsummary[gikb+gik,1] = idremember #id number
+            windowsummary[gikb+gik,2] = SN #sn number
+            windowsummary[gikb+gik,3] = fname #filename
+            windowsummary[gikb+gik,4] = as.character(vari[bbb1,1])
+            windowsummary[gikb+gik,5] = length(which(val[bbb1:bbb2] == 0))/ (3600/ws3) #hours of valid data
+            windowsummary[gikb+gik,((metrici-2)*Nfeatures)+6] = mean(as.numeric(vari[bbb1:bbb2,metrici]))
+            windowsummary[gikb+gik,((metrici-2)*Nfeatures)+7] = sd(as.numeric(vari[bbb1:bbb2,metrici]))
+            if (nrow(vari) > 10 & (bbb2 - bbb1) > 10) {
+              windowsummary[gikb+gik,((metrici-2)*Nfeatures)+8] = quantile(as.numeric(vari[bbb1:bbb2,metrici]),probs=0.05)
+              windowsummary[gikb+gik,((metrici-2)*Nfeatures)+9] = quantile(as.numeric(vari[bbb1:bbb2,metrici]),probs=0.25)
+              windowsummary[gikb+gik,((metrici-2)*Nfeatures)+10] = quantile(as.numeric(vari[bbb1:bbb2,metrici]),probs=0.5)
+              windowsummary[gikb+gik,((metrici-2)*Nfeatures)+11] = quantile(as.numeric(vari[bbb1:bbb2,metrici]),probs=0.75)
+              windowsummary[gikb+gik,((metrici-2)*Nfeatures)+12] = quantile(as.numeric(vari[bbb1:bbb2,metrici]),probs=0.95)
+            } else {
+              windowsummary[gikb+gik,(((metrici-2)*Nfeatures)+8):(((metrici-2)*Nfeatures)+12)] = NA
+            }
+          }
+        }
+        ws_names = c("id","serial number","filename",
+                     "time","Nhoursvalid")
+        if (ncol(vari) == 3) {
+          ws_names = c(ws_names,paste0("mean metric ",colnames(vari)[2]),
+                       paste0("sd metric ",colnames(vari)[2]),
+                       paste0("p5 metric ",colnames(vari)[2]),
+                       paste0("p25 metric ",colnames(vari)[2]),
+                       paste0("p50 metric ",colnames(vari)[2]),
+                       paste0("p75 metric ",colnames(vari)[2]),
+                       paste0("p95 metric ",colnames(vari)[2]),
+                       paste0("mean metric ",colnames(vari)[3]),
+                       paste0("sd metric ",colnames(vari)[3]),
+                       paste0("p5 metric ",colnames(vari)[3]),
+                       paste0("p25 metric ",colnames(vari)[3]),
+                       paste0("p50 metric ",colnames(vari)[3]),
+                       paste0("p75 metric ",colnames(vari)[3]),
+                       paste0("p95 metric ",colnames(vari)[3]))
+        }
+        gikb = gikb + gik
+      }
+      
       if (tooshort == 0) {
         #--------------------------------------      
         # extract time spent in activity levels (there are possibly many more features that can be extracted from this)
@@ -362,118 +438,137 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
               # newly added on 28/02/2014
               if (domvpa == TRUE) {
                 for (mvpai in 1:length(mvpathreshold)) {
+                  mvpa = rep(0,6)
                   # METHOD 1: time spent above threhold based on 5 sec epoch
-                  mvpa1 = length(which(varnum*1000 >= mvpathreshold[mvpai])) / (60/ws3) #time spent MVPA in minutes
+                  mvpa[1] = length(which(varnum*1000 >= mvpathreshold[mvpai])) / (60/ws3) #time spent MVPA in minutes
                   # METHOD 2: time spent above threshold based on 1minute epoch
                   varnum2 = cumsum(c(0,varnum))
                   select = seq(1,length(varnum2),by=60/ws3)
                   varnum3 = diff(varnum2[round(select)]) / abs(diff(round(select)))
-                  mvpa2 = length(which(varnum3*1000 >= mvpathreshold[mvpai])) #time spent MVPA in minutes
+                  mvpa[2] = length(which(varnum3*1000 >= mvpathreshold[mvpai])) #time spent MVPA in minutes
                   # METHOD 3: time spent above threshold based on 5minute epoch
                   select = seq(1,length(varnum2),by=300/ws3)
                   varnum3 = diff(varnum2[round(select)]) / abs(diff(round(select)))
-                  mvpa3 = length(which(varnum3*1000 >= mvpathreshold[mvpai])) * 5 #time spent MVPA in minutes
-                  # METHOD 4: time spent above threshold
-                  boutdur2 = 60/ws3 # per minute
-                  rr1 = matrix(0,length(varnum),1)
-                  p = which(varnum*1000 >= mvpathreshold[mvpai])
-                  rr1[p] = 1
-                  rr1t = rr1
-                  jmvpa = 1
-                  while(jmvpa <= length(p)) {
-                    endi = p[jmvpa]+boutdur2
-                    if (endi <= length(rr1)) { #does bout fall without measurement?
-                      lengthbout = sum(rr1[p[jmvpa]:endi])
-                      if (lengthbout > (boutdur2*boutcriter)) {
-                        rr1t[p[jmvpa]:endi] = 2 #remember that this was a bout in r1t
-                      } else {
-                        rr1[p[jmvpa]] = 0
-                      }    	
-                    } else { #bout does not fall within measurement
-                      if (length(p) > 1 & jmvpa > 2) {
-                        rr1[p[jmvpa]] = rr1[p[jmvpa-1]]
-                      }				
+                  mvpa[3] = length(which(varnum3*1000 >= mvpathreshold[mvpai])) * 5 #time spent MVPA in minutes
+                  if (mvpa.2014 == TRUE) { # MVPA bout calculation like in the 2014 papers
+                    # METHOD 4: time spent above threshold
+                    boutdur2 = mvpadur[1] * (60/ws3) # per minute
+                    rr1 = matrix(0,length(varnum),1)
+                    p = which(varnum*1000 >= mvpathreshold[mvpai]); rr1[p] = 1
+                    getboutout = g.getbout(rr=rr1,boutdur2=boutdur2,boutcriter=boutcriter,p=p,closedbout=closedbout)
+                    mvpa[4] = length(which(getboutout$rr == 1))   / (60/ws3) #time spent MVPA in minutes
+                    # METHOD 5: time spent above threshold 5 minutes
+                    boutdur2 = mvpadur[2] * (60/ws3) #per five minutes
+                    rr1 = matrix(0,length(varnum),1)
+                    p = which(varnum*1000 >= mvpathreshold[mvpai]); rr1[p] = 1
+                    getboutout = g.getbout(rr=rr1,boutdur2=boutdur2,boutcriter=boutcriter,p=p,closedbout=closedbout)
+                    mvpa[5] = length(which(getboutout$rr == 1))   / (60/ws3) #time spent MVPA in minutes
+                    # METHOD 6: time spent above threshold 10 minutes
+                    boutdur2 = mvpadur[3] * (60/ws3) # per ten minutes
+                    rr1 = matrix(0,length(varnum),1)
+                    p = which(varnum*1000 >= mvpathreshold[mvpai]); rr1[p] = 1
+                    getboutout = g.getbout(rr=rr1,boutdur2=boutdur2,boutcriter=boutcriter,p=p,closedbout=closedbout)
+                    mvpa[6] = length(which(getboutout$rr == 1))   / (60/ws3) #time spent MVPA in minutes
+                    if (length(which(varnum*1000 >= mvpathreshold[mvpai])) < 0 & length(varnum) < 100) {
+                      mvpa[1:6] = 0
                     }
-                    jmvpa = jmvpa + 1
-                  }
-                  rr1[which(rr1t == 2)] = 1
-                  mvpa4 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
-                  # METHOD 5: time spent above threshold 5 minutes
-                  boutdur2 = 5 * (60/ws3)
-                  rr1 = matrix(0,length(varnum),1)
-                  p = which(varnum*1000 >= mvpathreshold[mvpai])
-                  rr1[p] = 1
-                  rr1t = rr1
-                  jmvpa = 1
-                  while(jmvpa <= length(p)) {
-                    endi = p[jmvpa]+boutdur2
-                    if (endi <= length(rr1)) { #does bout fall without measurement?
-                      lengthbout = sum(rr1[p[jmvpa]:endi])
-                      if (lengthbout > (boutdur2*boutcriter)) { #0.9 => 90% of the bout needs to meet the criteria
-                        rr1t[p[jmvpa]:endi] = 2 #remember that this was a bout in r1t
-                      } else {
-                        rr1[p[jmvpa]] = 0
-                      }    	
-                    } else { #bout does not fall within measurement
-                      if (length(p) > 1 & jmvpa > 2) {
-                        rr1[p[jmvpa]] = rr1[p[jmvpa-1]]
-                      }				
+                    
+                  } else { # updated version
+                    cat("\nWARNING: MVPA Bout defintion has been updated, please see document for more information")
+                    cat("\nincluding instructions on how to continue using the old defintion\n")
+                    # METHOD 4: time spent above threshold
+                    boutdur2 = 60/ws3 # per minute
+                    rr1 = matrix(0,length(varnum),1)
+                    p = which(varnum*1000 >= mvpathreshold[mvpai])
+                    rr1[p] = 1
+                    rr1t = rr1
+                    jmvpa = 1
+                    while(jmvpa <= length(p)) {
+                      endi = p[jmvpa]+boutdur2
+                      if (endi <= length(rr1)) { #does bout fall without measurement?
+                        lengthbout = sum(rr1[p[jmvpa]:endi])
+                        if (lengthbout > (boutdur2*boutcriter)) {
+                          rr1t[p[jmvpa]:endi] = 2 #remember that this was a bout in r1t
+                        } else {
+                          rr1[p[jmvpa]] = 0
+                        }    	
+                      } else { #bout does not fall within measurement
+                        if (length(p) > 1 & jmvpa > 2) {
+                          rr1[p[jmvpa]] = rr1[p[jmvpa-1]]
+                        }				
+                      }
+                      jmvpa = jmvpa + 1
                     }
-                    jmvpa = jmvpa + 1
-                  }
-                  rr1[which(rr1t == 2)] = 1
-                  mvpa5 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
-                  # METHOD 6: time spent above threshold 10 minutes
-                  boutdur2 = 10 * (60/ws3) 
-                  rr1 = matrix(0,length(varnum),1)
-                  p = which(varnum*1000 >= mvpathreshold[mvpai])
-                  rr1[p] = 1
-                  rr1t = rr1
-                  jmvpa = 1
-                  while(jmvpa <= length(p)) {
-                    endi = p[jmvpa]+boutdur2
-                    if (endi <= length(rr1)) { #does bout fall without measurement?
-                      lengthbout = sum(rr1[p[jmvpa]:endi])
-                      if (lengthbout > (boutdur2*boutcriter)) { #0.9 => 90% of the bout needs to meet the criteria
-                        rr1t[p[jmvpa]:endi] = 2 #remember that this was a bout in r1t
-                      } else {
-                        rr1[p[jmvpa]] = 0
-                      }      
-                    } else { #bout does not fall within measurement
-                      if (length(p) > 1 & jmvpa > 2) {
-                        rr1[p[jmvpa]] = rr1[p[jmvpa-1]]
-                      }				
+                    rr1[which(rr1t == 2)] = 1
+                    mvpa4 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
+                    # METHOD 5: time spent above threshold 5 minutes
+                    boutdur2 = 5 * (60/ws3)
+                    rr1 = matrix(0,length(varnum),1)
+                    p = which(varnum*1000 >= mvpathreshold[mvpai])
+                    rr1[p] = 1
+                    rr1t = rr1
+                    jmvpa = 1
+                    while(jmvpa <= length(p)) {
+                      endi = p[jmvpa]+boutdur2
+                      if (endi <= length(rr1)) { #does bout fall without measurement?
+                        lengthbout = sum(rr1[p[jmvpa]:endi])
+                        if (lengthbout > (boutdur2*boutcriter)) { #0.9 => 90% of the bout needs to meet the criteria
+                          rr1t[p[jmvpa]:endi] = 2 #remember that this was a bout in r1t
+                        } else {
+                          rr1[p[jmvpa]] = 0
+                        }    	
+                      } else { #bout does not fall within measurement
+                        if (length(p) > 1 & jmvpa > 2) {
+                          rr1[p[jmvpa]] = rr1[p[jmvpa-1]]
+                        }				
+                      }
+                      jmvpa = jmvpa + 1
                     }
-                    jmvpa = jmvpa + 1
+                    rr1[which(rr1t == 2)] = 1
+                    mvpa5 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
+                    # METHOD 6: time spent above threshold 10 minutes
+                    boutdur2 = 10 * (60/ws3) 
+                    rr1 = matrix(0,length(varnum),1)
+                    p = which(varnum*1000 >= mvpathreshold[mvpai])
+                    rr1[p] = 1
+                    rr1t = rr1
+                    jmvpa = 1
+                    while(jmvpa <= length(p)) {
+                      endi = p[jmvpa]+boutdur2
+                      if (endi <= length(rr1)) { #does bout fall without measurement?
+                        lengthbout = sum(rr1[p[jmvpa]:endi])
+                        if (lengthbout > (boutdur2*boutcriter)) { #0.9 => 90% of the bout needs to meet the criteria
+                          rr1t[p[jmvpa]:endi] = 2 #remember that this was a bout in r1t
+                        } else {
+                          rr1[p[jmvpa]] = 0
+                        }      
+                      } else { #bout does not fall within measurement
+                        if (length(p) > 1 & jmvpa > 2) {
+                          rr1[p[jmvpa]] = rr1[p[jmvpa-1]]
+                        }				
+                      }
+                      jmvpa = jmvpa + 1
+                    }
+                    rr1[which(rr1t == 2)] = 1
+                    mvpa6 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
                   }
-                  rr1[which(rr1t == 2)] = 1
-                  mvpa6 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
-                  if (length(which(varnum*1000 >= mvpathreshold[mvpai])) < 0 & length(varnum) < 100) {
-                    mvpa1 = 0
-                    mvpa2 = 0
-                    mvpa3 = 0
-                    mvpa4 = 0
-                    mvpa5 = 0
-                    mvpa6 = 0
-                  }
-                  if (is.nan(mvpa1) == TRUE) mvpa1 = 0
-                  if (is.nan(mvpa2) == TRUE) mvpa2 = 0
-                  if (is.nan(mvpa3) == TRUE) mvpa3 = 0
-                  if (is.nan(mvpa4) == TRUE) mvpa4 = 0
-                  if (is.nan(mvpa5) == TRUE) mvpa5 = 0
-                  if (is.nan(mvpa6) == TRUE) mvpa6 = 0
+                  
+                  
+                  
+                  
+                  if (length(which(is.nan(mvpa) == TRUE)) > 0) mvpa[which(is.nan(mvpa) == TRUE)] = 0
                   mvpanames[,mvpai] = c( paste("MVPA_E",ws3,"S_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E1M_T",mvpathreshold[mvpai],sep=""),
                                          paste("MVPA_E5M_T",mvpathreshold[mvpai],sep=""),
-                                         paste("MVPA_E",ws3,"S_B1M",(boutcriter * 100),"%_T",mvpathreshold[mvpai],sep=""),
-                                         paste("MVPA_E",ws3,"S_B5M",(boutcriter * 100),"%_T",mvpathreshold[mvpai],sep=""),
-                                         paste("MVPA_E",ws3,"S_B10M",(boutcriter * 100),"%_T",mvpathreshold[mvpai],sep=""))
-                  daysummary[di,fi] = mvpa1;  ds_names[fi] = paste(mvpanames[1,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
-                  daysummary[di,fi] = mvpa2;  ds_names[fi] = paste(mvpanames[2,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
-                  daysummary[di,fi] = mvpa3;  ds_names[fi] = paste(mvpanames[3,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
-                  daysummary[di,fi] = mvpa4;  ds_names[fi] = paste(mvpanames[4,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
-                  daysummary[di,fi] = mvpa5;  ds_names[fi] = paste(mvpanames[5,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
-                  daysummary[di,fi] = mvpa6;  ds_names[fi] = paste(mvpanames[6,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                                         paste("MVPA_E",ws3,"S_B",mvpadur[1],"M",(boutcriter * 100),"%_T",mvpathreshold[mvpai],sep=""),
+                                         paste("MVPA_E",ws3,"S_B",mvpadur[2],"M",(boutcriter * 100),"%_T",mvpathreshold[mvpai],sep=""),
+                                         paste("MVPA_E",ws3,"S_B",mvpadur[3],"M",(boutcriter * 100),"%_T",mvpathreshold[mvpai],sep=""))
+                  daysummary[di,fi] = mvpa[1];  ds_names[fi] = paste(mvpanames[1,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa[2];  ds_names[fi] = paste(mvpanames[2,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa[3];  ds_names[fi] = paste(mvpanames[3,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa[4];  ds_names[fi] = paste(mvpanames[4,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa[5];  ds_names[fi] = paste(mvpanames[5,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
+                  daysummary[di,fi] = mvpa[6];  ds_names[fi] = paste(mvpanames[6,mvpai],"_",colnames(metashort)[mi],sep=""); fi=fi+1
                 }
               }
             }
@@ -836,5 +931,11 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   }
   summary = data.frame(value=t(summary),stringsAsFactors=FALSE) #needs to be t() because it will be a column otherwise
   names(summary) = s_names
-  invisible(list(summary=summary,daysummary=daysummary))
+  if (length(selectdaysfile) > 0) {
+    windowsummary = data.frame(windowsummary,stringsAsFactors = FALSE) # addition for Millenium cohort
+    names(windowsummary) = ws_names
+    invisible(list(summary=summary,daysummary=daysummary,windowsummary=windowsummary))
+  } else {
+    invisible(list(summary=summary,daysummary=daysummary))
+  }
 }

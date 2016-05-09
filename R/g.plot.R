@@ -67,7 +67,7 @@ g.plot = function(IMP,M,I,durplot) {
     timeline = timeline[1:length(var1)]
   }
   MEND = length(timeline)
-  if (mon == 2) { #for measurement without temperature
+  if (mon == 2) { #for measurement with temperature
     par(fig=c(0,1,0,0.65),new=T)
     plot(timeline,var1,type="l",xlab="Day",ylab="Acceleration (g)",bty="l",lwd=0.1,xlim=c(0,durplot),ylim=c(0,0.6))
     par(fig=c(0,1,0.45,0.80),new=T) #0.55 1 -- 0.35 0.8

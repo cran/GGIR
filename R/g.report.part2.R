@@ -1,4 +1,4 @@
-g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
+g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7,selectdaysfile=c()) {
   ms2.out = "/meta/ms2.out"
   if (file.exists(paste(metadatadir,ms2.out,sep=""))) {
     if (length(dir(paste(metadatadir,ms2.out,sep=""))) == 0) {
@@ -30,7 +30,7 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
     # house keeping variables
     pdfpagecount = 1 # counter to keep track of files being processed (for pdf)
     pdffilenumb = 1 #counter to keep track of number of pdf-s being generated
-    daySUMMARY = c()
+    winSUMMARY = daySUMMARY = c()
     if (length(f0) ==  0) f0 = 1
     if (length(f1) ==  0) f1 = length(fnames)
     #-----------------------------
@@ -56,9 +56,14 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
         if (M$filecorrupt == FALSE & M$filetooshort == FALSE) {
           if (i == 1 | i == f0) {
             SUMMARY = SUM$summary
-            SUM$summary$pdffilenumb = SUMMARY$pdffilenumb = pdffilenumb
-            SUM$summary$pdfpagecount = SUMMARY$pdfpagecount = pdfpagecount
+            SUMMARY$pdffilenumb = pdffilenumb
+            SUMMARY$pdfpagecount = pdfpagecount
+            SUM$summary = SUMMARY
             daySUMMARY = SUM$daysummary
+            if (length(selectdaysfile) > 0) {
+              winSUMMARY = SUM$windowsummary[,which(
+                is.na(colnames(SUM$windowsummary)) == FALSE)] # added for Millenium cohort
+            }
           } else {
             SUM$summary$pdffilenumb = pdffilenumb
             SUM$summary$pdfpagecount = pdfpagecount
@@ -77,6 +82,19 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
             }
             if (length(which(colnames(daySUMMARY) != names(SUM$daysummary)) ) > 0) {
               names(SUM$daysummary) =   colnames(daySUMMARY)
+            }
+            if (length(selectdaysfile) > 0) {
+              # winsummary
+              winSUMMARY2 = SUM$windowsummary[,which(is.na(colnames(SUM$windowsummary)) == FALSE)]
+              if (ncol(winSUMMARY) == ncol(winSUMMARY2)) {
+              } else {
+                winSUMMARY2 = cbind(winSUMMARY2,matrix(" ",1,(ncol(winSUMMARY) - ncol(winSUMMARY2))))
+                colnames(winSUMMARY2) = colnames(winSUMMARY)
+              }
+              if (length(which(colnames(winSUMMARY) != names(winSUMMARY2)) ) > 0) {
+                names(winSUMMARY2) =   colnames(winSUMMARY)
+              }
+              winSUMMARY = rbind(winSUMMARY,winSUMMARY2)
             }
             SUMMARY = rbind(SUMMARY,SUM$summary)
             daySUMMARY = rbind(daySUMMARY,SUM$daysummary)
@@ -150,6 +168,9 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
         #store matrix temporarily to keep track of process
         write.csv(SUMMARY,paste(path1,outputfolder,"/results/part2_summary.csv",sep=""),row.names=F)
         write.csv(daySUMMARY,paste(path1,outputfolder,"/results/part2_daysummary.csv",sep=""),row.names=F)
+        if (length(selectdaysfile) > 0) {
+          write.csv(winSUMMARY,paste(path1,outputfolder,"/results/windowsummary.csv",sep=""),row.names=F)
+        }
         write.csv(QCout,paste(path1,outputfolder,"/results/QC/data_quality_report.csv",sep=""),row.names=F)
       }
       pdfpagecount = pdfpagecount + 1
@@ -164,6 +185,9 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7) {
     # store final matrices again
     write.csv(SUMMARY,paste(path1,outputfolder,"/results/part2_summary.csv",sep=""),row.names=F)
     write.csv(daySUMMARY,paste(path1,outputfolder,"/results/part2_daysummary.csv",sep=""),row.names=F)
+    if (length(selectdaysfile) > 0) {
+      write.csv(winSUMMARY,paste(path1,outputfolder,"/results/part2_windowsummary.csv",sep=""),row.names=F)
+    }
     write.csv(QCout,paste(path1,outputfolder,"/results/QC/data_quality_report.csv",sep=""),row.names=F)
     SI = sessionInfo()  
     save(SI,file=paste(path1,outputfolder,"/results/QC/sessioninfo_part2.RData",sep=""))

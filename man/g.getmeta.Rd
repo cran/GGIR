@@ -13,15 +13,15 @@ from GENEA and GENEActiv. Further, the function should be able to cope with csv-
 data procuded by GENEActiv and Actigraph
 }
 \usage{
-g.getmeta(datafile, desiredtz = "Europe/London", 
+g.getmeta(datafile, desiredtz = c(), 
 windowsizes = c(5, 900, 3600),daylimit = FALSE, 
 offset = c(0,0,0), scale = c(1,1,1),
 tempoffset = c(0,0,0),do.bfen = FALSE, do.enmo = TRUE,
 do.lfenmo = FALSE, do.en = FALSE,
 do.hfen = FALSE, do.hfenplus = FALSE,
 do.teLindert2013=FALSE,do.anglex=FALSE,do.angley=FALSE,do.anglez=FALSE,
-do.enmoa = FALSE,
-lb = 0.2,hb = 15, n = 4,meantempcal=c(),chunksize=c())
+do.enmoa = FALSE,lb = 0.2,hb = 15, n = 4,meantempcal=c(),chunksize=c(),
+selectdaysfile=c(),dayborder=0,...)
 }
 \arguments{
   \item{datafile}{name of accelerometer file
@@ -79,23 +79,32 @@ lb = 0.2,hb = 15, n = 4,meantempcal=c(),chunksize=c())
   }
   \item{do.enmoa}{if TRUE (default), calculate metric ENMOa which is equal to
   metric ENMO but with the absolute taken from the Euclidean norm minus one.
-}
+  }
   \item{lb}{lower boundary of the frequency filter (in Hertz)
-}
+  }
   \item{hb}{upper boundary of the frequency filter (in Hertz)
-}
+  }
   \item{n}{order of the frequency filter
-}
+  }
   \item{meantempcal}{mean temperature corresponding to the data as used for 
 autocalibration. If autocalibration is not done or if temperature was not
 available then leave blank (default)
-}
-\item{chunksize}{number between 0.2 and 1 to specificy the size of chunks to be 
+  }
+  \item{chunksize}{number between 0.2 and 1 to specificy the size of chunks to be 
 loaded as a fraction of a 24 hour period, e.g. 0.5 equals 12 hour chunks.
 The default is 1 (24 hrs). For machines with less than 4Gb of RAM memory a value
 below 1 is recommended.
-}
-
+  }
+  \item{selectdaysfile}{
+  see \link{g.part1}
+  }
+  \item{dayborder}{
+   see \link{g.part1}
+  }
+  \item{...}{
+   Please ignore. Only used by the code internally when called from within
+   g.part1 with selectdaysfile specific.
+  }  
 }
 \value{
   \item{metalong}{dataframe with long epoch meta-data: EN, non-wear score,

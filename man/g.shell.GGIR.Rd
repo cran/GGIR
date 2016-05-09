@@ -13,7 +13,7 @@ on optional input arguments.
 }
 \usage{
 g.shell.GGIR(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1,f1=0,
-do.report=c(2),overwrite=FALSE,visualreport=FALSE,...)
+do.report=c(2),overwrite=FALSE,visualreport=FALSE,viewingwindow=1,...)
 }
 \arguments{
   \item{mode}{
@@ -60,6 +60,9 @@ do.report=c(2),overwrite=FALSE,visualreport=FALSE,...)
   \item{visualreport}{
   If TRUE then generate visual report based on combined output from part 2
   and 4. This is in beta-version at the moment.
+  }
+  \item{viewingwindow}{
+  Centre the day as displayed around noon (value = 1) or around midnight (value = 2)
   }
   \item{...}{
    Any input argument needed for functions g.part1, g.part2, g.part3

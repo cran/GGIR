@@ -18,7 +18,9 @@ combination with the epoch length as defined in g.getmeta.
 \usage{
 g.analyse(I, C, M, IMP, qlevels = c(), qwindow = c(0, 24), quantiletype = 7,
 L5M5window = c(0, 24), M5L5res = 10, includedaycrit = 16, ilevels = c(),
-winhr = 5, idloc = 1,snloc=1,mvpathreshold = c(),boutcriter=c())
+winhr = 5, idloc = 1,snloc=1,mvpathreshold = c(),boutcriter=c(),mvpadur=c(1,5,10),
+selectdaysfile=c(),window.summary.size=10,dayborder=0,mvpa.2014 = FALSE,
+closedbout=FALSE)
 }
 
 \arguments{
@@ -87,10 +89,31 @@ resoltion of L5 and M5 analysis in minutes (default: 10 minutes)
     \item{boutcriter}{
     The variable boutcriter is a number between 0 and 1 and defines what fraction
     of a bout needs to be above the mvpathreshold
-    
   }
-
-
+  \item{mvpadur}{
+    default = c(1,5,10). Three bout duration for which MVPA will be calculated
+  }
+  \item{selectdaysfile}{
+  Functionality designed for the London Centre of Longidutinal studies.
+  Csv file holding the relation between device serial numbers and measurement days of interest.
+  }
+    \item{dayborder}{
+  Hour at which days start and end (default = 0), value = 4 would mean 4am
+  }
+  \item{window.summary.size}{
+    Functionality designed for the London Centre of Longidutinal studies.
+  Size in minutes of the summary window
+  }
+  \item{mvpa.2014}{
+  If TRUE use the MVPA bout definition as has been available since 2014.
+  With hindsight this included a bug in the calculation which incorrectly allocated too
+  many minutes to each bout. In the revised calculation this has now been corrected.
+  To use the new calculation set value to FALSE (default) and also set argument closedbout.
+  }
+  \item{closedbout}{
+  If TRUE then count breaks in a bout towards the bout duration. If FALSE then only count
+  time spent above the threshold towards the bout duration.
+  }
 
 }
 \value{

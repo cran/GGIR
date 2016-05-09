@@ -27,7 +27,7 @@ g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3600),
                    lb = 0.2, hb = 15,  n = 4,
                    use.temp=TRUE,spherecrit=0.3,minloadcrit=72,
                    printsummary=TRUE,print.filename=FALSE,overwrite=FALSE,
-                   backup.cal.coef)
+                   backup.cal.coef=c(),selectdaysfile=c(),dayborder=0)
 }
 \arguments{
   \item{datadir}{
@@ -156,7 +156,18 @@ g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3600),
   calibration coefficients can be derived in an alternative way.
   It is the users responsibility to compile the csv-spreadsheet.
   }
-  
+  \item{selectdaysfile}{
+  Optional functionality. Character pointing at a csv file holding the relationship
+  between device serial numbers (first column) and measurement dates of interest 
+  (second and third column). The date format should be dd/mm/yyyy. And the first row
+  if the csv file is assumed to have a character variable names, e.g. "serialnumber"
+  "Day1" and "Day2" respectively. Raw data will be extracted and stored in the output
+  directory in a new subfolder named 'raw'.
+  }
+  \item{dayborder}{
+  Hour at which days start and end (default = 0), value = 4 would mean 4am
+  }
+
 }
 \value{
  The function provides no values, it only ensures that the output from other

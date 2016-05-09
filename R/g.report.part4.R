@@ -244,6 +244,8 @@ g.report.part4 = function(datadir=c(),metadatadir=c(),loglocation = c(),f0=f0,f1
           } else {
             CRIT = which(nightsummary$id == uid[i] & nightsummary$cleaningcode == 0) #when sleep log is available
           }
+          summarynames_backup = c()
+         
           if (length(CRIT) > 0) { #summarise data if there is data
             #-----------------------------------------------
             #         if (length(which(nightsummary$id == uid[i] & nightsummary$cleaningcode == 0)) > 0) { #summarise data if there is data
@@ -318,7 +320,17 @@ g.report.part4 = function(datadir=c(),metadatadir=c(),loglocation = c(),f0=f0,f1
         summary = as.data.frame(summary)
         #         print(length(summarynames)C)
         if (length(summarynames) != ncol(summary)) {
-          names(summary) = summarynames_backup
+          if (length(summarynames_backup) > 0) {
+            names(summary) = summarynames_backup
+          } else {
+            if (length(summarynames) >ncol(summary)) {
+              names(summary)[1:length(summarynames)] = summarynames
+            } else {
+               names(summary) = summarynames[1:ncol(summary)]
+            }
+            
+          }
+          
           # <= 29) print("use backup"); summarynames = summarynames_backup
         }
         names(summary) =summarynames

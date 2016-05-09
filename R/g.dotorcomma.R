@@ -26,7 +26,8 @@ g.dotorcomma = function(inputfile,dformat,mon) {
       }
     }
   } else if (dformat == 3) { #!decn is detect, but currently not used in the rest of the code!
-    # try(expr={deci = g.wavread(binfile=inputfile,start=1,end=3)},silent=TRUE)
+    print(inputfile)
+    try(expr={deci = g.wavread(binfile=inputfile,start=1,end=10)},silent=TRUE)
     deci = as.matrix(deci$rawxyz)
     if(is.na(suppressWarnings(as.numeric(deci[2,2]))) == T) {
       decn = "," #comma

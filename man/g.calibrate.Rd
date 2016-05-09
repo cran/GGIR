@@ -11,7 +11,8 @@ to address the calibration error and a summary of the callibration procedure.
 }
 \usage{
 g.calibrate(datafile, use.temp = TRUE, spherecrit = 0.3, minloadcrit = 72, 
-printsummary = TRUE,chunksize=c(),windowsizes=c(5,900,3600))
+printsummary = TRUE,chunksize=c(),windowsizes=c(5,900,3600),selectdaysfile=c(),
+dayborder=0)
 }
 \arguments{
   \item{datafile}{
@@ -38,10 +39,15 @@ loaded as a fraction of a 12 hour period, e.g. 0.5 equals 6 hour chunks.
 The default is 1 (12 hrs). For machines with less than 4Gb of RAM memory a value
 below 1 is recommended.
 }
-  
  \item{windowsizes}{
   see \link{g.getmeta}
 }
+  \item{selectdaysfile}{
+  see \link{g.part1}
+  }
+  \item{dayborder}{
+  see \link{g.part1}
+  }
 }
 \value{
  \item{\code{scale}}{scaling correction values, e.g. c(1,1,1) }

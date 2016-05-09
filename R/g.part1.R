@@ -7,7 +7,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                    do.cal = TRUE,
                    lb = 0.2, hb = 15,  n = 4,use.temp=TRUE,spherecrit=0.3,
                    minloadcrit=72,printsummary=TRUE,print.filename=FALSE,overwrite=FALSE,
-                   backup.cal.coef=c()) {
+                   backup.cal.coef=c(),selectdaysfile=c(),dayborder=0) {
   if (length(datadir) == 0 | length(outputdir) == 0) {
     if (length(datadir) == 0) {
       print("Variable datadir is not defined")
@@ -22,6 +22,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   if (length(datadir) == 1) { #could be a directory or one file
     if (length(unlist(strsplit(datadir,"[.]bi")))>1) filelist = TRUE
     if (length(unlist(strsplit(datadir,"[.]cs")))>1) filelist = TRUE
+    if (length(unlist(strsplit(datadir,"[.]wa")))>1) filelist = TRUE
   } else { #multiple files
     filelist = TRUE    
   }
@@ -42,6 +43,9 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
     dir.create(file.path(outputdir,outputfolder))
     dir.create(file.path(outputdir,outputfolder,"meta"))
     dir.create(file.path(outputdir,paste(outputfolder,"/meta",sep=""),"basic"))
+    if (length(selectdaysfile) > 0) {
+      dir.create(file.path(outputdir,paste(outputfolder,"/meta",sep=""),"raw"))
+    }
     dir.create(file.path(outputdir,outputfolder,"results"))
     dir.create(file.path(outputdir,paste(outputfolder,"/results",sep=""),"QC"))
   }
@@ -162,20 +166,37 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
     } else {
       skip = 0
     }
+    if (length(unlist(strsplit(datafile,"[.]RD"))) > 1) {
+        useRDA = TRUE
+      } else {
+        useRDA = FALSE
+    }
     #================================================================
     # Inspect file (and store output later on)
     options(warn=-1) #turn off warnings
-    I = g.inspectfile(datafile) 
+
+    if (useRDA == FALSE) {
+      I = g.inspectfile(datafile)
+    } else {
+      load(datafile) # to do: would be nice to only load the object I and not the entire datafile
+      I$filename = fnames[j]
+    }
     options(warn=0) #turn on warnings
     if (overwrite == TRUE) skip = 0
     if (skip == 0) { #if skip = 1 then skip the analysis as you already processed this file
       print(paste("P1 file",j,sep=""))
-      if (do.cal ==TRUE) {
+      turn.do.cal.back.on = FALSE
+      if (do.cal == TRUE & I$dformc == 3) { # do not do the auto-calibration for wav files (because already done in pre-processign)
+        do.cal = FALSE
+        turn.do.cal.back.on = TRUE
+      }
+      #--------------------------------------
+      if (do.cal ==TRUE & useRDA == FALSE) {
         print("---------------------------------------------")
         print("investigate calibration of the sensors...")
         C = g.calibrate(datafile,use.temp=use.temp,spherecrit=spherecrit,
                         minloadcrit=minloadcrit,printsummary=printsummary,chunksize=chunksize,
-                        windowsizes=windowsizes)
+                        windowsizes=windowsizes,selectdaysfile=selectdaysfile,dayborder=dayborder)
       } else {
         C = list(cal.error.end=0,cal.error.start=0)
         C$scale=c(1,1,1)
@@ -186,6 +207,10 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
         C$nhoursused= 0
         C$use.temp = use.temp
       }
+      if (turn.do.cal.back.on == TRUE) {
+        do.cal = TRUE
+      }
+      
       cal.error.end = C$cal.error.end
       cal.error.start = C$cal.error.start
       if (length(cal.error.start) == 0) {
@@ -249,7 +274,11 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                     lb = lb, hb = hb,  n = n,
                     desiredtz=desiredtz,daylimit=daylimit,windowsizes=windowsizes,
                     tempoffset=C$tempoffset,scale=C$scale,offset=C$offset,
-                    meantempcal=C$meantempcal,chunksize=chunksize)
+                    meantempcal=C$meantempcal,chunksize=chunksize,
+                    selectdaysfile=selectdaysfile,
+                    outputdir=outputdir,
+                    outputfolder=outputfolder,
+                    dayborder=dayborder)
       #------------------------------------------------
       print("save .RData-file with: calibration report, file inspection report and all meta data...")
       # remove directory in filename if present
