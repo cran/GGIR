@@ -474,8 +474,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                     }
                     
                   } else { # updated version
-                    cat("\nWARNING: MVPA Bout defintion has been updated, please see document for more information")
-                    cat("\nincluding instructions on how to continue using the old defintion\n")
                     # METHOD 4: time spent above threshold
                     boutdur2 = 60/ws3 # per minute
                     rr1 = matrix(0,length(varnum),1)

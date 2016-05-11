@@ -1,5 +1,6 @@
 g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1,f1=0,
                         do.report=c(2),overwrite=FALSE,visualreport=FALSE,viewingwindow=1,...) {
+  
   #get input variables
   input = list(...)
   if (length(input) > 0) {
@@ -168,6 +169,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
     cat(paste0(rep('_',options()$width),collapse=''))
     cat("\nPart 2\n")
     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/basic",sep="")))
+    
     g.part2(datadir =datadir,metadatadir=metadatadir,f0=f0,f1=f1,strategy = strategy, 
             hrs.del.start = hrs.del.start,hrs.del.end = hrs.del.end,
             maxdur =  maxdur, includedaycrit = includedaycrit,

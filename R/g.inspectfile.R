@@ -148,7 +148,10 @@ g.inspectfile = function(datafile) {
     }
     
   } else if (dformat == 3) { #wav data
-    header = rownames(read.csv(datafile,skipNul=TRUE,nrow=13,header=TRUE))
+    header = rownames(read.csv(datafile,skipNul=TRUE,nrow=13,header=TRUE,fileEncoding="UTF-8"))
+    if (length(header) == 0) {
+      header = rownames(read.csv(datafile,skipNul=TRUE,nrow=13,header=TRUE,fileEncoding="latin1"))
+    }
     H = sapply(as.character(header),function(x) {
       tmp = unlist(strsplit(x,": "))
       if (length(tmp) == 1) {

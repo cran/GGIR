@@ -2,6 +2,11 @@
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 1.2-6 (release date: 10-5-2016)}{
+\itemize{
+  \item Modified warning message in relation to the change in MVPA bout defintion 
+}
+}
 \section{Changes in version 1.2-5 (release date: 8-5-2016)}{
 \itemize{
   \item Accelerometer non-wear time is now also reported in the output of part 4

@@ -53,9 +53,7 @@ scientist. Therefore, the user may want to run g.part1 overnight or on a computi
 cluster, while g.part2 can then be the main playing ground for the movement scientist.
 So, function g.shell.GGIR basically is the central point for operating both g.part1 and
 g.part2 and most users should not really need to interact with g.part1 or g.part2
-directly.\cr
-\cr
-More recently I expanded the package with g.part3 and g.part4 which 
+directly. More recently I expanded the package with g.part3 and g.part4 which 
 provide functionality for estimating sleep and sustained inactivity bouts.\cr
 \cr
 If you want to use this package for a different data format (e.g. from a different
@@ -67,14 +65,14 @@ Please note that there is google discussion group for this package (link below).
 You can thank me for sharing the code in this package and for developing 
 it as a generic purpose tool by citing the package name and by
 citing the supporting publications in your own scientific
-journal/conference publications. 
+journal/conference publications.
 }
 \details{
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.2-5\cr
-Date: \tab 2016-5-08\cr
+Version: \tab 1.2-6\cr
+Date: \tab 2016-5-10\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 Discussion group: \tab https://groups.google.com/forum/#!forum/rpackageggir\cr
 }

@@ -11,6 +11,11 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
   outputfolder = paste("/output_",outputfolder,sep="")
   path1 = unlist(strsplit(metadatadir,"/output"))[1]
   snloc= 1
+  
+  cat("\nWARNING: The MVPA Bout defintion has been updated after the discovery of a bug (May 2016)")
+  cat("\nplease see package tutorial for more information including instructions on how use the old defintion ")
+  cat("\nin case you want to compare output.\n")
+  
   #---------------------------------
   # Specifying directories with meta-data and extracting filenames 
   path = paste(path1,outputfolder,"/meta/basic/",sep="")  #values stored per long epoch, e.g. 15 minutes
