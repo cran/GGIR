@@ -2,6 +2,11 @@
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 1.2-7 (release date: 12-5-2016)}{
+\itemize{
+  \item mvpa.2014 TRUE/FALSE was swapped, FALSE is now the default
+}
+}
 \section{Changes in version 1.2-6 (release date: 10-5-2016)}{
 \itemize{
   \item Modified warning message in relation to the change in MVPA bout defintion 
@@ -15,9 +20,8 @@
   is instructed to only wear the accelerometer on one or two specific days.
   \item Argument mvpa.2014 and closedbout added to function g.analyse. The calculation of
   MVPA (moderate and vigorous physical activity) has been available since 2014.
-  With hindsight this included a bug in the calculation which incorrectly allocated too
-  many minutes to each bout. This has now been corrected, but the user has the option
-  to continue using the old calculation.
+  This calculation has been improved, but the user has the option to continue using 
+  the old calculation.
 }
 }
 \section{Changes in version 1.2-2 (release date: 7-1-2016)}{

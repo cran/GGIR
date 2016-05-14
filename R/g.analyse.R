@@ -450,7 +450,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                   select = seq(1,length(varnum2),by=300/ws3)
                   varnum3 = diff(varnum2[round(select)]) / abs(diff(round(select)))
                   mvpa[3] = length(which(varnum3*1000 >= mvpathreshold[mvpai])) * 5 #time spent MVPA in minutes
-                  if (mvpa.2014 == TRUE) { # MVPA bout calculation like in the 2014 papers
+                  if (mvpa.2014 == FALSE) { # MVPA bout calculation like in the 2014 papers
                     # METHOD 4: time spent above threshold
                     boutdur2 = mvpadur[1] * (60/ws3) # per minute
                     rr1 = matrix(0,length(varnum),1)
