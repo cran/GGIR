@@ -474,6 +474,8 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                     }
                     
                   } else { # updated version
+                    # cat("\nWARNING: MVPA Bout defintion has been updated, please see package manual for more information")
+                    # cat("\nincluding instructions on how to continue using the old defintion\n")
                     # METHOD 4: time spent above threshold
                     boutdur2 = 60/ws3 # per minute
                     rr1 = matrix(0,length(varnum),1)
@@ -498,7 +500,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                       jmvpa = jmvpa + 1
                     }
                     rr1[which(rr1t == 2)] = 1
-                    mvpa4 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
+                    mvpa[4] = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
                     # METHOD 5: time spent above threshold 5 minutes
                     boutdur2 = 5 * (60/ws3)
                     rr1 = matrix(0,length(varnum),1)
@@ -523,7 +525,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                       jmvpa = jmvpa + 1
                     }
                     rr1[which(rr1t == 2)] = 1
-                    mvpa5 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
+                    mvpa[5] = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
                     # METHOD 6: time spent above threshold 10 minutes
                     boutdur2 = 10 * (60/ws3) 
                     rr1 = matrix(0,length(varnum),1)
@@ -548,7 +550,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                       jmvpa = jmvpa + 1
                     }
                     rr1[which(rr1t == 2)] = 1
-                    mvpa6 = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
+                    mvpa[6] = length(which(rr1 == 1))   / (60/ws3) #time spent MVPA in minutes
                   }
                   
                   

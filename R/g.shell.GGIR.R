@@ -1,6 +1,5 @@
 g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1,f1=0,
                         do.report=c(2),overwrite=FALSE,visualreport=FALSE,viewingwindow=1,...) {
-  
   #get input variables
   input = list(...)
   if (length(input) > 0) {
@@ -41,7 +40,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
       f1 = length(datadir) #modified
     }
   }
-  dopart1 = dopart2 = dopart3 = dopart4 = FALSE # dopart5 = FALSE
+  dopart1 = dopart2 = dopart3 = dopart4 = FALSE #dopart5 =
   if (length(which(mode == 0)) > 0) {
     dopart1 = TRUE
     dopart2 = TRUE
@@ -142,7 +141,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
   # part 2
   if (length(which(ls() == "mvpadur")) == 0)  mvpadur = c(1,5,10) # related to part 2 (functionality to anticipate part 5)
   if (length(which(ls() == "epochvalues2csv")) == 0)  epochvalues2csv = FALSE
-  if (length(which(ls() == "mvpa.2014")) == 0) mvpa.2014 = TRUE
+  # if (length(which(ls() == "mvpa.2014")) == 0) mvpa.2014 = TRUE
   if (length(which(ls() == "window.summary.size")) == 0) window.summary.size = 10
   if (length(which(ls() == "dayborder")) == 0)  dayborder = 0
   
@@ -169,7 +168,6 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
     cat(paste0(rep('_',options()$width),collapse=''))
     cat("\nPart 2\n")
     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/basic",sep="")))
-    
     g.part2(datadir =datadir,metadatadir=metadatadir,f0=f0,f1=f1,strategy = strategy, 
             hrs.del.start = hrs.del.start,hrs.del.end = hrs.del.end,
             maxdur =  maxdur, includedaycrit = includedaycrit,

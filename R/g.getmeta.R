@@ -79,6 +79,7 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
   sf = INFI$sf
   if (sf == 0) sf = 80 #assume 80Hertz in the absense of any other info
   header = INFI$header
+  
   options(warn=-1)
   if (useRDA == FALSE) decn =g.dotorcomma(datafile,dformat,mon=mon)
   options(warn=0)
@@ -408,9 +409,26 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
             starttime = P$timestamps2[1]
             lengthheader = nrow(header)
             
-          } else if (dformat == 3) {
-            # starttime = P$timestamp # initially used, but apparently its is corrupted sometimes, so I am now using ICMTzTime
+          } else if (dformat == 3) { #wav
+            starttime = c()
+            #It seems that Axivity does not store timestamp in a consistent position
+            # therefore, we need to search for it in the data:
             starttime = as.character(header[which(rownames(header) == "ICMTzTime"),1])
+            rn = rownames(header)
+            vl = header$value
+            if (length(starttime) == 0) {
+              if (length(which(rn == "Start")) > 0) {
+                starttime = as.character(header$value[which(rn == "Start")])
+                #in one of the files starttime is hidden in rowname
+                if (length(starttime) == 0) starttime = rownames(header)[2] 
+              }
+              #in one of the files start variable name is hidden in the values
+              if (length(which(vl == "Start")) > 0) {
+                starttime = header$value[2]
+              }
+            }
+            if (length(starttime) == 0) starttime = P$timestamp # initially used, but apparently its is corrupted sometimes, so I am now using ICMTzTime
+            if (length(starttime) == 0) starttime = as.character(P$hvalues[which(P$hnames == "Start")]) 
             lengthheader = nrow(header)
           } else if (mon == 2 & dformat == 1) {
             if (length(desiredtz) > 0) {
@@ -518,6 +536,9 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
           #assess how much data to delete till next 15 minute period
           temp = unlist(strsplit(as.character(starttime)," "))
           starttime2 = as.numeric(unlist(strsplit(temp[2],":")))
+          
+          
+          
           if (length(which(is.na(starttime2) ==  TRUE)) > 0 | length(starttime2) ==0) { #modified on 5may2015
             starttime2 = c(0,0,0)
           }

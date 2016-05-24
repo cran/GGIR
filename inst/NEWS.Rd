@@ -1,10 +1,17 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-
+\section{Changes in version 1.2-8 (release date: 24-5-2016)}{
+\itemize{
+  \item Updated documentation for function g.analyse to clarify different
+  mvpa bout definitions
+  \item mvpa.2014 = TRUE turned back on again (was disable in last version)
+}
+}
 \section{Changes in version 1.2-7 (release date: 12-5-2016)}{
 \itemize{
   \item mvpa.2014 TRUE/FALSE was swapped, FALSE is now the default
+  \item mvpa.2014 = TRUE disabled
 }
 }
 \section{Changes in version 1.2-6 (release date: 10-5-2016)}{
