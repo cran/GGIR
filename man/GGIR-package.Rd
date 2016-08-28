@@ -44,8 +44,16 @@ to a conveniently portable .RData-format away from the R workspace.
 Next, these .RData files are used as input for g.part2.\cr
 \cr
 Note that g.part1 generates a folder structure to help the user keep track of
-various output files and milestone data. The reason why g.part1 and g.part2 are
-not merged as one generic shell function is because g.part1 takes much longer to 
+various output files and milestone data. The folder structure entails:
+One master folder with a name output_xx where xx is equal to the name of the
+original data folder. Inside the output_xx folder there will be one folder
+named meta including all the milestone and a folder results with all the results.
+Inside the meta folder the following subfolders are created:
+basic, ms2.out, ms3out, and ms4out for respectively g.part1, g.part2, g.part3,
+and g.part4 milestone data.\cr
+\cr
+The reason why g.part1 and g.part2 are not merged as one generic shell
+function is because g.part1 takes much longer to 
 run and involves only minor decisions of interest to the movement scientist. 
 Function g.part2 on the other hand is relatively fast and comes with all the 
 decisions that directly impact on the variables that are of interest to the movement
@@ -71,8 +79,8 @@ journal/conference publications.
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.2-8\cr
-Date: \tab 2016-5-24\cr
+Version: \tab 1.2-10\cr
+Date: \tab 2016-8-28\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 Discussion group: \tab https://groups.google.com/forum/#!forum/rpackageggir\cr
 }
