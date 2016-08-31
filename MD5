@@ -1,9 +1,9 @@
-8c9c0f91ca9651d63f2b72b93954ce19 *DESCRIPTION
+1d3dd2d92d62cef736cc66e76e97ee64 *DESCRIPTION
 f98b0b01382e0f74145ef2e111e1f44e *NAMESPACE
 48918779e31fcb4d8771b9da934c49d5 *R/POSIXtime2iso8601.R
 5ac477d6c260cefa2a6e66859dd3298f *R/chartime2iso8601.R
 79f8c199a8e695c7dd2abbf5cd97bd5a *R/g.abr.day.names.R
-47c82203fe8e86271917f6d0cc89b193 *R/g.analyse.R
+5a2032b141a6f651eb7984d50a5676d7 *R/g.analyse.R
 19f994083880cfd32d7c2919badcd666 *R/g.binread.R
 d1b6e08018e1690bf214cc0c32815ca5 *R/g.calibrate.R
 3b1f7a8ee4dfcfb9554f025cd12020fb *R/g.create.sp.mat.R
@@ -38,8 +38,8 @@ c465d73a6a2d6510c97f069906ba47b8 *R/g.weardec.R
 5e07c17c608dee884ea2ad0a1bfa159f *data/data.getmeta.RData
 0cb14c60e18f5bd4c15fb942c95aea2b *data/data.inspectfile.RData
 2ef488d8543e33e67645f5c0deb94040 *data/datalist
-3f0d942c238081d751d47f29d7449c22 *inst/NEWS.Rd
-66d45d0cb24f178f25ed87a6d4234776 *man/GGIR-package.Rd
+f0dbaaa5c10b4b554ba567ae68c889d1 *inst/NEWS.Rd
+ca5b6a05d9cae065f3e1dd4676a9a74c *man/GGIR-package.Rd
 df7d0b5c90d4ad2909e3196064e23f30 *man/data.calibrate.Rd
 4c1353b061014b508c6ed057c3068699 *man/data.getmeta.Rd
 732e7f4d54ba71967c25ba6545b55e07 *man/data.inspectfile.Rd
