@@ -74,10 +74,12 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
   } else {
     load(datafile)
     INFI = I
+    INFI$sf = sf #new line
   }
   options(warn=0)
   mon = INFI$monc
   dformat = INFI$dformc
+  
   sf = INFI$sf
   if (sf == 0) sf = 80 #assume 80Hertz in the absense of any other info
   header = INFI$header
@@ -179,45 +181,31 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
       if (length(selectdaysfile) > 0) { # code to only read fragments of the data (Millenium cohort)
         #===================================================================
         # All of the below needed for Millenium cohort
-        SDF = read.csv(selectdaysfile)
+        SDF = read.csv(selectdaysfile, stringsAsFactors = FALSE) # small change by CLS
         I = g.inspectfile(datafile) ## modified by JH
         hvars = g.extractheadervars(I)
         SN = hvars$SN
-        SDFi = which(as.numeric(SDF$Monitor) == as.numeric(SN))
-        #==========================================================================
-        # STEP 1: now derive table with start and end times of intervals to load
-        # STEP 2: now (based on i and chunksize)  decide which section of these intervals needs to be loaded
-        # STEP 3: load data
-        tmp1 = unlist(strsplit(as.character(SDF[SDFi,2]),"/"))
-        nextday = as.numeric(tmp1[1]) + 1
-        nextday = paste0(nextday,"/",tmp1[2],"/",tmp1[3])
-        # read an entire day at a time
+        SDFi = which(basename(SDF$binFile) == basename(datafile))
         
-        tint = matrix(0,3,2)
-        if (dayborder > 0) {
-          fivebefore = paste0(" 0",dayborder-1,":55:00")
-          endday = paste0(" 0",dayborder,":00:00")
-        } else if (dayborder < 0) {
-          fivebefore = paste0(" ",24+dayborder-1,":55:00")
-          endday = paste0(" ",24+dayborder,":00:00")
-        } else if (dayborder == 0) {
-          fivebefore = paste0(" ",24+dayborder-1,":55:00")
-          endday = paste0(" 00:00:00")
+        if(length(SDFi) != 1) {
+          save(SDF, SDFi, file = "debuggingFile.Rda")
+          stop(paste0("CLS error: there are zero or more than one files: ",
+                      datafile, "in the wearcodes file"))
         }
-        tint[1,1] = paste0(SDF[SDFi,2],fivebefore) #" 03:55:00"
-        tint[1,2] =paste0(nextday,endday) #" ","04:00:00"
-        tmp2 = unlist(strsplit(as.character(SDF[SDFi,3]),"/"))
-        nextday = as.numeric(tmp2[1]) + 1
-        nextday = paste0(nextday,"/",tmp2[2],"/",tmp2[3])
-        tint[2,1] = paste0(SDF[SDFi,3],fivebefore) # now second day also loaded from 03:55 to ensure that start is at 4:00
-        tint[2,2] =paste0(nextday,endday)
-        if (i == nrow(tint)) {
+        tint <- rbind(getStartEnd(SDF$Day1[SDFi], dayborder),
+                      getStartEnd(SDF$Day2[SDFi], dayborder),stringsAsFactors = FALSE)
+
+        if (i == nrow(tint)+1 | nrow(tint) == 0) {
           #all data read now make sure that it does not try to re-read it with mmap on
           switchoffLD = 1
         } else {
-          try(expr={P = GENEAread::read.bin(binfile=datafile,start=tint[i,1],
-                                            end=tint[i,2],calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)},silent=TRUE)
-
+          try(expr= {
+              P = GENEAread::read.bin(binfile=datafile,start=tint[i,1],
+                                            end=tint[i,2],calibrate=TRUE,do.temp=TRUE,mmap.load=FALSE)
+              if (sf != P$freq) sf = P$freq
+              },silent=TRUE)
+          
+          # llll
           if (length(P) <= 2) {
             cat("\ninitial attempt to read data unsuccessful, try again with mmap turned on:\n")
             #try again but now with mmap.load turned on
@@ -282,6 +270,7 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
                                             end=(blocksize*i),calibrate=TRUE,do.temp=TRUE,mmap.load=TRUE)},silent=TRUE)
           if (length(P) != 0) {
             cat("\ndata read succesfully\n")
+            if (sf != P$freq) sf = P$freq
           } else {
             switchoffLD = 1
           }
@@ -546,6 +535,7 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
           secshift = 60 - start_sec #shift in seconds needed
           start_min = start_min +1 #shift in minutes needed (+1 one to account for seconds comp)
           #-----------
+          
           minshift = start_meas - (((start_min/start_meas) - floor(start_min/start_meas)) * start_meas)
           minshift = minshift - 1
           #-----------
@@ -573,7 +563,6 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
             print("desiredtz not specified, Europe/London used as default")
             desiredtz = "Europe/London"
           }
-
           starttime_a = as.POSIXct(starttime3,format="%d/%m/%Y %H:%M:%S",tz=desiredtz) #,origin="1970-01-01"
           starttime_b = as.POSIXct(starttime3,format="%d-%m-%Y %H:%M:%S",tz=desiredtz) #,origin="1970-01-01"
           starttime_c = as.POSIXct(starttime3,format="%Y/%m/%d %H:%M:%S",tz=desiredtz) #,origin="1970-01-01"
@@ -599,8 +588,6 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
             starttime = as.POSIXlt(as.numeric(starttime) + (24*3600),origin="1970-01-01")
           }
         }
-        
-        
         LD = nrow(data)
         if (LD < (ws*sf)) {
           cat("\nError: data too short for doing non-wear detection 3\n")
@@ -675,15 +662,12 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
             # i am doing this here and not at the top of the code, because at this point the starttime has already be adjusted
             # to the starttime of the first epoch in the data
             # starttime_aschar_tz = strftime(as.POSIXlt(as.POSIXct(starttime),tz=desiredtz),format="%Y-%m-%d %H:%M:%S %z")
-            # print(starttime)
-            # kkk
-            
             if (mon == 2) {
               I = INFI
-              save(I,wday,wdayname,decn,Gx,Gy,Gz,starttime,temperature,light,
+              save(I,sf,wday,wdayname,decn,Gx,Gy,Gz,starttime,temperature,light,
                    file = paste(path3,"/meta/raw/",filename,"_day",i,".RData",sep=""))
             } else {
-              save(I,wday,wdayname,decn,Gx,Gy,Gz,starttime,
+              save(I,sf,wday,wdayname,decn,Gx,Gy,Gz,starttime,
                    file = paste(path3,"/meta/raw/",filename,"_day",i,".RData",sep=""))
             }
           }
@@ -1042,9 +1026,11 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
   if (filecorrupt == FALSE & filetooshort == FALSE & filedoesnotholdday == FALSE) {
     # cut = (count+1):nrow(metashort) # how it was
     cut = count:nrow(metashort)
+    # print(nrow(as.matrix(metashort)) / (12*60))
     if (length(cut) > 1) {
       metashort = as.matrix(metashort[-cut,])
     }
+    # print(nrow(metashort) / (12*60))
     if (nrow(metashort) > 1) {
       starttime3 = round(as.numeric(starttime)) #numeric time but relative to the desiredtz
       time5 = seq(starttime3,(starttime3+((nrow(metashort)-1)*ws3)),by=ws3)
