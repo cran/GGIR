@@ -19,29 +19,10 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
     }
   }
   if (f1 == 0) print("Warning: f1 = 0 is not a meaningful value")
-  filelist = FALSE
-  #   verify whether datadir is a directory or a list of files
-  if (length(datadir) == 1) { #could be a directory or one file
-    if (length(unlist(strsplit(datadir,"[.]bi")))>1) filelist = TRUE
-    if (length(unlist(strsplit(datadir,"[.]cs")))>1) filelist = TRUE
-    if (length(unlist(strsplit(datadir,"[.]wa")))>1) filelist = TRUE
-  } else { #multiple files
-    filelist = TRUE    
-  }
+  filelist = isfilelist(datadir)
   #Extra code to handle raw accelerometer data in Raw data format:
   # list of all csv and bin files
-  if (filelist == FALSE) {
-    fnames = c(dir(datadir,recursive=TRUE,pattern="[.]csv"),
-               dir(datadir,recursive=TRUE,pattern="[.]bin"),
-               dir(datadir,recursive=TRUE,pattern="[.]wav"))
-    fnamesRD = dir(datadir,recursive=TRUE,pattern="[.]RD")
-    if (length(fnames) == length(fnamesRD)) { #because filenames may have both .bin in the middle and .RData
-      fnames = c()
-      fnames = fnamesRD
-    }
-  } else {
-    fnames = datadir
-  }
+  fnames = datadir2fnames(datadir,filelist)
   # check whether these are RDA
   if (length(unlist(strsplit(fnames[1],"[.]RD"))) > 1) {
     useRDA = TRUE
@@ -74,18 +55,19 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   path3 = paste(outputdir,outputfolder,sep="") #where is output stored?
   use.temp = TRUE; 
   daylimit = FALSE
+
   #=================================================================
   # Other parameters:
   #--------------------------------
   # get file path if requested:
   #   if (storefolderstructure == TRUE) {
-  filelist = FALSE
-  if (length(datadir) == 1) { #could be a directory or one file
-    if (length(unlist(strsplit(datadir,"[.]bi")))>1) filelist = TRUE
-    if (length(unlist(strsplit(datadir,"[.]cs")))>1) filelist = TRUE
-  } else { #multiple files
-    filelist = TRUE    
-  }
+#   filelist = FALSE
+#   if (length(datadir) == 1) { #could be a directory or one file
+#     if (length(unlist(strsplit(datadir,"[.]bi")))>0) filelist = TRUE
+#     if (length(unlist(strsplit(datadir,"[.]cs")))>0) filelist = TRUE
+#   } else { #multiple files
+#     filelist = TRUE    
+#   }
   if (filelist == FALSE) {
     fnamesfull = c(dir(datadir,recursive=TRUE,pattern="[.]csv"),
                    dir(datadir,recursive=TRUE,pattern="[.]bin"),
@@ -125,6 +107,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   # check which files have already been processed, such that no double work is done
   # ffdone a matrix with all the binary filenames that have been processed
   ffdone = fdone = dir(paste(outputdir,outputfolder,"/meta/basic",sep=""))
+  
   if (length(fdone) > 0) {
     for (ij in 1:length(fdone)) {
       tmp = unlist(strsplit(fdone[ij],".RData"))
@@ -170,7 +153,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
     if (length(withoutRD) > 1) {
       fnames_without = withoutRD[1]
     }
-    
+
     if (length(ffdone) > 0) {
       ffdone_without = 1:length(ffdone) #dummy variable
       for (index in 1:length(ffdone)) {
@@ -275,7 +258,6 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
           cat(paste0("\nCheck that filename ",fnames[j]," exists in the csv-file\n"))
         }
       }
-    
       #------------------------------------------------
       print("get meta data...")
       M = g.getmeta(datafile,                  

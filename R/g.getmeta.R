@@ -74,7 +74,7 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
   } else {
     load(datafile)
     INFI = I
-    INFI$sf = sf #new line
+    sf = INFI$sf #= sf #new line
   }
   options(warn=0)
   mon = INFI$monc
@@ -163,7 +163,7 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
         cat("\nEnd of file reached\n")
       }
     } else if (mon == 4 & dformat == 3) {
-      try(expr={P = g.wavread(binfile=datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
+      try(expr={P = g.wavread(wavfile=datafile,(blocksize*(i-1)),(blocksize*i))},silent=TRUE)
       if (length(P) > 1) {
         if (nrow(P$rawxyz) < ((sf*ws*2)+1) & i == 1) {
           P = c() ; switchoffLD = 1 #added 30-6-2012
@@ -192,8 +192,9 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
           stop(paste0("CLS error: there are zero or more than one files: ",
                       datafile, "in the wearcodes file"))
         }
-        tint <- rbind(getStartEnd(SDF$Day1[SDFi], dayborder),
-                      getStartEnd(SDF$Day2[SDFi], dayborder),stringsAsFactors = FALSE)
+        hhr <- GENEAread::header.info(datafile)
+        tint <- rbind(getStartEndNumeric(SDF$Day1[SDFi], hhr = hhr, startHour = dayborder),
+                      getStartEndNumeric(SDF$Day2[SDFi], hhr = hhr, startHour = dayborder))
 
         if (i == nrow(tint)+1 | nrow(tint) == 0) {
           #all data read now make sure that it does not try to re-read it with mmap on
@@ -412,7 +413,8 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
           } else if (mon == 2 & dformat == 1) {
             if (length(desiredtz) > 0) {
               # starttime = as.POSIXlt(P$page.timestamps[1],tz=desiredtz)
-              starttime = POSIXtime2iso8601(P$page.timestamps[1],tz=desiredtz)
+              # starttime = POSIXtime2iso8601(P$page.timestamps[1],tz=desiredtz)
+              starttime = POSIXtime2iso8601 (getFirstTimestamp(datafile, P$data.out[1,1]), tz = desiredtz)
               if (length(unlist(strsplit(as.character(starttime),":"))) < 2) {
                 #needed for MaM study where first timestamp does not have clock time in it
                 starttime = POSIXtime2iso8601(P$page.timestamps[2],tz=desiredtz) 
@@ -535,18 +537,19 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
           secshift = 60 - start_sec #shift in seconds needed
           start_min = start_min +1 #shift in minutes needed (+1 one to account for seconds comp)
           #-----------
-          
           minshift = start_meas - (((start_min/start_meas) - floor(start_min/start_meas)) * start_meas)
-          minshift = minshift - 1
+          # minshift = minshift - 1 # Removed as suggested by E Mirkes
+          if (minshift == start_meas) minshift = 0; # Addition as suggested by E Mirkes: One of my files has the first record at 2016-02-11 13:14:55 but the resulting file contains data from 2016-02-11 13:30:00. It means that we lost 15 minutes.
           #-----------
           sampleshift = (minshift*60*sf) + (secshift*sf) #derive sample shift
           data = data[-c(1:floor(sampleshift)),] #delete data accordingly
           newmin = start_min+minshift #recalculate first timestamp
-          newsec = start_sec+secshift
-          if (newsec >= 60) {
-            newsec = newsec - 60
-            newmin = newmin + 1
-          }
+          newsec = 0
+          # newsec = start_sec+secshift # Removed as suggested by E Mirkes
+          # if (newsec >= 60) { # Removed as suggested by E Mirkes
+          #   newsec = newsec - 60 # Removed as suggested by E Mirkes
+          #   newmin = newmin + 1 # Removed as suggested by E Mirkes
+          # } # Removed as suggested by E Mirkes
           remem2add24 = FALSE
           if (newmin >= 60) {
             newmin = newmin - 60
