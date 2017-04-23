@@ -2,7 +2,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                    desiredtz = "Europe/London",chunksize=c(),studyname=c(),
                    do.enmo = TRUE,do.lfenmo = FALSE,do.en = FALSE,
                    do.bfen = FALSE,do.hfen=FALSE,do.hfenplus = FALSE,
-                   do.teLindert2013=FALSE,do.anglex=FALSE,do.angley=FALSE,do.anglez=FALSE,
+                   do.anglex=FALSE,do.angley=FALSE,do.anglez=FALSE,
                    do.enmoa = FALSE,
                    do.roll_med_acc_x=FALSE,do.roll_med_acc_y=FALSE,do.roll_med_acc_z=FALSE,
                    do.dev_roll_med_acc_x=FALSE,do.dev_roll_med_acc_y=FALSE,do.dev_roll_med_acc_z=FALSE,
@@ -71,7 +71,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   if (filelist == FALSE) {
     fnamesfull = c(dir(datadir,recursive=TRUE,pattern="[.]csv"),
                    dir(datadir,recursive=TRUE,pattern="[.]bin"),
-                   dir(datadir,recursive=TRUE,pattern="[.]wav"))
+                   dir(datadir,recursive=TRUE,pattern="[.]wav"),
+                   dir(datadir,recursive=TRUE,pattern="[.]cwa"))
   } else {
     fnamesfull = datadir
   }
@@ -124,7 +125,6 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   }
   filelocationkey = matrix("",length(fnames),3)
   fnames = sort(fnames)
- 
   for (j in f0:f1) { #f0:f1 #j is file index (starting with f0 and ending with f1)
     if (print.filename == TRUE) {
       print(paste("File name: ",fnames[j],sep=""))
@@ -267,7 +267,6 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                     do.en=do.en,
                     do.hfen=do.hfen,
                     do.hfenplus=do.hfenplus,
-                    do.teLindert2013=do.teLindert2013,
                     do.anglex=do.anglex,do.angley=do.angley,do.anglez=do.anglez,
                     do.roll_med_acc_x=do.roll_med_acc_x,do.roll_med_acc_y=do.roll_med_acc_y,do.roll_med_acc_z=do.roll_med_acc_z,
                     do.dev_roll_med_acc_x=do.dev_roll_med_acc_x,do.dev_roll_med_acc_y=do.dev_roll_med_acc_y,do.dev_roll_med_acc_z=do.dev_roll_med_acc_z,

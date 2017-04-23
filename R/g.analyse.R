@@ -2,7 +2,8 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                       includedaycrit = 16,ilevels=c(),winhr=5,idloc=1,snloc=1,
                       mvpathreshold = c(),boutcriter=c(),mvpadur=c(1,5,10),selectdaysfile=c(),
                       window.summary.size=10,
-                      dayborder=0,bout.metric = 1,closedbout=FALSE,desiredtz=c()) {
+                      dayborder=0,bout.metric = 1,closedbout=FALSE,desiredtz=c(),
+                      IVIS_windowsize_minutes = 60, IVIS_epochsize_seconds = 30) {
   winhr = winhr[1]
   fname=I$filename
   averageday = IMP$averageday
@@ -28,7 +29,6 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   ws3 = windowsizes[1]
   ws2 = windowsizes[2]
   vi = 1
-  
   # Time window for L5 & M5 analysis
   t0_LFMF = L5M5window[1] #start in 24 hour clock hours
   t1_LFMF = L5M5window[2]+(winhr-(M5L5res/60)) #end in 24 hour clock hours (if a value higher than 24 is chosen, it will take early hours of previous day to complete the 5 hour window
@@ -44,7 +44,9 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   #------------------------------------------------------
   summary = matrix(" ",1,100) #matrix to be stored with summary per participant
   s_names = rep(" ",ncol(summary))
-  nfeatures = 50+length(qlevels)+length(ilevels)    #levels changed into qlevels 
+  NVARS = (length(colnames(IMP$metashort))-1)
+  if (NVARS < 1) NVARS = 1
+  nfeatures = 50+NVARS*(20+length(qlevels)+length(ilevels))    #levels changed into qlevels 
   i = 1  
   #---------------
   if (domvpa) { #create dummy data
@@ -52,8 +54,8 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     mvpanames[,1:length(mvpathreshold)] = c("MVPA1","MVPA2","MVPA3","MVPA4","MVPA5","MVPA6")
   }
   # What is the minimum number of accelerometer axis needed to meet the criteria for nonwear in order for the data to be detected as nonwear?
-  wearthreshold = 2 #needs to be 0, 1 or 2
-  # Extracting basic meta_short variables
+  wearthreshold = 2 #needs to be 0, 1 or 2 (hard coded to avoid inconsistency in literature)
+  # Extracting basic information about the file
   hvars = g.extractheadervars(I)
   id = hvars$id;              iid =hvars$iid; idd =hvars$idd
   HN = hvars$HN;              BL = hvars$BL
@@ -196,6 +198,45 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       }
     }
   }
+  #============================
+  # IS and IV variables
+  
+  # select data from first midnight to last midnight
+  fmn = midnightsi[1] * (ws2/ws3)
+  lmn = midnightsi[length(midnightsi)] * (ws2/ws3)
+  Xi = IMP$metashort$ENMO[fmn:lmn] # this is already imputed, so no need to ignore segments
+  if (IVIS_epochsize_seconds > ws3) { # downsample Xi now
+    Xicum =cumsum(Xi)
+    step = IVIS_epochsize_seconds/ws3 # should be 6 when ws3=5 and IVIS_epochsize_seconds = 30
+    select= seq(1,length(Xicum)/step,by=step)
+    Xi = diff(c(0,Xicum[select]))/step
+  }
+  nhr = 24*round(60/IVIS_windowsize_minutes) # Number of hours in a day (modify this variable if you want to study different resolutions)
+  Nsecondsinday = 24*3600
+  # ni = (Nsecondsinday/nhr)/ws3 # number of epochs in an hour
+  ni = (Nsecondsinday/nhr)/IVIS_epochsize_seconds # number of epochs in an hour
+  # derive average day with 1 'hour' resolution (hour => windowsize):
+  N = length(Xi)
+  hour = rep(1:ceiling(N/ni),each=ni)
+  if (length(hour) > N) hour = hour[1:N]
+  dat = data.frame(Xi=Xi,hour=hour)
+  InterdailyStability = NA
+  IntradailyVariability = NA
+  if (nrow(dat) > 1) {
+    hh = aggregate(. ~ hour,data=dat,mean)
+    hh$hour_perday = hh$hour - (floor(hh$hour/nhr)*nhr) # 24 hour in a day
+    hh$day = ceiling(hh$hour/nhr)
+    if (nrow(hh) > 1) {
+      hh2 = aggregate(. ~ hour_perday,data=hh,mean)
+      Xh = hh2$Xi
+      # average acceleration per day
+      Xm = mean(Xh,na.rm = TRUE) 
+      p = length(Xh)
+      InterdailyStability = (sum((Xh - Xm)^2) * N) / (p * sum((Xi-Xm)^2)) # IS: lower is less synchronized with the 24 hour zeitgeber
+      IntradailyVariability = (sum(diff(Xi)^2) * N) / ((N-1) * sum((Xm-Xi)^2)) #IV: higher is more variability within days (fragmentation)
+      # print(paste0(InterdailyStability," ",IntradailyVariability))
+    }
+  }
   #--------------------------------------------------------------
   # Features per day
   if (doperday == TRUE) { # extract fe
@@ -220,7 +261,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
       }
     }
     daysummary = matrix("",ceiling(ndays),nfeatures)
-
+    
     ds_names = rep("",nfeatures)
     #=============================
     if (length(selectdaysfile) > 0) {   # Millenium cohort related:
@@ -346,25 +387,22 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
         }
         ws_names = c("id","serial number","filename",
                      "time","Nhoursvalid")
-        if (ncol(vari) == 3) {
-          ws_names = c(ws_names,paste0("mean metric ",colnames(vari)[2]),
-                       paste0("sd metric ",colnames(vari)[2]),
-                       paste0("p5 metric ",colnames(vari)[2]),
-                       paste0("p25 metric ",colnames(vari)[2]),
-                       paste0("p50 metric ",colnames(vari)[2]),
-                       paste0("p75 metric ",colnames(vari)[2]),
-                       paste0("p95 metric ",colnames(vari)[2]),
-                       paste0("mean metric ",colnames(vari)[3]),
-                       paste0("sd metric ",colnames(vari)[3]),
-                       paste0("p5 metric ",colnames(vari)[3]),
-                       paste0("p25 metric ",colnames(vari)[3]),
-                       paste0("p50 metric ",colnames(vari)[3]),
-                       paste0("p75 metric ",colnames(vari)[3]),
-                       paste0("p95 metric ",colnames(vari)[3]))
+        
+        
+        if (ncol(vari) >= 3) {
+          for (columnvari in 2:ncol(vari)) {
+            ws_names = c(ws_names,paste0("mean metric ",colnames(vari)[columnvari]),
+                         paste0("sd metric ",colnames(vari)[columnvari]),
+                         paste0("p5 metric ",colnames(vari)[columnvari]),
+                         paste0("p25 metric ",colnames(vari)[columnvari]),
+                         paste0("p50 metric ",colnames(vari)[columnvari]),
+                         paste0("p75 metric ",colnames(vari)[columnvari]),
+                         paste0("p95 metric ",colnames(vari)[columnvari])) 
+            
+          }
         }
         gikb = gikb + gik
       }
-      
       if (tooshort == 0) {
         #--------------------------------------      
         # extract time spent in activity levels (there are possibly many more features that can be extracted from this)
@@ -638,6 +676,18 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     summary[(vi+1)] = length(wkday) # number of week day
     if (is.na(summary[(vi+1)]) == TRUE) summary[(vi+1)] = 0
     s_names[vi:(vi+1)] = c("N valid WEdays","N valid WKdays")
+    vi = vi + 2
+    summary[vi] = InterdailyStability
+    if (is.na(summary[vi]) == TRUE) summary[vi] = " "
+    summary[(vi+1)] = IntradailyVariability
+    if (is.na(summary[(vi+1)]) == TRUE) summary[(vi+1)] = " "
+    s_names[vi:(vi+1)] = c("IS_interdailystability","IV_intradailyvariability")
+    vi = vi + 2
+    summary[vi] = IVIS_windowsize_minutes
+    if (is.na(summary[vi]) == TRUE) summary[vi] = " "
+    summary[(vi+1)] = IVIS_epochsize_seconds
+    if (is.na(summary[(vi+1)]) == TRUE) summary[(vi+1)] = " "
+    s_names[vi:(vi+1)] = c("IVIS_windowsize_minutes","IVIS_epochsize_seconds")
     vi = vi + 2
     #############################################################
     #metrics - summarise with stratification to weekdays and weekend days
