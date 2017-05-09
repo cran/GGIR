@@ -55,6 +55,7 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
         # count posture changes that happen less than once per ten minutes
         q1 = c()
         if (length(postch) > 1) {
+          
           q1 = which(diff(postch) > (i*(60/ws3))) #less than once per i minutes
         }
         if (length(q1) > 0) {
@@ -82,7 +83,7 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
     }
     #-------------------------------------------------------------------
     # detect midnights
-    detemout = g.detecmidnight(ND,time,desiredtz) # no use common function for midnight detection
+    detemout = g.detecmidnight(time,desiredtz) # ND,
     midnights=detemout$midnights
     midnightsi=detemout$midnightsi
     countmidn = length(midnightsi)
@@ -157,6 +158,7 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
       cat("No midnights found")
       detection.failed = TRUE
     }
+
     metatmp = data.frame(time,invalid,night=night,sleep = sleep)
   } else {
     metatmp =c()

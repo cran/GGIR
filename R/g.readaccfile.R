@@ -15,17 +15,21 @@ g.readaccfile = function(filename,blocksize,blocknumber,selectdaysfile=c(),fileq
   # sf = sample frequency (Hertz)
   # ws = large window size (default 3600 seconds)
   switchoffLD = 0
-  I = g.inspectfile(filename) ## modified by JH
-  mon = I$monc
-  dformat = I$dformc
-  sf = I$sf
-  ws=3600
-  P = c()
+  
   if (length(unlist(strsplit(filename,"[.]RD"))) > 1) {
     useRDA = TRUE
   } else {
     useRDA = FALSE
   }
+  if (useRDA == FALSE) {
+    I = g.inspectfile(filename) ## modified by JH
+    mon = I$monc
+    dformat = I$dformc
+    sf = I$sf
+  }
+  ws=3600
+  P = c()
+  
   if (mon == 1 & dformat == 1) { # genea binary
     try(expr={P = g.binread(binfile=filename,(blocksize*(blocknumber-1)),(blocksize*blocknumber))},silent=TRUE)
     if (length(P) > 1) {

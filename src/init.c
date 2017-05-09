@@ -1,22 +1,19 @@
-#include <stdlib.h>
+#include <R.h>
+#include <Rinternals.h>
+#include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
-#include <R_ext/Visibility.h>  // optional
 
-#include "GGIR.h"
+extern SEXP GGIR_numUnpack(SEXP);
+extern SEXP GGIR_resample(SEXP, SEXP, SEXP, SEXP);
 
-#define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
-
-static const R_CallMethodDef R_CallDef[] = {
-  CALLDEF(GGIR_numUnpack, 1),
-  CALLDEF(GGIR_resample, 4),
-  {NULL, NULL, 0}
+static const R_CallMethodDef CallEntries[] = {
+    {"GGIR_numUnpack", (DL_FUNC) &GGIR_numUnpack, 1},
+    {"GGIR_resample",  (DL_FUNC) &GGIR_resample,  4},
+    {NULL, NULL, 0}
 };
 
-void
-  attribute_visible  // optional
-  R_init_GGIR(DllInfo *dll)
-  {
-    R_registerRoutines(dll, NULL, R_CallDef, NULL, NULL);
+void R_init_GGIR(DllInfo *dll)
+{
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
-    R_forceSymbols(dll, TRUE);
-  }
+}
