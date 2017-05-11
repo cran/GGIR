@@ -38,7 +38,7 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
   # specify parameters
   ffdone = fnames.ms5 #ffdone is now a list of files that have already been processed by g.part5
   wdaynames = c("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
-  nfeatures = 500
+  nfeatures = 1000
   ws3 = windowsizes[1]
   ds_names = rep("",nfeatures)
   di = 1
