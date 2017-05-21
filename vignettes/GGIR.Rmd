@@ -1,7 +1,7 @@
 ---
 title: "Accelerometer data processing with GGIR"
 author: "Vincent van Hees"
-date: "May 9 2017"
+date: "May 21 2017"
 output:
   rmarkdown::html_vignette:
     toc : true
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## What is GGIR?
 
-[GGIR](https://CRAN.R-project.org/package=GGIR) is an R-package to process multi-day raw accelerometer data for physical activity and sleep research. The term _**raw**_ in raw accelerometry refers to data being expressed in m/s<sup>2</sup> or gravitational acceleration as opposed to the previous generation accelerometers which stored data in accelerometer brand specific units. The signal processing includes automatic calibration, detection of sustained abnormally high values, detection of non-wear and calculation of average magnitude of dynamic acceleration based on a variety of metrics.
+[GGIR](https://CRAN.R-project.org/package=GGIR) is an R-package to process multi-day raw accelerometer data for physical activity and sleep research. The term _**raw**_ in raw accelerometry refers to data being expressed in m/s<sup>2</sup> or gravitational acceleration as opposed to the previous generation accelerometers which stored data in accelerometer brand specific units. The signal processing includes automatic calibration, detection of sustained abnormally high values, detection of non-wear and calculation of average magnitude of dynamic acceleration based on a variety of metrics. Next, GGIR uses this information to describe the data per day of measurement or per measurement, including estimates of physical activity, inactivity and sleep.
 
 ## Who has been using GGIR?
 
@@ -30,6 +30,33 @@ GGIR is increasingly being used by a number of research groups acros the world. 
 A non-exhaustive list of academic institutes that have been using GGIR:
 
 **United Kingdom:** University College London, Exeter University, Newcastle University, Edge Hill University, University of Cambridge, University of Chester, Edinburgh Napier University, University of Birmingham, Liverpool John Moores University | **United States:** University College San Diego, Iowa State University, University of Southern California, University of Michican, West Virginia University, Arizona State University, University of Utah, National Institute of Health | **The Netherlands:** Erasmus Medical Centre Rotterdam, VU University Medical Centre, Leiden University Medical Centre | **France:** French Institute for Health and Medical Research, Institute of Myology, University  of Dijon, University of Montpellier | **Brazil:** Federal University of Pelotas | **Australia:** Newcastle University, Australian Catholic University, University of Sydney, Queensland University of Technology, University of Western Australia | **Spain:** University of Granada | **Norway:** University of Oslo | **Sweden:** University of Lund | **Switszerland:** Centre Hospitalier Universitaire Vaudois | **Germany:** Technische Universität Dresden, Technical University Munich
+
+## Acknowledgements
+
+R package GGIR would not have been possible without the support of the following people, institutions, and funders:
+ 
+**People:** 
+
+- Dr. Evgeny Mirkes and Dr. Jing Hua Zhao provided code to enable binary accelerometer data to be read in R
+- Dr. Zhou Fang contributed code for the auto-calibration functionality
+- Joe Heywood contributed code to correctly extract specific time segments with correct timestamps from an GENEActiv recording
+- Dr. Severine Sabia tested and provided feedback on numerous aspects of the package
+- Dr. Soren Brage provided supervision for a number of studies that formed the basis for GGIR
+- Dr. Vincent van Hees as main developer
+ 
+**Institutions:**
+
+- The MRC Epidemiology Unit at the University of Cambridge, Cambridge, UK
+- Movelab at Newcastle University, Newcastle upon Tyne, UK
+- Netherlands eScience Center, Amsterdam, NL
+- University of Exeter, Exeter, UK
+- Centre for Longitudinal Studies, London, UK
+ 
+**Funders:**
+
+- Medical Research Council (MRC) grants MR/P012167/1 and MC_UU_12015/3
+- Economic and Social Research Council (ESRC) grant ES/K005987 for ‘Millennium Cohort Study Sweep 6 (Age 14) Survey’ (MCS6)
+- Biotechnology and Biological Sciences Research Council (BBSRC) and Unilever Discover Ltd funded a CASE studentship 
 
 ## How can I contribute to the GGIR development?
 
@@ -41,7 +68,7 @@ The development version of GGIR can be found on [github](https://github.com/wadp
 
 [Download and install R](https://cran.r-project.org/)
 
-[Download and install RStudio](https://www.rstudio.com/products/rstudio/download2/)
+[Download and install RStudio](https://www.rstudio.com/products/rstudio/download2/) (optional, but recommended)
 
 Download GGIR with its dependencies, you can do this with one command from the console command line:
 
@@ -58,8 +85,7 @@ In ActiLife you have the option to export data with timestamps. Please do not do
     - [Axivity](http://axivity.com/) .wav and .cwa
     - Genea (not available anymore) .bin and .csv
 2. All accelerometer data that needs to be analysed should be stored in one folder, or subfolders of that folder.
-3. Give the folder an appropriate name, e.g. studyname_data
-4.	Create a folder where the output will be stored. This should also be on the external hard drive. Give the folder an appropriate name, e.g. studyname_output
+3. Give the folder an appropriate name, preferable with a reference to the study or project it is related to rather than just 'data', because the name of this folder will be used later on as an identifier of the dataset.
 
 ## GGIR shell function
 
@@ -72,6 +98,7 @@ g.shell.GGIR(#=======================================
              mode=c(1,2,3,4,5),
              datadir="C:/mystudy/mydata",
              outputdir="D:/myresults",
+             f0=1, f1=2,
              #-------------------------------
              # Part 1:
              #-------------------------------
@@ -143,24 +170,24 @@ The function arguments need to be tailored to your experimental protocol. There 
 
 By looking up the corresponding functions g.part1, g.part2, g.part3, g.part4, and g.part5 you can see what arguments are possible. All of these arguments are also accepted by the shell function g.shell.GGIR, because g.shell.GGIR is nothing more than a wrapper around those functions.
 
-Below I have highlighted a few of the key arguments you may want to be aware of:
+Below I have highlighted a few of the key arguments you may want to be aware of. Please see the package manual for more detailed documentation:
 
 ### do.cal
-Performs the autocalibration to investigate calibration error based on free-living data and proposes correction factors
+Autocalibration is the process of investigating the acceleration signals for calibration error based on free-living data.  `do.cal` is a boolean argument to indicate whether autocalibration needs to be performed. If set to TRUE (default) GGIR will propose calibration correction factors to minimize calibration error.
 
 ### datadir
-GGIR only needs to know where your data is. It will detect automatically from what accelerometer brand the data comes from
+GGIR needs to know where your data is. It will detect automatically from what accelerometer brand the data comes from
 and in what data format the information is stored
 
 ### strategy
-Allows you to give GGIR your knowledge about the study design:
+Argument `strategy` allows you to give GGIR your knowledge about the study design:
   - strategy = 1: Exclude 'hrs.del.start' number of hours at the beginning and 'hrs.del.end' number of hours at the end of the measurement and never allow for more than 'maxdur' number of hours. These three parameters are set by their respective function arguments.
   - strategy = 2 makes that only the data between the first midnight and the last midnight is used for imputation.
   - strategy = 3 only selects the most active X days in the files. X is specified by argument 'ndayswindow'
 
 ### do.imp
-GGIR detects when the accelerometer is not work. Argument 'do.imp' indicates whether you want those missing periods to be
-imputed by measurements from similar timepoints at different days of the measurment
+GGIR detects when the accelerometer is not worn. Argument 'do.imp' indicates whether you want those missing periods to be
+imputed by measurements from similar timepoints at different days of the measurment or not.
 
 ### loglocation
 If you applied a sleeplog in your experiments then this can be used by GGIR to improve the sleep estimations. Argument
@@ -176,11 +203,15 @@ knitr::include_graphics("sleeplogexample.jpg")
 
 ## From the console
 
-You can use ```source("pathtoscript/myshellscript.R")``` or use the Source button in RStudio if you use RStudio.
+You can use
+
+```source("pathtoscript/myshellscript.R")```
+
+or use the Source button in RStudio if you use RStudio.
 
 ## In a cluster
 
-It is possible to run GGIR on a computing cluster to processing multiple files in parallel is possible. The way I did it is as follows, please note that some of these commands are specific to the computing cluster you are working on. Please consult your local cluster specilist to tailor this to your situation. I have three files:
+It is possible to run GGIR on a computing cluster to process multiple files in parallel. The way I did it is as follows, please note that some of these commands are specific to the computing cluster you are working on. Please consult your local cluster specilist to tailor this to your situation. In my case, I had three files:
 
 **submit.sh**
 
@@ -215,12 +246,12 @@ if(length(args) > 0) {
 g.shell.GGIR(f0=f0,f1=f1,...)
 ```
 
-You will need to update the ... in the last line with the arguments you used for g.shell.GGIR. Note that `f0=f0,f1=f1` is essential for this to work. The values of `f0` and `f1` are passed from the bash script.
+You will need to update the ... in the last line with the arguments you used for g.shell.GGIR. Note that `f0=f0,f1=f1` is essential for this to work. The values of `f0` and `f1` are passed on from the bash script.
 
 Once this is all setup you will need to call `bash submit.sh`
 from the command line.
 _**Note: Please make sure that you process one GGIR part at the same time on a cluster, because each part assumes that preceding parts have been ran. You can make sure of this by always specifying argument mode to a single part of GGIR. Once the analysis stops update argument mode to the next part until all parts are done.**_
-The speed of the parallel processing is obviously dependent on the capacity of your computing cluster. I have been able to process all 4000 files of the Whitehall II Study in just a couple of hours.
+The speed of the parallel processing is obviously dependent on the capacity of your computing cluster and the size of your dataset. I have been able to process all 4000 files from the Whitehall II Study in just a couple of hours.
 
 
 # Inspecting the results
@@ -296,12 +327,17 @@ Tis is a non-exhaustive list, because most concepts have been explained in summa
 
 Variables	| Description
 ------------------------ | ---------------------------------------------
-N valid hours | Number of hours with valid data
-N hours	| Number of hours of measurement
+ID | Participant id
+filename | Name of the data file
+calender_date | Timestamp and date on which measurement started
+bodylocation | Location of the accelerometer as extracted from file header
+N valid hours | Number of hours with valid data in the day
+N hours	| Number of hours of measurement in a day, which typically is 24, unless it is a day on which the clock changes (DST) resulting in 23 or 25 hours. The value can be less than 23 if the measurement started or ended this day
 weekday | Name of weekday
 measurement | Day of measurement	Day number relative to start of the measurement
+L5hr_ENMO_mg_0-24h | Hour on which L5 starts for these 24 hours (defined with metric ENMO)
+L5_ENMO_mg_0-24h | Average acceleration for L5 (defined with metric ENMO)
 `[A,B)_mg_0-24h_ENMO` |	Time spent in minutes between (and including) acceleration value A in mg and (excluding) acceleration value B in mg based on metric ENMO
-
 
 ## Output part 4
 
@@ -310,6 +346,16 @@ Part 4 generates the following output:
 - part4_nightsummary_sleep_cleaned.csv
 - part4_summary_sleep_cleaned.csv
 - visualisation_sleep.pdf (optional)
+
+When input argument `do.visual` is set to TRUE GGIR can show the following visual comparison between the time window of being asleep (or in bed) according to the sleeplog and the detected sustained inactivity bouts according to the accelerometer data. This visualisation is stored in the results folder as visualisation_sleep.pdf. 
+
+Explanation of the image: Each line represents one night. Colors are used to dinstinguish definitions of sustianed inacitivty bouts (2 definitions in this case) and to indicate existence or absense of overlap with the sleeplog. When argument `outliers.only` is set to FALSE it will visualise all available nights in the dataset. If `outliers.only` is set to TRUE it will visualise only nights with a difference in onset or waking time between sleeplog and sustained inactivity bouts larger than the value of argument `criterror`.
+
+This visualisation with outliers.only set to TRUE and critererror set to 4 was very powerful to identify entry errors in sleeplog data in van Hees et al PLoSONE 2016. We had over 25 thousand nights of data, and this visualisation allowed us to quickly zoom in on the most problematic nights to investigate possible mistakes in GGIR or mistakes in data entry.
+
+```{r, out.width = "700px",echo=FALSE}
+knitr::include_graphics("example_dovisual.jpg")
+```
 
 
 ## Output part 5
@@ -322,6 +368,41 @@ The output of part 5 is dependent on the parameter configuration, it will genera
 - part5_personsummary_WW_L30M100V400_T5A5.csv
 - file summary reports/Report_nameofdatafile.pdf
 
+Here is a beta-version of the variable dictionary, see GGIR package manual for more details
+
+Variables	| Description
+------------------------ | ---------------------------------------------
+dur_nightsleep_min_pla | Sleep duration
+XX_pla | plain average of variable XX across all days
+XX_wei | weighted average of variable XX across all days
+L5VALUE_pla	| Acceleration value for lowest 5hrs
+M5VALUE_pla	| Acceleration value for highest 5hrs
+Acc_day_mg_pla |	Average acceleration for daytime hours
+ACC_night_mg_pla |	Average acceleration for night hours
+ACC_nightandday_mg_pla | Average acceleleration for night and day combined
+Dur_day_SIB_min_pla	| sustained inactivity bouts, are the periods of time during which the arm does not rotate at all for at least 5 or 10 minutes (depending on criteria used). This could be daytime sleep or the monitor not being worn for a very short period of time (these are not part of the inactivity bouts)
+dur_day_OIN40_min_pla | Time spent below 40mg (OTHER INACTIVITY)
+dur_day_LIG40_100_min_pla | Time spent in light (only unbouted)
+dur_day_MOD100_400_min_pla | Time spent in moderate (only unbouted)
+dur_day_VIG400_min_pla | Time spent in vigorous (only unbouted)
+dur_MVPA_D10T100_min_pla | Bouts of at least 10 minutes of MVPA (i.e above 100mg) 
+dur_MVPA_D1T100_min_pla | 	Bouts between 1-9.99mins above MVPA
+dur_INB_D10T40_min_pla | Bouts of 10mins INACTIVE (other inactivity or SIB)
+dur_LIGB_D10T40_100_min_pla | Bouts of 10mins light
+dur_LIGB_D1T40_100_min_pla | Bouts between 1-99.9mins light
+dur_TSIBday_min_pla | T=unbouted+bouted. THIS IS DIFFERENT TO SIB, because TSIB is regardless of whether they contributed or not to inactivity (INB) bouts or not, whereas SIB is just time not part of INB. So would expect TSIB to be higher
+dur_TOINday_min_pla | Unbouted and bouted time  spent in ‘other inactivity’ 
+dur_TLIGday_min_pla | Unbouted and bouted time spent in light
+dur_TMODday_min_pla |	Unbouted and bouted time spent in mod
+dur_TVIGday_min_pla | Unbouted and bouted time spent in vig
+dur_TINday_min_pla | Unbouted and bouted time spent in TOTAL INACTIVITY=TOIN+SIB
+nonwear_perc_day_pla | non-wear time day
+nonwear_perc_night_pla | non-wear time night
+nonwear_perc_nightandday_pla | non-wear time night and day
+sleep_efficiency_pla | Sleep efficiency
+boutcriter.in_pla | 0.9-90% of the bout has to be above threshold. The reason that the criteria is 90% rather than 80%, is “somewhat arbitrary decision, but the idea was that if you allow for bouts of 30 minutes it would not make sense if you allow for breaks of 20% of the time(6 minutes!) this is why I used a more stringent criteria for the highest category”
+boutcriter.lig_pla | 0.8-80% has to be above
+boutcriter.mvpa_pla | 0.8-80% has to be above threshold
 
 # Motivation and clarification
 
@@ -413,7 +494,6 @@ In most studies I have been involved in we used metric ENMO (Euclidean Norm Minu
 I wanted a short name and not to spend too much time finding it. At the time when I created GGIR I was working with GENEActiv and GENEA data In R, and that's how the name GGIR was born.
 
 # Other Resources
-
 - The [GGIR package manual](https://CRAN.R-project.org/package=GGIR) provides documentation on individual functions.
 - For general questions about how to use GGIR join our [google group/mailing list](https://groups.google.com/forum/#!forum/rpackageggir).
 - For bug reports please post them [here](https://github.com/wadpac/GGIR/issues).

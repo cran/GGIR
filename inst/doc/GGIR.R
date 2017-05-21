@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #               mode=c(1,2,3,4,5),
 #               datadir="C:/mystudy/mydata",
 #               outputdir="D:/myresults",
+#               f0=1, f1=2,
 #               #-------------------------------
 #               # Part 1:
 #               #-------------------------------
@@ -84,6 +85,9 @@ knitr::include_graphics("sleeplogexample.jpg")
 
 ## ---- out.width = "700px",echo=FALSE-------------------------------------
 knitr::include_graphics("reportexample.jpg")
+
+## ---- out.width = "700px",echo=FALSE-------------------------------------
+knitr::include_graphics("example_dovisual.jpg")
 
 ## ---- out.width = "400px",echo=FALSE-------------------------------------
 knitr::include_graphics("nonwearimage.jpg")

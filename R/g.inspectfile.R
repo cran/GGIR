@@ -122,8 +122,6 @@ g.inspectfile = function(datafile) {
       H = tuneR::readWave(datafile,from = 1, to = 10,units = c("seconds"), header = TRUE)
       sf = H$sample.rate
     } else if (dformat == 4) { # cwa
-      # Rcpp::sourceCpp('src/numUnpack.cpp')
-      # Rcpp::sourceCpp('src/resample.cpp')
       PP = g.cwaread(datafile,start = 1, end = 10)
       H = PP$header
       sf = H$frequency
@@ -198,8 +196,6 @@ g.inspectfile = function(datafile) {
     }
     names(H) = c("hnames","hvalues")
   } else if (dformat == 4) { #cwa data
-    Rcpp::sourceCpp('src/numUnpack.cpp')
-    Rcpp::sourceCpp('src/resample.cpp')
     PP = g.cwaread(datafile,start = 1, end = 10)
     H = PP$header
   }

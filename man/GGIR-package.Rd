@@ -12,6 +12,9 @@ tri-axial acceleration sensors. The term raw accelerometry refers to data being
 expressed in m/s2 or gravitational acceleration as opposed to the previous
 generation accelerometers which stored only processed summary measures.\cr
 \cr
+For a tutorial and more background in formation on GGIR, please see the
+package vignette: Accelerometer data processing with GGIR\cr
+\cr
 The package has been developed with and for the accelerometer brands Genea and Geneactive.
 Additionally, it should work for .csv data from Geneactiv, .csv data from
 Actigraph, and .wav and .cwa format from Axivity. Although, I have tested this less thoroughly
@@ -87,8 +90,8 @@ journal/conference publications.
 \tabular{ll}{
 Package: \tab GGIR\cr
 Type: \tab Package\cr
-Version: \tab 1.5-7\cr
-Date: \tab 2017-5-9\cr
+Version: \tab 1.5-9\cr
+Date: \tab 2017-5-21\cr
 License: \tab LGPL (>= 2.0, < 3)\cr
 Discussion group: \tab https://groups.google.com/forum/#!forum/rpackageggir\cr
 }
