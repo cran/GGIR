@@ -110,7 +110,14 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
       }
       # load output g.part2
       selp = which(fnames.ms2 == fnames.ms3[i]) # so, fnames.ms3[i] is the reference point for filenames
+       try({
+        hayError=TRUE
       load(file=paste(metadatadir,"/meta/ms2.out/",fnames.ms2[selp],sep=""))
+      hayError=FALSE
+      })
+      if(hayError){
+        stop(paste(metadatadir,"/meta/ms2.out/",fnames.ms2[selp],sep=""))
+      }
       daysummary = SUM$daysummary
       summary = SUM$summary
       # load output g.part4
