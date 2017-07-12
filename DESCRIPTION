@@ -1,8 +1,8 @@
 Package: GGIR
 Type: Package
 Title: Raw Accelerometer Data Analysis
-Version: 1.5-9
-Date: 2017-5-21
+Version: 1.5-10
+Date: 2017-7-12
 Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                   email="vincentvanhees@gmail.com"),
                   person("Zhou","Fang",role="ctb"),
@@ -23,7 +23,7 @@ Depends: stats, utils, R (>= 2.10)
 NeedsCompilation: yes
 LinkingTo: Rcpp
 VignetteBuilder: knitr
-Packaged: 2017-05-21 19:35:59 UTC; vincent
+Packaged: 2017-07-12 13:55:18 UTC; vincent
 Author: Vincent T van Hees [aut, cre],
   Zhou Fang [ctb],
   Jing Hua Zhao [ctb],
@@ -31,4 +31,4 @@ Author: Vincent T van Hees [aut, cre],
   Evgeny Mirkes [ctb],
   Severine Sabia [ctb]
 Repository: CRAN
-Date/Publication: 2017-05-21 19:58:04 UTC
+Date/Publication: 2017-07-12 14:18:59 UTC
