@@ -198,7 +198,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/basic",sep="")))
     g.part3(metadatadir=metadatadir,f0=f0,
             f1=f1,anglethreshold=anglethreshold,timethreshold=timethreshold,
-            ignorenonwear=ignorenonwear,overwrite=overwrite,desiredtz=desiredtz)
+            ignorenonwear=ignorenonwear,overwrite=overwrite,desiredtz=desiredtz,strategy=strategy)
   }
   if (dopart4 == TRUE) {
     cat('\n')
