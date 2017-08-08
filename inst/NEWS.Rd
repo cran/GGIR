@@ -1,6 +1,32 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 1.5-12 (release date:08-8-2017)}{
+\itemize{
+  \item Fixed bug introduced in 1.5-1: large window size of 3600 seconds was accidentally
+  hardcoded when the g.readaccfile function was added to GGIR in version 1.5-1
+  \item Codecov testing added and badge added to the README file
+  \item Functions added to create dummy accelerometer file (csv) and dummy sleeplog (csv), 
+	needed for testing
+	\item Bug fixed in g.wavread to recognize .wav extension file header for files with alternative
+	header size
+  \item Default IVIS_epochsize_seconds parameter updated from 30 to 3600
+  \item g.part1 messages on the consolo are now condensed printing only the number of the 
+	blocks loaded separated by spaces rather than new lines
+  \item Split g.part5 function into multiple smaller functions
+  \item Replace hard-coded "Europe/London" in g.part5 by desiredtz, to make the function
+	work for users outside the UK
+  \item Data frame output from g.part5 is now tidied up by removing empty rows and columns generated
+  \item Calculation of mean amplitude deviation (MAD) is now implemented in g.part1 by the argument do.mad
+  \item Percentiles and levels in g.part2 are now calculated for all the acceleration metrics selected
+  \item g.part3, g.part4 and g.part5 are now independent on metric ENMO to work, argument acc.metric allows
+	the user to select which metric to use to describe behavior
+  \item Argument dayborder is now included in g.part5 to consider the whole measurement in case the protocol
+	starts after midnight
+	\item Jairo Migueles added to list of contributors
+  }
+}
+			 
 \section{Changes in version 1.5-10 (release date:12-7-2017)}{
 \itemize{
   \item Date format recognition improved for Actigraph csv files

@@ -1,6 +1,62 @@
 g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
-                     timethreshold = c(5,10),desiredtz="Europe/London") {
+                     timethreshold = c(5,10), acc.metric = "ENMO", desiredtz="Europe/London") {
   #==============================================================
+  inbed = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5) {
+    # exploratory function 27/7/2017
+    medabsdi = function(angle) {
+      angvar = stats::median(abs(diff(angle))) #50th percentile, do not use mean because that will be outlier dependent
+      return(angvar)
+    }
+    x = zoo::rollapply(angle, k, medabsdi) # 5 minute rolling median of the absolute difference
+    nomov = rep(0,length(x)) # no movement
+    inbedtime = rep(NA,length(x))
+    pp = quantile(x,probs=c(perc)) * inbedthreshold 
+    if (pp == 0) pp = 7
+    nomov[which(x < pp)] = 1
+    nomov = c(0,nomov,0)
+    s1 = which(diff(nomov) == 1) #start of blocks in bed
+    e1 = which(diff(nomov) == -1) #end of blocks in bed
+    bedblock = which((e1 - s1) > ((60/ws3)*bedblocksize*1)) #which are the blocks longer than bedblocksize in minutes?
+    if (length(bedblock) > 0) { #
+      s2 = s1[bedblock] # only keep the bedblocks that are long enough
+      e2 = e1[bedblock] # only keep the bedblocks that are long enough
+      for (j in 1:length(s2)){
+        inbedtime[ s2[j]:e2[j]] = 1 #record these blocks in the inbedtime vector
+      }
+      # fill up gaps in time between bed blocks
+      outofbed = rep(0,length(inbedtime))
+      outofbed[which(is.na(inbedtime) == TRUE)] = 1
+      outofbed = c(0,outofbed,0)
+      s3 = which(diff(outofbed) == 1) #start of blocks out of bed?
+      e3 = which(diff(outofbed) == -1) #end blocks out of bed?
+      outofbedblock = which((e3 - s3) < ((60/ws3)*outofbedsize*1))
+      if (length(outofbedblock) > 0) { # only fill up gap if there are gaps
+        s4 = s3[outofbedblock]
+        e4 = e3[outofbedblock]
+        if (length(s4) > 0) {
+          for (j in 1:length(s4)){
+            inbedtime[ s4[j]:e4[j]] = 1
+          }
+        }
+      }
+      if (length(inbedtime) == (length(x)+1)) inbedtime = inbedtime[1:(length(inbedtime)-1)]
+      # keep indices for longest in bed block:
+      inbedtime2 = rep(1,length(inbedtime))
+      inbedtime2[which(is.na(inbedtime) == TRUE)] = 0
+      s5 = which(diff(c(0,inbedtime2,0)) == 1) #start of blocks out of bed?
+      e5 = which(diff(c(0,inbedtime2,0)) == -1) #end blocks out of bed?
+      inbeddurations = e5 - s5
+      longestinbed = which(inbeddurations == max(inbeddurations))
+      lightsout = s5[longestinbed] - 1
+      lightson = e5[longestinbed] - 1
+    } else {
+      lightson = c()
+      lightsout = c()
+    }
+    invisible(list(lightsout=lightsout,lightson=lightson))
+  }
+  
+  #==================================================
   # get variables  
   D = IMP$metashort
   nD = nrow(D)
@@ -36,7 +92,7 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
       cat("metric anglez was not extracted, please make sure that anglez  is extracted")
     }
     angle = as.numeric(as.matrix(D[1:nD,which(colnames(D)=="anglez")]))
-    ENMO = as.numeric(as.matrix(D[1:nD,which(colnames(D)=="ENMO")]))
+    ACC = as.numeric(as.matrix(D[1:nD,which(colnames(D)==acc.metric)]))
     night = rep(0,length(angle))
     if (length(which(is.na(angle) ==TRUE)) > 0) {
       if (which(is.na(angle) ==TRUE)[1] == length(angle)) {
@@ -83,11 +139,13 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
     }
     #-------------------------------------------------------------------
     # detect midnights
+    
     detemout = g.detecmidnight(time,desiredtz) # ND,
     midnights=detemout$midnights
     midnightsi=detemout$midnightsi
     countmidn = length(midnightsi)
-    L5list = rep(0,countmidn)
+    
+    lightson = lightsout = L5list = rep(0,countmidn)
     if (countmidn != 0) {
       if (countmidn == 1) {
         tooshort = 1
@@ -102,15 +160,25 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
         night[qqq1:qqq2] = 1
         detection.failed = FALSE  
         #------------------------------------------------------------------
+        # calculate time in bed, because this will be used by g.part4 if sleeplog is not available
+        tmpANGLE = angle[qqq1:qqq2]
+        inbedout = inbed(tmpANGLE,ws3=ws3)
+        if (length(inbedout$lightson) > 0 & length(inbedout$lightsout) > 0) {
+          lightson[1] = inbedout$lightson
+          lightsout[1] = inbedout$lightsout
+        }
+        
+        
+        #------------------------------------------------------------------
         # calculate L5 because this is used in case the sleep diary is not available (added 17-11-2014)
-        tmpENMO = ENMO[qqq1:qqq2]
+        tmpACC = ACC[qqq1:qqq2]
         windowRL = round((3600/ws3)*5)
         if ((windowRL/2) == round(windowRL/2)) windowRL = windowRL+1
-        if (length(tmpENMO) < windowRL) {  0 # added 4/4/2-17
+        if (length(tmpACC) < windowRL) {  0 # added 4/4/2-17
           cat("Warning: time window shorter than 5 hours which makes it impossible to identify L5")
           L5 = 0
         } else {
-          ZRM = zoo::rollmean(x=c(tmpENMO),k=windowRL,fill="extend",align="center") #
+          ZRM = zoo::rollmean(x=c(tmpACC),k=windowRL,fill="extend",align="center") #
           
           L5 = which(ZRM == min(ZRM))[1]
           if (sd(ZRM) == 0) {
@@ -139,10 +207,10 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
           night[qqq1:qqq2] = j
           #------------------------------------------------------------------
           # calculate L5 because this is used in case the sleep diary is not available (added 17-11-2014)
-          tmpENMO = ENMO[qqq1:qqq2]
+          tmpACC = ACC[qqq1:qqq2]
           windowRL = round((3600/ws3)*5)
           if ((windowRL/2) == round(windowRL/2)) windowRL = windowRL+1
-          ZRM = zoo::rollmean(x=c(tmpENMO),k=windowRL,fill="extend",align="center") #
+          ZRM = zoo::rollmean(x=c(tmpACC),k=windowRL,fill="extend",align="center") #
           L5 = which(ZRM == min(ZRM))[1]
           if (sd(ZRM) == 0) {
             L5 = c()
@@ -151,6 +219,15 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
           }
           if (length(L5) == 0) L5 = 0 #if there is no L5, because full they is zero
           L5list[j] = L5
+          # calculate time in bed, because this will be used by g.part4 if sleeplog is not available
+          tmpANGLE = angle[qqq1:qqq2]
+          inbedout = inbed(tmpANGLE,ws3=ws3)
+          if (length(inbedout$lightson) != 0 & length(inbedout$lightsout) != 0) {
+            lightson[j] = (inbedout$lightson / (3600/ ws3)) + 12
+            lightsout[j] = (inbedout$lightsout / (3600/ ws3)) + 12
+          }
+          
+          
         }
         detection.failed = FALSE      
       }
@@ -158,12 +235,14 @@ g.sib.det = function(M,IMP,I,twd=c(-12,12),anglethreshold = 5,
       cat("No midnights found")
       detection.failed = TRUE
     }
-
+    
     metatmp = data.frame(time,invalid,night=night,sleep = sleep)
   } else {
     metatmp =c()
     L5list = c()
+    lightson = c()
+    lightsout = c()
     detection.failed = TRUE
   }
-  invisible(list(output = metatmp,detection.failed=detection.failed,L5list=L5list))
+  invisible(list(output = metatmp,detection.failed=detection.failed,L5list=L5list,lightson =lightson,lightsout=lightsout))
 }

@@ -1,15 +1,16 @@
 Package: GGIR
 Type: Package
 Title: Raw Accelerometer Data Analysis
-Version: 1.5-10
-Date: 2017-7-12
+Version: 1.5-12
+Date: 2017-8-8
 Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                   email="vincentvanhees@gmail.com"),
                   person("Zhou","Fang",role="ctb"),
                   person("Jing Hua","Zhao",role="ctb"),
                   person("Joe","Heywood",role="ctb"),
                   person("Evgeny","Mirkes",role="ctb"),
-                  person("Severine","Sabia",role="ctb"))
+                  person("Severine","Sabia",role="ctb"),
+                  person("Jairo H","Migueles",role="ctb"))
 Maintainer: Vincent T van Hees <vincentvanhees@gmail.com>
 Description: A tool to process and analyse data collected with wearable raw acceleration sensors. The package has been developed and tested for binary data from GENEActiv and GENEA devices, .csv-export data from  Actigraph devices, and .cwa and .wav-format data from Axivity. These devices are currently widely used in research on human daily physical activity.
 URL: https://github.com/wadpac/GGIR/,
@@ -23,12 +24,13 @@ Depends: stats, utils, R (>= 2.10)
 NeedsCompilation: yes
 LinkingTo: Rcpp
 VignetteBuilder: knitr
-Packaged: 2017-07-12 13:55:18 UTC; vincent
+Packaged: 2017-08-08 13:52:44 UTC; vincent
 Author: Vincent T van Hees [aut, cre],
   Zhou Fang [ctb],
   Jing Hua Zhao [ctb],
   Joe Heywood [ctb],
   Evgeny Mirkes [ctb],
-  Severine Sabia [ctb]
+  Severine Sabia [ctb],
+  Jairo H Migueles [ctb]
 Repository: CRAN
-Date/Publication: 2017-07-12 14:18:59 UTC
+Date/Publication: 2017-08-08 14:28:57 UTC
