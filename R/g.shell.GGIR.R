@@ -131,6 +131,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
   if (length(which(ls() == "closedbout")) == 0)  closedbout = FALSE
   if (length(which(ls() == "IVIS_windowsize_minutes")) == 0)  IVIS_windowsize_minutes=60
   if (length(which(ls() == "IVIS_epochsize_seconds")) == 0)  IVIS_epochsize_seconds=30
+  if (length(which(ls() == "acc.metric")) == 0) acc.metric = "ENMO"
   
   
   # # specific for part 5
@@ -144,7 +145,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
   if (length(which(ls() == "boutdur.mvpa")) == 0)  boutdur.mvpa = c(1,5,10)
   if (length(which(ls() == "boutdur.in")) == 0)  boutdur.in = c(10,20,30)
   if (length(which(ls() == "boutdur.lig")) == 0)  boutdur.lig = c(1,5,10)
-  
+  if (length(which(ls() == "save_ms5rawlevels")) == 0) save_ms5rawlevels = FALSE
   # part 2
   if (length(which(ls() == "mvpadur")) == 0)  mvpadur = c(1,5,10) # related to part 2 (functionality to anticipate part 5)
   if (length(which(ls() == "epochvalues2csv")) == 0)  epochvalues2csv = FALSE
@@ -197,7 +198,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
     cat(paste0(rep('_',options()$width),collapse=''))
     cat("\nPart 3\n")
     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/basic",sep="")))
-    g.part3(metadatadir=metadatadir,f0=f0,
+    g.part3(metadatadir=metadatadir,f0=f0, acc.metric = acc.metric,
             f1=f1,anglethreshold=anglethreshold,timethreshold=timethreshold,
             ignorenonwear=ignorenonwear,overwrite=overwrite,desiredtz=desiredtz)
   }
@@ -220,9 +221,9 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
     cat("\nPart 5\n")
     if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
     g.part5(datadir=datadir,metadatadir=metadatadir,f0=f0,f1=f1,strategy=strategy,maxdur=maxdur,
-            hrs.del.start=hrs.del.start,
+            hrs.del.start=hrs.del.start, 
             hrs.del.end=hrs.del.end,
-            loglocation=loglocation,excludefirstlast=excludefirstlast,
+            loglocation=loglocation,excludefirstlast=excludefirstlast, acc.metric=acc.metric,
             windowsizes=windowsizes,boutcriter.in=boutcriter.in,boutcriter.lig=boutcriter.lig,
             boutcriter.mvpa=boutcriter.mvpa,storefolderstructure=storefolderstructure,
             threshold.lig = threshold.lig,
@@ -232,7 +233,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
             boutdur.in = boutdur.in,
             boutdur.lig = boutdur.lig,
             winhr = winhr,M5L5res = M5L5res,
-            overwrite=overwrite,desiredtz=desiredtz)
+            overwrite=overwrite,desiredtz=desiredtz,save_ms5rawlevels = save_ms5rawlevels)
   }
   
   #==========================

@@ -199,7 +199,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
              <span class="dt">hrs.del.start =</span> <span class="dv">0</span>,          <span class="dt">hrs.del.end =</span> <span class="dv">0</span>,
              <span class="dt">maxdur =</span> <span class="dv">9</span>,                 <span class="dt">includedaycrit =</span> <span class="dv">16</span>,
              <span class="dt">winhr =</span> <span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">10</span>),
-             <span class="dt">qlevels =</span> <span class="kw">c</span>(<span class="kw">c</span>(<span class="dv">1380</span>/<span class="dv">1440</span>),<span class="kw">c</span>(<span class="dv">1410</span>/<span class="dv">1440</span>)),
+             <span class="dt">qlevels =</span> <span class="kw">c</span>(<span class="kw">c</span>(<span class="dv">1380</span><span class="op">/</span><span class="dv">1440</span>),<span class="kw">c</span>(<span class="dv">1410</span><span class="op">/</span><span class="dv">1440</span>)),
              <span class="dt">qwindow=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">24</span>),
              <span class="dt">ilevels =</span> <span class="kw">c</span>(<span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">400</span>,<span class="dt">by=</span><span class="dv">50</span>),<span class="dv">8000</span>),
              <span class="dt">mvpathreshold =</span><span class="kw">c</span>(<span class="dv">100</span>,<span class="dv">120</span>),
@@ -291,22 +291,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">3.2</span> In a cluster</h2>
 <p>It is possible to run GGIR on a computing cluster to process multiple files in parallel. The way I did it is as follows, please note that some of these commands are specific to the computing cluster you are working on. Please consult your local cluster specilist to tailor this to your situation. In my case, I had three files:</p>
 <p><strong>submit.sh</strong></p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">for</span> <span class="kw">i</span> in <span class="dt">{1..707}</span><span class="kw">;</span> <span class="kw">do</span>
-    <span class="ot">n=</span>1
-    <span class="ot">s=$(($(($n</span> * $[<span class="ot">$i</span>-1]<span class="ot">))</span>+1<span class="ot">))</span>
-    <span class="ot">e=$(($i</span> * <span class="ot">$n))</span>
-    <span class="kw">qsub</span> /home/nvhv/WORKING_DATA/bashscripts/run-mainscript.sh <span class="ot">$s</span> <span class="ot">$e</span>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..707}</span><span class="kw">;</span> <span class="kw">do</span>
+    <span class="va">n=</span>1
+    <span class="va">s=$(($(($n</span> * $[<span class="va">$i</span>-1]<span class="va">))</span>+1<span class="va">))</span>
+    <span class="va">e=$(($i</span> * <span class="va">$n))</span>
+    <span class="ex">qsub</span> /home/nvhv/WORKING_DATA/bashscripts/run-mainscript.sh <span class="va">$s</span> <span class="va">$e</span>
 <span class="kw">done</span></code></pre></div>
 <p><strong>run-mainscript.sh</strong></p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#! /bin/bash</span>
 <span class="co">#$ -cwd -V</span>
 <span class="co">#$ -l h_vmem=12G</span>
-<span class="kw">/usr/bin/R</span> --vanilla --args f0=<span class="ot">$1</span> f1=<span class="ot">$2</span> <span class="kw">&lt;</span> /home/nvhv/WORKING_DATA/test/myshellscript.R</code></pre></div>
+<span class="ex">/usr/bin/R</span> --vanilla --args f0=<span class="va">$1</span> f1=<span class="va">$2</span> <span class="op">&lt;</span> /home/nvhv/WORKING_DATA/test/myshellscript.R</code></pre></div>
 <p><strong>myshellscript.R</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">echo=</span><span class="ot">TRUE</span>)
 args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="ot">TRUE</span>)
-if(<span class="kw">length</span>(args) &gt;<span class="st"> </span><span class="dv">0</span>) {
-  for (i in <span class="dv">1</span>:<span class="kw">length</span>(args)) {
+<span class="cf">if</span>(<span class="kw">length</span>(args) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {
+  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(args)) {
     <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> args[[i]]))
   }
 }
