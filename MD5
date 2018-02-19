@@ -1,4 +1,4 @@
-5f2ec2510b482fa5fe6c67f7a597a8b1 *DESCRIPTION
+fbb6c370ac4e1202e20750b239d859e8 *DESCRIPTION
 e6a600fd5e1d9cbde2d983680233ad02 *LICENSE
 d43951c4619b51486206d634a4951343 *NAMESPACE
 48918779e31fcb4d8771b9da934c49d5 *R/POSIXtime2iso8601.R
@@ -30,7 +30,7 @@ a3d14a68438c79d9f6d192d31c2bdac0 *R/g.getbout.R
 d8111ea2bf9474c801eb4a5f2d66a250 *R/g.metric.R
 5e3f5add952795caa1423083c26163e5 *R/g.part1.R
 8a1edf724fad7b8c3466d6a91630e2e3 *R/g.part2.R
-b453c81ea6a1135c9893086dedd6a7f3 *R/g.part3.R
+fc57e3d645178d5532cad3ca04ec0d0a *R/g.part3.R
 6958564ef464b4d5d98a719fa1f9b33c *R/g.part4.R
 626f72067fc29f98fe67b556559da366 *R/g.part5.R
 b99f66bf5c949e21df5446d1ae77df73 *R/g.plot.R
@@ -39,8 +39,8 @@ bd69d8c2d2bba663963b7dddddfd6373 *R/g.plot5.R
 cb8f83c1e0d80e139bfbcc19144e3d7e *R/g.report.part2.R
 bc8ba213acf7c804fe7806c37d77b2df *R/g.report.part4.R
 ae88b9ea2ce20771e51399b6d580823d *R/g.report.part5.R
-1c222a38ec69e33304c9d924395cb30c *R/g.shell.GGIR.R
-61fa9e8247dcf89b92bf732ab8b4d1f4 *R/g.sib.det.R
+d9b0e8b4845ab662c9c4f6aa3e923a6c *R/g.shell.GGIR.R
+3553f0abc2ff1644760cb620c4f5debd *R/g.sib.det.R
 6c6986b14ca92a73e21f56f6265152e6 *R/g.sib.plot.R
 40504e6757b2246f1c52d92838b33ccc *R/g.sib.sum.R
 f7cb058d53b200006098e6c9c69303bf *R/g.wavread.R
@@ -52,17 +52,17 @@ d05c19d91134761cfbb79d4d3ef43a65 *R/getfolderstructure.R
 6c25e5197eaa04cd827cceabdf1df136 *R/identify_level.R
 2f3551f3c35b724f0a779550874e78fc *R/isfilelist.R
 60096aeaba0718c0630fb9f57dbc95ab *R/iso8601chartime2POSIX.R
-6281dc627d702e59aacfdce28bc6e901 *README.md
+b44325abf1e92191f9f6dab2c812fe17 *README.md
 4c911ed4b887b3ec40efc637f093a392 *build/vignette.rds
 122d40c84ba0190dfff1b717e537cf44 *data/data.calibrate.RData
 5e07c17c608dee884ea2ad0a1bfa159f *data/data.getmeta.RData
 0cb14c60e18f5bd4c15fb942c95aea2b *data/data.inspectfile.RData
 2ef488d8543e33e67645f5c0deb94040 *data/datalist
-b79a09dd50748ebd321d7f88f34958ef *inst/NEWS.Rd
+03d80a423f9a974ffeed842fc6b9d5a5 *inst/NEWS.Rd
 f864e5eb94489dc2a268ce400538b579 *inst/doc/GGIR.R
 d13bc9e72f225bf04f3a26ffaa354da9 *inst/doc/GGIR.Rmd
 bbcba0986acb07ec8ae284af8caae953 *inst/doc/GGIR.html
-02f5518a5164116fba1292938a6066c9 *man/GGIR-package.Rd
+b5b066083ef49a8410b8aed5f0bae113 *man/GGIR-package.Rd
 08db6e66f6e884a075aed5eccd921524 *man/POSIXtime2iso8601.Rd
 81268234a63add597f6ca8ae1e7b03ee *man/chartime2iso8601.Rd
 be4dde8f6f04c6d173b9ef10287b6172 *man/create_test_acc_csv.Rd
@@ -94,7 +94,7 @@ c54a940431cb1e5005c100a38c12c9de *man/g.loadlog.Rd
 1fb6fbf195225fc5b62c97aaed76ed05 *man/g.metric.Rd
 874bbf42add576b23f523a3b2d4f1a4b *man/g.part1.Rd
 62d41a9fb9c2de52398eaf2940551621 *man/g.part2.Rd
-81accf44f7ca2a035e62da4bd930e056 *man/g.part3.Rd
+32e94980cd3f5a1b88a7e57e7559df5c *man/g.part3.Rd
 a7f6ca6d87c4319aa994a41b4f96464c *man/g.part4.Rd
 9a2cadcdb46f0fd771946c4d8fea47e3 *man/g.part5.Rd
 8e77ce330a6d53931ca2c4ed0470425d *man/g.plot.Rd
@@ -104,7 +104,7 @@ a7f6ca6d87c4319aa994a41b4f96464c *man/g.part4.Rd
 c8161509d4eeeef75b2fa215a7f4976b *man/g.report.part4.Rd
 f4493f1335e04204c94e2a50cf10fb0f *man/g.report.part5.Rd
 cbd182775a2015cab03e985982da0739 *man/g.shell.GGIR.Rd
-19176d15231b704da5fc4dad592a9512 *man/g.sib.det.Rd
+0b666d9dab55360d77e1a923d95e5c17 *man/g.sib.det.Rd
 b64d5798f10c4152e2071e7a9937bcae *man/g.sib.plot.Rd
 621551fcea6083c220f94c3bef4e9dcd *man/g.sib.sum.Rd
 3bd2854311f27d6fab922d7bad47fbfd *man/g.wavread.Rd
