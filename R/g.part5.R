@@ -290,8 +290,7 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                 s1 = which(as.character(time) == w1c)[1]
               }
               timebb = as.character(time) 
-              
-              if(length(unlist(strsplit(timebb,"[+]"))) > 1) { # only do this for ISO8601 format
+              if(length(unlist(strsplit(timebb[1],"[+]"))) > 1) { # only do this for ISO8601 format
                 timebb = iso8601chartime2POSIX(timebb,tz=desiredtz)
               }
               if (is.na(s0) == TRUE) s0 = which(timebb == paste(w0c," 00:00:00",sep=""))[1]
@@ -593,15 +592,24 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                               if (length(unlist(strsplit(L5HOUR," "))) == 1) L5HOUR = paste0(L5HOUR," 00:00:00") #added because on some OS timestamps are deleted for midnight
                               if (length(unlist(strsplit(M5HOUR," "))) == 1) M5HOUR = paste0(M5HOUR," 00:00:00")
                             }
-                            time_num = sum(as.numeric(unlist(strsplit(unlist(strsplit(L5HOUR," "))[2],":"))) * c(3600,60,1)) / 3600
-                            if (time_num < 12) time_num = time_num + 24
-                            dsummary[di,fi] = time_num
+                          
+                            if (L5HOUR != "not detected") {
+                              time_num = sum(as.numeric(unlist(strsplit(unlist(strsplit(L5HOUR," "))[2],":"))) * c(3600,60,1)) / 3600
+                              if (time_num < 12) time_num = time_num + 24
+                              dsummary[di,fi] = time_num
+                            } else {
+                              dsummary[di,fi] = NA
+                            }
                           }
                           ds_names[fi] = paste("L",wini,"TIME_num",sep="");      fi = fi + 1
                           if (ignore == FALSE) {
-                            time_num = sum(as.numeric(unlist(strsplit(unlist(strsplit(M5HOUR," "))[2],":"))) * c(3600,60,1)) / 3600
-                            if (time_num < 12) time_num = time_num + 24
-                            dsummary[di,fi] = time_num
+                            if (M5HOUR != "not detected") {
+                              time_num = sum(as.numeric(unlist(strsplit(unlist(strsplit(M5HOUR," "))[2],":"))) * c(3600,60,1)) / 3600
+                              if (time_num < 12) time_num = time_num + 24
+                              dsummary[di,fi] = time_num
+                            } else {
+                              dsummary[di,fi] = NA
+                            }
                           }
                           ds_names[fi] = paste("M",wini,"TIME_num",sep="");      fi = fi + 1
                         }

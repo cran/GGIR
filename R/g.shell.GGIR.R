@@ -39,7 +39,6 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
     if (length(which(mode == 4)) > 0) dopart4 = TRUE
     if (length(which(mode == 5)) > 0) dopart5 = TRUE
   }
-  
   # test whether RData input was used and if so, use original outputfolder
   if (length(datadir) > 0) {
     # list of all csv and bin files
@@ -133,7 +132,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
   if (length(which(ls() == "IVIS_epochsize_seconds")) == 0)  IVIS_epochsize_seconds=30
   if (length(which(ls() == "acc.metric")) == 0) acc.metric = "ENMO"
   if (length(which(ls() == "constrain2range")) == 0) constrain2range = TRUE
-  
+  if (length(which(ls() == "do.part3.pdf")) == 0) do.part3.pdf = TRUE
   
   # # specific for part 5
   if (length(which(ls() == "boutcriter.in")) == 0)  boutcriter.in = 0.9
@@ -153,8 +152,6 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
   # if (length(which(ls() == "bout.metric")) == 0) bout.metric = 1
   if (length(which(ls() == "window.summary.size")) == 0) window.summary.size = 10
   if (length(which(ls() == "dayborder")) == 0)  dayborder = 0
-  
-
   
   cat("\n   Help sustain GGIR into the future \n")
   cat("   Check out: https://www.movementdata.nl/how-to-help-sustain-ggir \n")
@@ -217,7 +214,7 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
             excludefirstlast=excludefirstlast,criterror = criterror,
             includenightcrit=includenightcrit,relyonsleeplog=relyonsleeplog,
             sleeplogidnum=sleeplogidnum,def.noc.sleep=def.noc.sleep,do.visual = do.visual, #
-            storefolderstructure=storefolderstructure,overwrite=overwrite)
+            storefolderstructure=storefolderstructure,overwrite=overwrite,desiredtz=desiredtz)
   }
   if (dopart5 == TRUE) {
     cat('\n')
@@ -250,12 +247,12 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
       stop()
     }
   }  
-  if (visualreport==TRUE & length(do.report) == 0) {
-    if (file.exists(paste(metadatadir,"/meta/ms4.out",sep=""))) {
-    } else {
-      do.report=c(2,4) #visual report is impossible without creating quantitative reports first
-    }
-  }  
+  # if (visualreport==TRUE & length(do.report) == 0) { 
+  #   if (file.exists(paste(metadatadir,"/meta/ms4.out",sep=""))) {
+  #   } else {
+  #     do.report=c(2,4) #visual report is impossible without creating quantitative reports first
+  #   }
+  # }  
   if (length(which(do.report == 2)) > 0) {
     cat('\n')
     cat(paste0(rep('_',options()$width),collapse=''))
@@ -292,9 +289,9 @@ g.shell.GGIR = function(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1
     cat('\n')
     cat(paste0(rep('_',options()$width),collapse=''))
     cat("\nGenerate visual reports\n")
-    if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
+    f1 = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
+    # if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
     g.plot5(metadatadir=metadatadir,dofirstpage=dofirstpage,
             viewingwindow=viewingwindow,f0=f0,f1=f1,overwrite=overwrite,desiredtz = desiredtz)
   }
-  
 }
