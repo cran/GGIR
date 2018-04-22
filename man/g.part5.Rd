@@ -11,8 +11,8 @@ based on bouted periods as well as non-bouted periods.
 \usage{
 g.part5(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7,
 hrs.del.start=0,hrs.del.end =0,
-loglocation= c(),excludefirstlast=FALSE,windowsizes=c(5,900,3600), acc.metric="ENMO",
-boutcriter.mvpa=0.8,boutcriter.in=0.9,boutcriter.lig=0.8,
+loglocation= c(),excludefirstlast.part5=FALSE,windowsizes=c(5,900,3600), 
+acc.metric="ENMO",boutcriter.mvpa=0.8,boutcriter.in=0.9,boutcriter.lig=0.8,
 storefolderstructure=FALSE,threshold.lig = c(40),threshold.mod = c(100),
 threshold.vig = c(400),timewindow=c("MM","WW"),boutdur.mvpa = c(1,5,10),
 boutdur.in = c(10,20,30),boutdur.lig = c(1,5,10),winhr = 5,
@@ -64,7 +64,7 @@ save_ms5rawlevels=FALSE)
   to lights out or intention to fall asleep, then it is the end-users responsibility
   to account for this in the interpretation of the results.
   }
- \item{excludefirstlast}{
+ \item{excludefirstlast.part5}{
     If TRUE then the first and last night of the measurement are ignored for the
   sleep assessment.
   }
@@ -222,13 +222,15 @@ at least 10 minutes.
 unbouted time contributing. Just MOD and VIG are only the unbouted time spent in
 those categories.
 \item nightwak = night waking time
-\item SIB= sustained inactivity bouts, can be part of inactivity bouts 
-(INB variables), SIB are the sustained inactivity bouts that are not part of 
-the inactivity bouts. This is why I have a TSIB and a SIB variable
+\item Variable names with SIB in them are the sustained inactivity bouts that are
+not part of the inactivity bouts. Only TSIB shows the total time spent in all
+sustained inactivity bouts. I make this distinction, because sustained inactivity
+bouts, can be part of inactivity bouts and are then counted towards the inactivity
+bout (INB variables) and not towards the SIB category.
 \item TSIB = total of all sustained inactivity bouts (regardless of whether
 they contributed or not to inactivity bouts (INB).
 \item TOIN = Total other inactivity
-\item TIN = Total inactivity = TOIN + SIB = Total other inactivty + Sustained
+\item TIN = Total inactivity = TOIN + TSIB = Total other inactivty + Total sustained
 inactivity
 \item Levels of behaviour from least active to most active are: Sleep or SIB,
 Other inactivity, Light, Moderate, Vigorous

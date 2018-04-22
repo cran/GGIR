@@ -12,7 +12,7 @@ calls to \link{g.part1}, \link{g.part2}, \link{g.part3} and
 on optional input arguments.
 }
 \usage{
-g.shell.GGIR(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1,f1=0,
+g.shell.GGIR(mode=c(1,2),datadir=c(),outputdir=c(),studyname=c(),f0=1,f1=0, 
 do.report=c(2),overwrite=FALSE,visualreport=FALSE,viewingwindow=1,...)
 }
 \arguments{
@@ -46,7 +46,6 @@ do.report=c(2),overwrite=FALSE,visualreport=FALSE,viewingwindow=1,...)
   \item{f1}{
    File index to finish with (defaults to number of files available)
   }
-  
   \item{overwrite}{
   Do you want to overwrite analysis for which milestone data exists? 
   If overwrite=FALSE then milestone data from a previous analysis will 
@@ -92,7 +91,7 @@ g.shell.GGIR(#-------------------------------
              outputdir=outputdir, 
              studyname=studyname, 
              f0=f0, 
-             f1=f1, 
+             f1=f1,
              overwrite = FALSE, 
              do.imp=TRUE,
              idloc=1, 
@@ -132,7 +131,7 @@ g.shell.GGIR(#-------------------------------
              #-------------------------------
              # Part 4 parameters:
              #-------------------------------
-             excludefirstlast = TRUE,
+             excludefirstlast = FALSE,
              includenightcrit = 16,
              def.noc.sleep = c(),
              loglocation= "D:/sleeplog.csv",
@@ -151,6 +150,7 @@ g.shell.GGIR(#-------------------------------
              threshold.lig = c(30,40,50),
              threshold.mod = c(100,120),
              threshold.vig = c(400,500),
+             excludefirstlast = FALSE,
              boutcriter = 0.8,
              boutcriter.in = 0.9,
              boutcriter.lig = 0.8,

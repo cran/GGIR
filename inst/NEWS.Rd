@@ -2,9 +2,23 @@
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
+\section{Changes in version 1.5-21 (release date:22-4-2018)}{
+\itemize{
+  \item g.part5 is now able to generate summary from all measurment days (thanks Jairo).
+  \item MM results in g.part5 now correctly stores onset and waking for single date per row.
+  \item Various checks added to g.part4 to ensure measurements in all shapes and size can be
+  processed.
+  \item minor improvements to documentation g.part5
+  \item size of example data and vignette images reduced to reduce package size
+  }
+}
+
+
 \section{Changes in version 1.5-18 (release date:18-3-2018)}{
 \itemize{
-  \item Improved handling of day saving time in g.part3 and g.part4
+  \item Improved handling of day saving time in g.part3 and g.part4 within the two nights
+  in a year when the clock changes (DST was already correctly handled in the rest
+  of the year)
   \item Algorithm HDCZA is now the default algorithm to use, if a sleeplog
   is used and an entry is missing for a particular night.
   \item pdf generation in part 3 is now optional (argument do.part3.pdf), this may
