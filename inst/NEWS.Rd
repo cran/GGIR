@@ -1,7 +1,17 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-
+\section{Changes in version 1.5-23 (release date:4-7-2018)}{
+\itemize{
+  \item Unit tests speeded up by using a smaller test file.
+  }
+}
+\section{Changes in version 1.5-22 (release date:3-7-2018)}{
+\itemize{
+  \item g.part4 bug fixed that was introduced in version 1.5-21 regarding the handling
+  of daysleepers (people who wake up after noon) causing sleep estimates to be zero.
+  }
+}
 \section{Changes in version 1.5-21 (release date:22-4-2018)}{
 \itemize{
   \item g.part5 is now able to generate summary from all measurment days (thanks Jairo).
@@ -12,8 +22,6 @@
   \item size of example data and vignette images reduced to reduce package size
   }
 }
-
-
 \section{Changes in version 1.5-18 (release date:18-3-2018)}{
 \itemize{
   \item Improved handling of day saving time in g.part3 and g.part4 within the two nights
