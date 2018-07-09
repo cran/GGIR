@@ -1,4 +1,4 @@
-516d4007c5adf29c023f72d12b0fa718 *DESCRIPTION
+68dd2b566ec94283478249526b2869a6 *DESCRIPTION
 e6a600fd5e1d9cbde2d983680233ad02 *LICENSE
 93f2900994844620bc778d8b70ad4eef *NAMESPACE
 48918779e31fcb4d8771b9da934c49d5 *R/POSIXtime2iso8601.R
@@ -8,7 +8,7 @@ e6a600fd5e1d9cbde2d983680233ad02 *LICENSE
 9dc20bba8a06daf7e02e07ef7eef09ed *R/create_test_sleeplog_csv.R
 d865869741da400dfde087f91565be7b *R/datadir2fnames.R
 79f8c199a8e695c7dd2abbf5cd97bd5a *R/g.abr.day.names.R
-f7d5f4dd1b545414ecd7a8649cae8ef7 *R/g.analyse.R
+c5972d5c9f19bf489088dcadaa356a9e *R/g.analyse.R
 74c34baf4327b402f75499de1cd0f07b *R/g.applymetrics.R
 19f994083880cfd32d7c2919badcd666 *R/g.binread.R
 b955f7a7bea119396735c5715af398f0 *R/g.calibrate.R
@@ -32,7 +32,7 @@ d8111ea2bf9474c801eb4a5f2d66a250 *R/g.metric.R
 fbae7167c504a92a122fa313dddfac3d *R/g.part2.R
 612580213744966f7619f74aea3369c7 *R/g.part3.R
 f9629b19fa308b4914acb50d3f3b5162 *R/g.part4.R
-3073715cd34194032fc820fb600e7671 *R/g.part5.R
+852d0c1231796a3616b5e516d7f9e2c3 *R/g.part5.R
 b99f66bf5c949e21df5446d1ae77df73 *R/g.plot.R
 e6ae042b745b5ced0eaf51874c7a46c2 *R/g.plot5.R
 03106e7b36e291d3b0afab84699c4949 *R/g.readaccfile.R
@@ -59,11 +59,11 @@ b699d25a79846a60bf6b4aede2bdf20f *R/is_this_a_dst_night.R
 70d52d29d1fa61fe80c9c498ebd7a6c7 *data/data.getmeta.RData
 0cb14c60e18f5bd4c15fb942c95aea2b *data/data.inspectfile.RData
 491b9d2d9479915953a86a28c56d759a *inst/CITATION
-7d23ebc60b3f7978a2e4a6d75256de73 *inst/NEWS.Rd
+8a852709a97cea6bb9d60b8bec7433d5 *inst/NEWS.Rd
 f864e5eb94489dc2a268ce400538b579 *inst/doc/GGIR.R
 120f8a9e37ddf3c393c449d6aa5d323e *inst/doc/GGIR.Rmd
 edf032dd209e050ad95053b624509258 *inst/doc/GGIR.html
-69b9c49afffc84a2f25dd851d3f429e3 *man/GGIR-package.Rd
+2d3bee8d43024511cd9524842a358085 *man/GGIR-package.Rd
 02209cee65544d54b26a34114f42e085 *man/POSIXtime2iso8601.Rd
 9c0310ad4076a9de8fdeaa9fa386d08c *man/chartime2iso8601.Rd
 be4dde8f6f04c6d173b9ef10287b6172 *man/create_test_acc_csv.Rd
