@@ -69,7 +69,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Accelerometer data processing with GGIR</h1>
 <h4 class="author"><em>Vincent van Hees</em></h4>
-<h4 class="date"><em>April 21 2018</em></h4>
+<h4 class="date"><em>September 21 2018</em></h4>
 
 
 <div id="TOC">
@@ -765,7 +765,7 @@ args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="
 <p>An acceleration sensor works on the principle that acceleration is captured mechanically and converted into an electrical signal. The relationship between the electrical signal and the acceleration is usually assumed to be linear, involving an offset and a gain factor. We shall refer to the establishment of the offset and gain factor as the sensor calibration procedure. Accelerometers are usually calibrated as part of the manufacturing process under non-movement conditions using the local gravitational acceleration as a reference. The manufacturer calibration can later be evaluated by holding each sensor axis parallel (up and down) or perpendicular to the direction of gravity; readings for each axis should be ±1 and 0 g, respectively. However, this procedure can be cumbersome in studies with a high throughput. Furthermore, such a calibration check will not be possible for data that have been collected in the past and for which the corresponding accelerometer device does not exist anymore. Techniques have been proposed that can check and correct for calibration error based on the collected triaxial accelerometer data in the participant’s daily life without additional experiments, referred to as autocalibration. The general principle of these techniques is that a recording of acceleration is screened for nonmovement periods. Next, the moving average over the nonmovement periods is taken from each of the three orthogonal sensor axes and used to generate a three-dimensional ellipsoid representation that should ideally be a sphere with radius 1 g. Here, deviations between the radius of the three-dimensional ellipsoid and 1 g (ideal calibration) can then be used to derive correction factors for sensor axis-specific calibration error. This auto-calibration performed by GGIR uses this technique and a more detailed description and demonstration can be found in the published paper.</p>
 <p>Reference:</p>
 <ul>
-<li>van Hees VT, Fang Z, Langford J, Assah F, Mohammad A, da Silva IC, Trenell MI, White T, Wareham NJ, Brage S. Autocalibration of accelerometer data for free-living physical activity assessment using local gravity and temperature: an evaluation on four continents. J Appl Physiol (1985). 2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014. Epub 2014 Aug 7. PMID: 25103964 <a href="http://jap.physiology.org/cgi/pmidlookup?view=long&amp;pmid=25103964">link</a></li>
+<li>van Hees VT, Fang Z, Langford J, Assah F, Mohammad A, da Silva IC, Trenell MI, White T, Wareham NJ, Brage S. Autocalibration of accelerometer data for free-living physical activity assessment using local gravity and temperature: an evaluation on four continents. J Appl Physiol (1985). 2014 Oct 1;117(7):738-44. doi: 10.1152/japplphysiol.00421.2014. Epub 2014 Aug 7. PMID: 25103964 <a href="https://www.physiology.org/doi/10.1152/japplphysiol.00421.2014">link</a></li>
 </ul>
 <p>Key decisions to be made:</p>
 <ol style="list-style-type: decimal">
@@ -849,12 +849,13 @@ args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="
 </ol>
 <p>If you used the <strong>auto-calibration functionality:</strong></p>
 <ol start="3" style="list-style-type: decimal">
-<li>van Hees VT, Fang Z, et al. Auto-calibration of accelerometer data for free-living physical activity assessment using local gravity and temperature: an evaluation on four continents. J Appl Physiol 2014. <a href="http://jap.physiology.org/cgi/pmidlookup?view=long&amp;pmid=25103964">link</a></li>
+<li>van Hees VT, Fang Z, et al. Auto-calibration of accelerometer data for free-living physical activity assessment using local gravity and temperature: an evaluation on four continents. J Appl Physiol 2014. <a href="https://www.physiology.org/doi/10.1152/japplphysiol.00421.2014">link</a></li>
 </ol>
 <p>If you used the <strong>sleep detection:</strong></p>
 <ol start="4" style="list-style-type: decimal">
 <li>van Hees VT, Sabia S, et al. A novel, open access method to assess sleep duration using a wrist-worn accelerometer, PLoS ONE, 2015 <a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533">link</a></li>
 </ol>
+<p>If you used the <strong>sleep detection without relying on sleep diary:</strong> 5. van Hees VT, Sabia S, et al. Estimating sleep parameters using an accelerometer without sleep diary. Scientific Reports 2018. doi: 10.1038/s41598-018-31266-z. <a href="https://www.nature.com/articles/s41598-018-31266-z">link</a></p>
 </div>
 
 

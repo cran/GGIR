@@ -1,7 +1,24 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-
+\section{Changes in version 1.6-7 (release date:23-9-2018)}{
+\itemize{
+  \item Link with Zenodo for doi generation removed
+  \item Broken url fixed in vignette
+  }
+}
+\section{Changes in version 1.6-1 (release date:21-9-2018)}{
+\itemize{
+  \item Report part 4: Count of available nights with accelerometer data fixed
+  \item Report part 4: NA and NaN values replaced by empty cells like in other reports
+  \item Intensity gradient analysis added to part2 output according to Rowlands et al.
+  MSSE 2018, doi: 10.1249/MSS.0000000000001561
+  \item Documentation on part4 output variables improved.
+  \item Providing incorrect value of sleeplogidnum in part4 should now provide a more
+  informative error message
+  \item Added functionality to handle timestamps that start with the year.
+  }
+}
 \section{Changes in version 1.6-0 (release date:29-7-2018)}{
 \itemize{
   \item Fixed timezone dependency of g.analyse (affected only order of columns), g.part5
@@ -30,7 +47,7 @@
   with terminology used in supporting papers, which are about SPT (sleep period time)
   detection and not about time in bed detection.
   \item output variable acc_dur_noc renamed to acc_SleepDurationInSpt to improve clarity
-  of variable name relative to acc_SptDuration.
+  of variable name relative to acc_SptDuration
   }
 }
 \section{Changes in version 1.5-24 (release date:9-7-2018)}{
