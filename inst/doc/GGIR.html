@@ -69,7 +69,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Accelerometer data processing with GGIR</h1>
 <h4 class="author"><em>Vincent van Hees</em></h4>
-<h4 class="date"><em>September 21 2018</em></h4>
+<h4 class="date"><em>November 25 2018</em></h4>
 
 
 <div id="TOC">
@@ -113,7 +113,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h1><span class="header-section-number">1</span> Introduction</h1>
 <div id="what-is-ggir" class="section level2">
 <h2><span class="header-section-number">1.1</span> What is GGIR?</h2>
-<p><a href="https://CRAN.R-project.org/package=GGIR">GGIR</a> is an R-package to process multi-day raw accelerometer data for physical activity and sleep research. The term <em><strong>raw</strong></em> in raw accelerometry refers to data being expressed in m/s<sup>2</sup> or gravitational acceleration as opposed to the previous generation accelerometers which stored data in accelerometer brand specific units. The signal processing includes automatic calibration, detection of sustained abnormally high values, detection of non-wear and calculation of average magnitude of dynamic acceleration based on a variety of metrics. Next, GGIR uses this information to describe the data per day of measurement or per measurement, including estimates of physical activity, inactivity and sleep.</p>
+<p><a href="https://CRAN.R-project.org/package=GGIR">GGIR</a> is an R-package to process multi-day raw accelerometer data for physical activity and sleep research. The term <em><strong>raw</strong></em> in raw accelerometry refers to data being expressed in m/s<sup>2</sup> or gravitational acceleration as opposed to the previous generation accelerometers which stored data in accelerometer brand specific units. The signal processing includes automatic calibration, detection of sustained abnormally high values, detection of non-wear and calculation of average magnitude of dynamic acceleration based on a variety of metrics. Next, GGIR uses this information to describe the data per day of measurement or per measurement, including estimates of physical activity, inactivity and sleep. This vignette provides a general introduction to GGIR, additionally you can find a general <a href="https://youtu.be/RuFBCAqFJ2M">introduction video</a> and a <a href="https://youtu.be/S8YPTrYNWdU">mini-tutorial</a> on YouTube.</p>
 </div>
 <div id="who-has-been-using-ggir" class="section level2">
 <h2><span class="header-section-number">1.2</span> Who has been using GGIR?</h2>
@@ -170,7 +170,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul>
 <li><a href="https://www.geneactiv.org/">GENEActiv</a> .bin and .csv</li>
 <li><a href="http://actigraphcorp.com/">ActiGraph</a> .csv. Note for Actigraph users: In ActiLife you have the option to export data with timestamps. Please do not do this as this causes memory issues. To cope with the absense of timestamps GGIR will re-caculate timestamps from the sample frequency and the start time and date as presented in the file header.</li>
-<li><a href="http://axivity.com/">Axivity</a> .wav and .cwa</li>
+<li><a href="http://axivity.com/">Axivity</a> .wav, .csv and .cwa</li>
 <li>Genea (an accelerometer that is not available anymore, but which was used for some studies between 2007 and 2012) .bin and .csv</li>
 </ul></li>
 <li>All accelerometer data that needs to be analysed should be stored in one folder, or subfolders of that folder.</li>

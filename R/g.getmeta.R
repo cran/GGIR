@@ -54,7 +54,7 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
   windowsizes = c(ws3,ws2,ws)
   start_meas = ws2/60 #ensures that first window starts at logical timepoint relative to its size (15,30,45 or 60 minutes of each hour)
   monnames = c("genea","geneactive","actigraph","axivity") #monitor names
-  filequality = data.frame(filetooshort=FALSE,filecorrupt=FALSE,filedoesnotholdday = FALSE)
+  filequality = data.frame(filetooshort=FALSE,filecorrupt=FALSE,filedoesnotholdday = FALSE,NFilePagesSkipped = 0)
   # filecorrupt = FALSE
   # filetooshort = FALSE
   # filedoesnotholdday = FALSE
@@ -94,9 +94,8 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
   if (mon == 1) blocksize = round(21467 * (sf/80)  * chunksize)
   if (mon == 3 & dformat == 2) blocksize = round(blocksize)#round(blocksize/5) # Actigraph
   if (mon == 4 & dformat == 3) blocksize = round(1440 * chunksize)
-  if (mon == 4 & dformat == 4) {
-    blocksize = round(blocksize * 1.0043)
-  }
+  if (mon == 4 & dformat == 4) blocksize = round(blocksize * 1.0043)
+  if (mon == 4 & dformat == 2) blocksize = round(blocksize)
   id = g.getidfromheaderobject(filename=filename,header=header,dformat=dformat,mon=mon)
   #creating matrixes for storing output
   S = matrix(0,0,4) #dummy variable needed to cope with head-tailing succeeding blocks of data
@@ -104,7 +103,7 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
   # NR = ceiling((90*10^6) / (sf*ws3)) + 1000 #NR = number of 'ws3' second rows (this is for 10 days at 80 Hz)
   NR = ceiling(nev / (sf*ws3)) + 1000 #NR = number of 'ws3' second rows (this is for 10 days at 80 Hz)
   metashort = matrix(" ",NR,(1+nmetrics)) #generating output matrix for acceleration signal
-  if (mon == 1 | mon == 3 | (mon == 4 & dformat == 3)) {
+  if (mon == 1 | mon == 3 | (mon == 4 & dformat == 3) | (mon == 4 & dformat == 2)) {
     temp.available = FALSE
   } else if (mon == 2 | (mon == 4 & dformat == 4)){
     temp.available = TRUE
@@ -136,18 +135,20 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
     if (useRDA == FALSE) {
       accread = g.readaccfile(filename=datafile,blocksize=blocksize,blocknumber=i,
                               selectdaysfile = selectdaysfile,filequality=filequality,decn=decn,
-                              dayborder=dayborder,ws=ws)
+                              dayborder=dayborder,ws=ws,desiredtz=desiredtz)
       
       P = accread$P
       filequality = accread$filequality
       filetooshort = filequality$filetooshort
       filecorrupt = filequality$filecorrupt
       filedoesnotholdday = filequality$filedoesnotholdday
+      NFilePagesSkipped = filequality$NFilePagesSkipped
       switchoffLD = accread$switchoffLD
     } else {
       filetooshort = FALSE
       filecorrupt = FALSE
       filedoesnotholdday = FALSE
+      NFilePagesSkipped = 0
     }
     options(warn=0) #turn on warnings
     #============
@@ -195,7 +196,6 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
                                      dformat=dformat,desiredtz=desiredtz,selectdaysfile=selectdaysfile)
           #==================================================
           #inspection timezone
-          
           timezone = attr(unclass(as.POSIXlt(starttime[1])),which="tzone")
           starttimebefore = as.POSIXlt(starttime)
           # assuming that timestamps is good, but that timezone might be lost in conversion from string to POSIXct
@@ -327,7 +327,7 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
           } else if (mon == 4 & dformat == 3) {
             data[,1:3] = scale(data[,1:3],center = -offset, scale = 1/scale) #rescale data
             Gx = as.numeric(data[,1]); Gy = as.numeric(data[,2]); Gz = as.numeric(data[,3])
-          } else if (mon == 4 & dformat == 4) {
+          } else if (mon == 4 & (dformat == 4 |  dformat == 2)) {
             data[,2:4] = scale(data[,2:4],center = -offset, scale = 1/scale) #rescale data
             Gx = as.numeric(data[,2]); Gy = as.numeric(data[,3]); Gz = as.numeric(data[,4])
           } else if (mon == 2 & dformat == 1) {
@@ -726,7 +726,7 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
       metashort[,ncolms] = as.numeric(metashort[,ncolms])
     }
     
-    if (mon == 1 | mon == 3 | (mon == 4 & dformat == 3)) {
+    if (mon == 1 | mon == 3 | (mon == 4 & dformat == 3) | (mon == 4 & dformat == 2)) {
       metricnames_long = c("timestamp","nonwearscore","clippingscore","en")
     } else if (mon == 2 | (mon == 4 & dformat == 4)) {
       metricnames_long = c("timestamp","nonwearscore","clippingscore","lightmean","lightpeak","temperaturemean","EN")
@@ -745,6 +745,6 @@ g.getmeta = function(datafile,desiredtz = c(),windowsizes = c(5,900,3600),
   
   # detach(allmetrics,warn.conflicts = FALSE)
   if (length(metashort) == 0 | filedoesnotholdday == TRUE) filetooshort = TRUE
-  invisible(list(filecorrupt=filecorrupt,filetooshort=filetooshort,
+  invisible(list(filecorrupt=filecorrupt,filetooshort=filetooshort,NFilePagesSkipped=NFilePagesSkipped,
                  metalong=metalong, metashort=metashort,wday=wday,wdayname=wdayname,windowsizes=windowsizes,bsc_qc=bsc_qc))  
 }
