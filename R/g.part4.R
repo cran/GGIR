@@ -56,6 +56,9 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                            "acc_onset_ts","acc_wake_ts","sleeplog_onset_ts", "sleeplog_wake_ts",
                            "page","daysleeper","weekday","calendardate","filename",
                            "cleaningcode","sleeplog_used","acc_available")
+  if (storefolderstructure == TRUE) {
+    colnamesnightsummary  = c(colnamesnightsummary,"filename_dir","foldername")
+  }
   # initialize variable to hold sleeplog derived sleep duration
   # if not sleep log was used then the estimates of the sleep period time window
   # will be used instead
@@ -115,7 +118,24 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
       }
     }
   }
-  
+  convertHRsinceprevMN2Clocktime = function(x) {
+    # x = hours Since Previous Midnight
+    HR = floor(x)
+    MI = floor((x - floor(x)) * 60)
+    SE = round(((x - HR) - (MI/60)) * 3600)
+    if (SE == 60) {
+      MI = MI + 1; SE = 0
+    }
+    if (MI == 60) {
+      HR = HR + 1; MI = 0
+    }
+    if (HR == 24) HR = 0
+    if (HR < 10) HR = paste0("0",HR)
+    if (MI < 10) MI = paste0("0",MI)
+    if (SE < 10) SE = paste0("0",SE)
+    return(paste0(HR,":",MI,":",SE))
+  }
+
   #=================================================================
   #=================================================================
   # start of loop through the participants
@@ -282,10 +302,8 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
             sleeplog.t[nightj,1] = accid
             sleeplog.t[nightj,2] = j
             sleeplog.t[nightj,3] = defaultdur
-            minSptOnset = round((defaultSptOnset - floor(defaultSptOnset)) * 60)
-            minSptWake = round((defaultSptWake - floor(defaultSptWake)) * 60)
-            sleeplog.t[nightj,4] = paste(floor(defaultSptOnset),":",minSptOnset,":00",sep="")
-            sleeplog.t[nightj,5] = paste(floor(defaultSptWake),":",minSptWake,":00",sep="") #"08:00:00"
+            sleeplog.t[nightj,4] = convertHRsinceprevMN2Clocktime(defaultSptOnset)
+            sleeplog.t[nightj,5] = convertHRsinceprevMN2Clocktime(defaultSptWake)
             names(sleeplog.t) = c("id","night","duration","sleeponset","sleepwake")
             sleeplog_used[i] = FALSE
             cleaningcode = 1
@@ -471,7 +489,8 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                   }
                 }
                 #------------------------------------------------------------------------
-                # HERE THERE SHOULD BE A VARIABLE 'spo' with all the sleep periods FOR ONE SLEEP DEFINITION
+                # Variable 'spo' contains all the sleep periods FOR ONE SLEEP DEFINITION
+                # Variable 'spocum' contains all the sleep periods FOR MULTIPLE SLEEP DEFINITIONS
                 spo[,5] = k
                 if (spocumi == 1) {
                   spocum = spo
@@ -536,6 +555,9 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                 if (is.matrix(spocum.t) == FALSE) {
                   spocum.t = t(as.matrix(spocum.t))
                 }
+                #remove double rows
+                spocum.t = spocum.t[!duplicated(spocum.t),]
+                
                 #------------------------------------
                 # ACCELEROMETER
                 if (length(which(as.numeric(spocum.t[,4]) == 1)) > 0) {
@@ -545,12 +567,16 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                 } else {
                   nightsummary[sumi,3:4] = 0
                 }
-                nightsummary[,3] = as.numeric(nightsummary[,3])
-                nightsummary[,4] = as.numeric(nightsummary[,4])
+                nightsummary[,3] = as.numeric(nightsummary[,3]) # onset
+                nightsummary[,4] = as.numeric(nightsummary[,4]) # wake
+                if (nightsummary[sumi,3] > nightsummary[sumi,4] & # onset after wake is impossible 
+                    nightsummary[sumi,4] < 36 & daysleeper[j] == TRUE) {  # even more impossible if wake occurs before none, while we previously labelled it as daysleep
+                  nightsummary[sumi,4] = nightsummary[sumi,4] + 12 # correction for overcorrection in waking time
+                }
                 if (nightsummary[sumi,3] > nightsummary[sumi,4]) {
                   nightsummary[sumi,5] = (36 - nightsummary[sumi,3]) + (nightsummary[sumi,4] - 12)
                 } else {
-                  nightsummary[sumi,5] = nightsummary[sumi,4] - nightsummary[sumi,3]
+                  nightsummary[sumi,5] = nightsummary[sumi,4] - nightsummary[sumi,3] #sleep duration within Spt
                 }
                 nightsummary[,5] = as.numeric(nightsummary[,5])
                 nightsummary[sumi,6] = defi #sleep definition
@@ -699,9 +725,9 @@ g.part4 = function(datadir=c(),metadatadir=c(),f0=f0,f1=f1,idloc=1,loglocation =
                     HR = HR + 1; MI = 0
                   }
                   if (HR == 24) HR = 0
-                  if (HR < 9) HR = paste0("0",HR)
-                  if (MI < 9) MI = paste0("0",MI)
-                  if (SE < 9) SE = paste0("0",SE)
+                  if (HR < 10) HR = paste0("0",HR)
+                  if (MI < 10) MI = paste0("0",MI)
+                  if (SE < 10) SE = paste0("0",SE)
                   return(paste0(HR,":",MI,":",SE))
                 }
                 acc_onsetTS = convertHRsinceprevMN2Clocktime(acc_onset)

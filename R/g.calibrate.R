@@ -1,7 +1,6 @@
 g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,printsummary=TRUE,
                        chunksize=c(),windowsizes=c(5,900,3600),selectdaysfile=c(),dayborder=0,
                        desiredtz = c()) {
-  
   if (length(chunksize) == 0) chunksize = 1
   if (chunksize > 1) chunksize = 1
   if (chunksize < 0.4) chunksize = 0.4
@@ -19,20 +18,20 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   spheredata=c()
   tempoffset=c()
   npoints=c()
+  PreviousEndPage = c() # needed for g.readaccfile
   scale = c(1,1,1)
   offset = c(0,0,0)
-  bsc_cnt = 0
-  bsc_qc = data.frame(time=c(),size=c())
+  bsc_qc = data.frame(time=c(),size=c(),stringsAsFactors = FALSE)
   #inspect file  
   options(warn=-1) #turn off warnings
-  INFI = g.inspectfile(datafile)  # Check which file type and monitor brand it is
+  INFI = g.inspectfile(datafile, desiredtz=desiredtz)  # Check which file type and monitor brand it is
   options(warn=0) #turn off warnings
   mon = INFI$monc
   dformat = INFI$dformc
   sf = INFI$sf
   if (sf == 0) sf = 80 #assume 80Hertz in the absense of any other info
   options(warn=-1) #turn off warnings
-  suppressWarnings(expr={decn = g.dotorcomma(datafile,dformat,mon)}) #detect dot or comma dataformat
+  suppressWarnings(expr={decn = g.dotorcomma(datafile,dformat,mon, desiredtz = desiredtz)}) #detect dot or comma dataformat
   options(warn=0) #turn off warnings
   #creating matrixes for storing output
   S = matrix(0,0,4) #dummy variable needed to cope with head-tailing succeeding blocks of data
@@ -61,16 +60,17 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
     }
     #try to read data blocks based on monitor type and data format
     options(warn=-1) #turn off warnings (code complains about unequal rowlengths
-    
     accread = g.readaccfile(filename=datafile,blocksize=blocksize,blocknumber=i,
                             selectdaysfile = selectdaysfile,filequality=filequality,
-                            decn=decn,dayborder=dayborder,ws=ws,desiredtz=desiredtz)
+                            decn=decn,dayborder=dayborder,ws=ws,desiredtz=desiredtz,
+                            PreviousEndPage=PreviousEndPage,inspectfileobject=INFI)
     P = accread$P
     filequality = accread$filequality
     filetooshort = filequality$filetooshort
     filecorrupt = filequality$filecorrupt
     filedoesnotholdday = filequality$filedoesnotholdday
     switchoffLD = accread$switchoffLD
+    PreviousEndPage = accread$endpage
     options(warn=0) #turn on warnings
     #process data as read from binary file
     if (length(P) > 0) { #would have been set to zero if file was corrupt or empty
@@ -185,25 +185,17 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
           }
           count = count + length(EN2) #increasing "count": the indicator of how many seconds have been read
           rm(Gx); rm(Gy); rm(Gz)
-          # reduce blocksize if memory is getting higher
-          gco = gc()
-          memuse = gco[2,2] #memuse in mb
-          bsc_qc = rbind(bsc_qc,c(memuse,Sys.time()))
-          if (memuse > 4000) {
-            if (bsc_cnt < 5) {
-              if ((chunksize * (0.8 ^ bsc_cnt)) > 0.2) {
-                blocksize = round(blocksize * 0.8)
-                
-                bsc_cnt = bsc_cnt + 1
-              }
-            }
-          }
+          
+          # Update blocksize depending on available memory:
+          BlocksizeNew = updateBlocksize(blocksize=blocksize, bsc_qc=bsc_qc)
+          bsc_qc = BlocksizeNew$bsc_qc
+          blocksize = BlocksizeNew$blocksize
         }
         #--------------------------------------------
       }
     } else {
       LD = 0 #once LD < 1 the analysis stops, so this is a trick to stop it
-      cat("\nstop reading because there is not enough data in this block\n")
+      # cat("\nstop reading because there is not enough data in this block\n")
     }
     spherepopulated = 0
     if (switchoffLD == 1) {
@@ -250,7 +242,7 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
           QC = "recalibration not done because not enough points on all sides of the sphere"
         }
       } else {
-        cat("\nno non-movement found\n")
+        cat("\nNo non-movement found\n")
         QC = "recalibration not done because no non-movement data available"
         meta_temp = c()
       }
@@ -364,27 +356,20 @@ g.calibrate = function(datafile,use.temp=TRUE,spherecrit=0.3,minloadcrit=72,prin
   }
   QCmessage = QC
   if (printsummary == TRUE) {
-    cat("\n----------------------------------------\n")
-    cat("Summary of autocalibration procedure:\n")
-    cat("\nStatus:\n")
-    print(QCmessage)
-    cat("\nCalibration error (g) before:\n")
-    print(cal.error.start)
-    cat("\nCallibration error (g) after:\n")
-    print(cal.error.end)
-    cat("\nOffset correction:\n")
-    print(offset)
-    cat("\nScale correction:\n")
-    print(scale)
-    cat("\nNumber of hours used:\n")
-    print(nhoursused)
-    cat("\nNumber of 10 second windows around the sphere:\n")
-    print(npoints)
-    cat("\nTemperature used (if available):\n")
-    print(use.temp)
-    cat("\nTemperature offset (if temperature is available):\n")
-    print(tempoffset)
-    cat("\n----------------------------------------\n")
+    # cat(paste0(rep('_ ',options()$width),collapse=''))
+    cat("\nSummary of autocalibration procedure:")
+    cat("\n")
+    cat(paste0("\nStatus: ",QCmessage))
+    cat(paste0("\nCalibration error (g) before: ",cal.error.start))
+    cat(paste0("\nCallibration error (g) after: ",cal.error.end))
+    cat(paste0("\nOffset correction ",c("x","y","z"),": ",offset))
+    cat(paste0("\nScale correction ",c("x","y","z"),": ",scale))
+    cat(paste0("\nNumber of hours used: ",nhoursused))
+    cat(paste0("\nNumber of 10 second windows around the sphere: ",npoints))
+    cat(paste0("\nTemperature used (if available): ",use.temp))
+    cat(paste0("\nTemperature offset (if temperature is available) ",c("x","y","z"),": ",tempoffset))
+    cat("\n")
+    # cat(paste0(rep('_',options()$width),collapse=''))
   }
   if (use.temp==TRUE) {
     if (length(spheredata) > 0) {

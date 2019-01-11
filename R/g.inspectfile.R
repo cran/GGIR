@@ -1,4 +1,4 @@
-g.inspectfile = function(datafile) {
+g.inspectfile = function(datafile, desiredtz = c()) {
   # note that if the file is an RData file then this function will not be called
   # the output of this function for the original datafile is stored inside the RData file in the form of object I
   getbrand = function(filename=c(),datafile=c()) {
@@ -136,7 +136,7 @@ g.inspectfile = function(datafile) {
       H = tuneR::readWave(datafile,from = 1, to = 10,units = c("seconds"), header = TRUE)
       sf = H$sample.rate
     } else if (dformat == 4) { # cwa
-      PP = g.cwaread(datafile,start = 1, end = 10)
+      PP = g.cwaread(datafile,start = 1, end = 10, desiredtz = desiredtz)
       H = PP$header
       sf = H$frequency
     }
@@ -165,7 +165,7 @@ g.inspectfile = function(datafile) {
   } else if (dformat == 2) { #csv data
     if (mon == 2) { #genea
       H = read.csv(datafile,nrow=20,skip=0) #note that not the entire header is copied
-    } else if (mon == 3) { #geneactive
+    } else if (mon == 3) { #actigraph
       H = read.csv(datafile,nrow=9,skip=0)
     } else if (mon == 4) { #ax3 (axivity)
       H = "file does not have header" # these files have no header
@@ -211,11 +211,16 @@ g.inspectfile = function(datafile) {
     }
     names(H) = c("hnames","hvalues")
   } else if (dformat == 4) { #cwa data
-    PP = g.cwaread(datafile,start = 1, end = 10)
+    PP = g.cwaread(datafile,start = 1, end = 10, desiredtz = desiredtz)
     H = PP$header
   }
   
   H = as.matrix(H)
+  if (ncol(H) == 3 & dformat == 2 & mon == 3) {
+    if (length(which(is.na(H[,2]) == FALSE)) == 0) {
+      H = as.matrix(H[,1])
+    }
+  }
   if (ncol(H) == 1 & dformat == 2) {
     if (mon == 3) {
       vnames = c("Number:","t Time","t Date",":ss)","d Time","d Date","Address:","Voltage:","Mode =")

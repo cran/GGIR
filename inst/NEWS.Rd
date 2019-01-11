@@ -1,6 +1,22 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 1.8-0 (release date:10-01-2019)}{
+\itemize{
+  \item Part4 handling of clocktime 9am corrected in addition to fix from version 1.7-1.
+  \item Fixed bug for Actigraph csv header recognition when column 2 and 3 are NA (prevented processing before)
+  \item Fixed bug in g.report.part5 in the calculation of the total number of valid days per person.
+  \item Fixed bug that caused part5 to struggle with timezones west of greenwhich time.
+  \item desiredtz added as explicit argument to g.inspectfile, g.cwaread, and g.dotorcomma.
+  \item Fixed bug in pageindexing in g.readaccfile when machine runs out of memory.
+  \item Fixed bug in pageindexing in Actigraph csv files (10 rows in raw data skipped every block (day)) of data.
+  \item Added more informative warning message in g.report.part2 if file cannot be read.
+  \item Fixed bug in scenario when person is daysleeper and wakingup time occurs before noon, and 12 hours too early.
+  \item Fixed bug re. storefolderstructure=TRUE causing 2 variables to drop in g.report.part4 if storefolderstructure=TRUE.
+  \item g.intensitygradient enabled to handle absense of data.
+  \item tidied up some of the redundant or even confusiong information printer to the console
+  }
+}
 \section{Changes in version 1.7-1 (release date:25-11-2018)}{
 \itemize{
   \item Fixed order of Nbouts output in g.part5 was not consistent with bout duration.
@@ -15,6 +31,7 @@
   \item Part4 handling of clocktime 9am corrected.
   \item Filename identification in part5 improved when saving raw level data.
   \item Fixed ability to read wav file header when shorter than expected.
+  \item Fixed issue with CWA read functionality causing some files not to be completely read
   }
 }
 \section{Changes in version 1.6-7 (release date:23-9-2018)}{
