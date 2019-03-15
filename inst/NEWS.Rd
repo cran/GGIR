@@ -1,7 +1,18 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-\section{Changes in version 1.8-0 (release date:10-01-2019)}{
+\section{Changes in version 1.9-0 (release date:14-03-2019)}{
+\itemize{
+  \item functionality storefilestructure should now store filestructure in output of part 2, 4 and 5.
+  \item filelocationkey.csv that was previously written by storefilestructure was redundant and removed.
+  \item sessioninfo storage improved.
+  \item Fixed bug that caused part2 to provide incorrect window specific estimates on first day.
+  of measurement if day is incomplete (not 23, 24 or 25 hours).
+  \item Calibrate function now better able to handle files with more than a week of data, where
+  auto-calibration struggles to find enough sphere data in the first week.
+  }
+}
+\section{Changes in version 1.8-1 (release date:11-01-2019)}{
 \itemize{
   \item Part4 handling of clocktime 9am corrected in addition to fix from version 1.7-1.
   \item Fixed bug for Actigraph csv header recognition when column 2 and 3 are NA (prevented processing before)

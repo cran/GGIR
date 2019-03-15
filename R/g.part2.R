@@ -35,6 +35,19 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
   if (length(f0) ==  0) f0 = 1
   if (length(f1) ==  0) f1 = length(fnames)
   #--------------------------------
+  # get full file path and folder name if requested by end-user and keep this for storage in output
+  if (storefolderstructure == TRUE) {
+    extractfilenames = function(x) {
+      x2 = as.character(unlist(strsplit(x,".RDa"))[1])
+      x3 = as.character(unlist(strsplit(x2,"eta_"))[2])
+      return(x3)
+    }
+    referencefnames = sapply(fnames,extractfilenames)
+    folderstructure = getfolderstructure(datadir,referencefnames)
+    fullfilenames = folderstructure$fullfilenames
+    foldername = folderstructure$foldername
+  }
+  #--------------------------------
   # Loop through all the files
   fnames = sort(fnames)
   if (f1 > length(fnames)) f1 = length(fnames)
@@ -121,6 +134,12 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
         if (length(unlist(strsplit(name,"[.]RD"))) == 1) { # to avoid getting .RData.RData
           filename = paste0(name,".RData")
         }
+        
+        if (storefolderstructure == TRUE) { # newly added 20-2-2019
+          SUM$daysummary$filename_dir = fullfilenames[i] #full filename structure
+          SUM$daysummary$foldername = foldername[i] #store the lowest foldername
+        }
+        
         save(SUM,IMP,file=paste0(metadatadir,ms2.out,"/",name)) #IMP is needed for g.plot in g.report.part2
       }
       if (M$filecorrupt == FALSE & M$filetooshort == FALSE) rm(IMP)
@@ -128,6 +147,18 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
       rm(M); rm(I)
     }
   }
-  SI = sessionInfo()
-  save(SI,file=paste0(metadatadir,"/results/QC/sessioninfo_part2.RData"))
+  # SI = sessionInfo()
+  # save(SI,file=paste0(metadatadir,"/results/QC/sessioninfo_part2.RData"))
+  SI = sessionInfo() 
+  sessionInfoFile = paste(metadatadir,"/results/QC/sessioninfo_part42.RData",sep="")
+  if (file.exists(sessionInfoFile)) {
+    FI = file.info(sessionInfoFile)
+    timesincecreation = abs(as.numeric(difftime(FI$ctime,Sys.time(),units="secs")))
+    # if file is older than 2 hours plus a random number of seconds (max 1 hours) then overwrite it
+    if (timesincecreation > (2*3600 + (sample(seq(1,3600,by=0.1),size = 1)))) {
+      save(SI,file=sessionInfoFile)
+    }
+  } else {
+    save(SI,file=sessionInfoFile)
+  }
 }

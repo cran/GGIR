@@ -123,7 +123,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   if (length(fnames) == 0) {
     cat("\nNo files to analyse")
   }
-  filelocationkey = matrix("",length(fnames),3)
+  # filelocationkey = matrix("",length(fnames),3)
   fnames = sort(fnames)
   for (j in f0:f1) { #f0:f1 #j is file index (starting with f0 and ending with f1)
     if (print.filename == TRUE) {
@@ -139,7 +139,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
     #by comparing filename to read with list of processed files
     fnames_without = as.character(unlist(strsplit(as.character(fnames[j]),".csv"))[1])
     # create list of both file name and full directory
-    filelocationkey[j,1] = fnames_without
+    # filelocationkey[j,1] = fnames_without
     #remove / if it was a list
     fnames_without2 = fnames_without
     teimp = unlist(strsplit(as.character(fnames_without),"/"))
@@ -292,15 +292,51 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
         filename = paste0(filename,".RData")
       }
       save(M,I,C,filename_dir,filefoldername,file = paste(path3,"/meta/basic/meta_",filename,sep=""))
-      SI = sessionInfo()
-      save(SI,file=paste(path3,"/results/QC/sessioninfo_part1.RData",sep=""))
+      # SI = sessionInfo()
+      # save(SI,file=paste(path3,"/results/QC/sessioninfo_part1.RData",sep=""))
+      
+      
+      # as metadatdir is not known derive it:
+      metadatadir = c()
+      if (length(datadir) > 0) {
+        # list of all csv and bin files
+        fnames = datadir2fnames(datadir,filelist)
+        # check whether these are RDA
+        if (length(unlist(strsplit(fnames[1],"[.]RD"))) > 1) {
+          useRDA = TRUE
+        } else {
+          useRDA = FALSE
+        }
+      } else {
+        useRDA = FALSE
+      }
+      if (filelist == TRUE | useRDA == TRUE) {
+        metadatadir = paste(outputdir,"/output_",studyname,sep="")
+      } else {
+        outputfoldername = unlist(strsplit(datadir,"/"))[length(unlist(strsplit(datadir,"/")))]
+        metadatadir = paste(outputdir,"/output_",outputfoldername,sep="")
+      }
+      if (length(metadatadir) > 0) {
+        SI = sessionInfo() 
+        sessionInfoFile = paste(metadatadir,"/results/QC/sessioninfo_part1.RData",sep="")
+        if (file.exists(sessionInfoFile)) {
+          FI = file.info(sessionInfoFile)
+          timesincecreation = abs(as.numeric(difftime(FI$ctime,Sys.time(),units="secs")))
+          # if file is older than 2 hours plus a random number of seconds (max 1 hours) then overwrite it
+          if (timesincecreation > (2*3600 + (sample(seq(1,3600,by=0.1),size = 1)))) {
+            save(SI,file=sessionInfoFile)
+          }
+        } else {
+          save(SI,file=sessionInfoFile)
+        }
+      }
       rm(M); rm(I); rm(C)
     }
-    if(length(filelocationkey) > 0) {
-      filelocationkey[,3] = datadir[j]
-      filelocationkey = rbind(c("Filename with full path","Filename","data directory"),filelocationkey)
-      write.csv(filelocationkey,paste(path3,"/results/QC/filelocationkey.csv",sep=""),row.names=FALSE)
-    }
+    # if(length(filelocationkey) > 0) { # turned off on 20-2-2019, because information is already stored in part2, 4 and 5
+    #   filelocationkey[,3] = datadir[j]
+    #   filelocationkey = rbind(c("Filename with full path","Filename","data directory"),filelocationkey)
+    #   write.csv(filelocationkey,paste(path3,"/results/QC/filelocationkey.csv",sep=""),row.names=FALSE)
+    # }
     closeAllConnections()
   }
 }

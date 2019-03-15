@@ -155,7 +155,6 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
         rm(sib.cla.sum)
         def = unique(S$definition)
         cut = which(S$fraction.night.invalid > 0.7 | S$nsib.periods == 0)
-        
         if (length(cut) > 0) S = S[-cut,]
         for (j in def) { # loop through sleep definitions (defined by angle and time threshold in g.part3)        
           #========================================================
@@ -373,7 +372,6 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                       rm(ms5rawlevels)
                     }
                   }
-                  
                   #=============================================
                   # NOW LOOP TROUGH DAYS AND GENERATE DAY SPECIFIC SUMMARY VARIABLES
                   # we want there to be one more nights in the accelerometer data than there are nights with sleep results
@@ -452,7 +450,7 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                           dsummary[di,fi] = j
                           ds_names[fi] = "acc_def";      fi = fi + 1
                           dsummary[di,fi] = summarysleep_tmp2$night[wi-1]+1
-                          ds_names[fi] = "night number";      fi = fi + 1
+                          ds_names[fi] = "night_number";      fi = fi + 1
                           dsummary[di,fi:(fi+11)] = NA  #Since this is data afte last night, we don't have sleep information here
                           ds_names[fi:(fi+11)] = c("acc_onset","acc_wake","sleeplog_onset","sleeplog_wake",
                                                    "acc_onset_ts","acc_wake_ts","sleeplog_onset_ts","sleeplog_wake_ts",
@@ -472,7 +470,7 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                             dsummary[di,fi] = j
                             ds_names[fi] = "acc_def";      fi = fi + 1
                             dsummary[di,fi] = summarysleep_tmp2$night[wi-1] + addone
-                            ds_names[fi] = "night number";      fi = fi + 1
+                            ds_names[fi] = "night_number";      fi = fi + 1
                           } else {
                             dsummary[di,fi:(fi+1)] = c(as.character(summarysleep_tmp2$weekday[wi]),
                                                        as.character(as.Date(summarysleep_tmp2$calendardate[wi], format="%e/%m/%Y")))
@@ -481,7 +479,7 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                             dsummary[di,fi] = j
                             ds_names[fi] = "acc_def";      fi = fi + 1
                             dsummary[di,fi] = summarysleep_tmp2$night[wi]
-                            ds_names[fi] = "night number";      fi = fi + 1
+                            ds_names[fi] = "night_number";      fi = fi + 1
                           }
                           dsummary[di,fi] = summarysleep_tmp2$acc_onset[wi]
                           ds_names[fi] = "acc_onset";      fi = fi + 1
@@ -815,16 +813,14 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
         }
         output = data.frame(dsummary,stringsAsFactors=FALSE)
         names(output) = ds_names
-        
-        # This is not a good solution anymore: If excludefirstlast == TRUE then part4 does not generate sleep estimates for the first and last night,
-        # therefore, part5 will also mis waking up time for the second and the beforelast day.
-        # So, I think if we want to facilitate that the first and last day are excluded in part5 then this will have to be handled
-        # with a different input argument
-        if (excludefirstlast.part5 == TRUE) { #undesirable because it will slowly remove alchanged to TRUE on 20 May 2015
-          output = output[-c(which(output$night_number == min(output$night_number)),
-                             which(output$night_number == max(output$night_number))),] #Moved here, first, it analyzes the whole measurement, then it selects the days to show
+        if (excludefirstlast.part5 == TRUE) {
+          output$night_number = as.numeric(output$night_number)
+          cells2exclude = c(which(output$night_number == min(output$night_number,na.rm = TRUE)),
+                            which(output$night_number == max(output$night_number,na.rm = TRUE)))
+          if (length(cells2exclude) > 0) {
+            output = output[-cells2exclude,]
+          }
         }
-        
         # correct definition of sleep log availability for window = WW, because now it
         # also relies on sleep log from previous night
         whoareWW = which(output$window == "WW") # look up WW
@@ -856,6 +852,18 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
         rm(output,dsummary)
       }
     }
+  }
+  SI = sessionInfo() 
+  sessionInfoFile = paste(metadatadir,"/results/QC/sessioninfo_part5.RData",sep="")
+  if (file.exists(sessionInfoFile)) {
+    FI = file.info(sessionInfoFile)
+    timesincecreation = abs(as.numeric(difftime(FI$ctime,Sys.time(),units="secs")))
+    # if file is older than 2 hours plus a random number of seconds (max 1 hours) then overwrite it
+    if (timesincecreation > (2*3600 + (sample(seq(1,3600,by=0.1),size = 1)))) {
+      save(SI,file=sessionInfoFile)
+    }
+  } else {
+    save(SI,file=sessionInfoFile)
   }
 }
 
