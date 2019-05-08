@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 1.9-1 (release date:08-05-2019)}{
+\itemize{
+  \item Fixed part5 output midnight-midnight window when monitor not worn during first days.
+  \item Fixed assumption that when using argument idloc=2 the ID has a letter at the end, and automatically
+  removes the last value in the index. The code now first checks for this assumption.
+  \item Update vignette with a more elaborate explanation of the optional arguments to g.shell.GGIR.
+  }
+}
 \section{Changes in version 1.9-0 (release date:14-03-2019)}{
 \itemize{
   \item functionality storefilestructure should now store filestructure in output of part 2, 4 and 5.
@@ -10,6 +18,7 @@
   of measurement if day is incomplete (not 23, 24 or 25 hours).
   \item Calibrate function now better able to handle files with more than a week of data, where
   auto-calibration struggles to find enough sphere data in the first week.
+  \item Fixed part5 output midnight-midnight window when monitor not worn during first days.
   }
 }
 \section{Changes in version 1.8-1 (release date:11-01-2019)}{
