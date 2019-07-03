@@ -14,9 +14,14 @@ knitr::include_graphics("sleeplogexample.jpg")
 
 ## ----eval=FALSE----------------------------------------------------------
 #  library(GGIR)
-#  g.shell.GGIR(mode=c(1,2,3,4,5),
+#  g.shell.GGIR(
+#               mode=c(1,2,3,4,5),
 #               datadir="C:/mystudy/mydata",
 #               outputdir="D:/myresults",
+#               do.report=c(2,4,5),
+#               #=====================
+#               # Part 2
+#               #=====================
 #               strategy = 1,
 #               hrs.del.start = 0,          hrs.del.end = 0,
 #               maxdur = 9,                 includedaycrit = 16,
@@ -25,15 +30,24 @@ knitr::include_graphics("sleeplogexample.jpg")
 #               bout.metric = 4,
 #               excludefirstlast = FALSE,
 #               includenightcrit = 16,
-#               def.noc.sleep = c(1),
+#               #=====================
+#               # Part 3 + 4
+#               #=====================
+#               def.noc.sleep = 1,
 #               outliers.only = TRUE,
 #               criterror = 4,
 #               do.visual = TRUE,
+#               #=====================
+#               # Part 5
+#               #=====================
 #               threshold.lig = c(30), threshold.mod = c(100),  threshold.vig = c(400),
 #               boutcriter = 0.8,      boutcriter.in = 0.9,     boutcriter.lig = 0.8,
 #               boutcriter.mvpa = 0.8, boutdur.in = c(1,10,30), boutdur.lig = c(1,10),
-#               boutdur.mvpa = c(1),   timewindow = c("WW"),
-#               do.report=c(2,4,5),
+#               boutdur.mvpa = c(1),
+#               #=====================
+#               # Visual report
+#               #=====================
+#               timewindow = c("WW"),
 #               visualreport=TRUE)
 
 ## ----eval=FALSE----------------------------------------------------------
