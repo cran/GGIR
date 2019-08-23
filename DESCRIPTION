@@ -1,8 +1,8 @@
 Package: GGIR
 Type: Package
 Title: Raw Accelerometer Data Analysis
-Version: 1.9-2
-Date: 2019-07-03
+Version: 1.10-1
+Date: 2019-08-23
 Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                   email="vincentvanhees@gmail.com"),
                   person("Zhou","Fang",role="ctb"),
@@ -18,15 +18,15 @@ URL: https://github.com/wadpac/GGIR/,
         https://groups.google.com/forum/#!forum/RpackageGGIR
 BugReports: https://github.com/wadpac/GGIR/issues
 License: LGPL (>= 2.0, < 3) | file LICENSE
-Suggests: MASS, signal, zoo, mmap, bitops, matlab, GENEAread, tuneR,
-        testthat, covr, knitr, rmarkdown
-Imports: data.table, Rcpp (>= 0.12.10)
-Depends: stats, utils, R (>= 3.1.2)
+Suggests: testthat, covr, knitr, rmarkdown
+Imports: data.table, Rcpp (>= 0.12.10), foreach, doParallel, MASS,
+        signal, zoo, mmap, bitops, matlab, GENEAread, tuneR
+Depends: stats, utils, R (>= 3.5.0)
 NeedsCompilation: yes
 LinkingTo: Rcpp
 VignetteBuilder: knitr
 ByteCompile: yes
-Packaged: 2019-07-03 13:48:34 UTC; vincent
+Packaged: 2019-08-23 16:49:58 UTC; vincent
 Author: Vincent T van Hees [aut, cre],
   Zhou Fang [ctb],
   Jing Hua Zhao [ctb],
@@ -36,4 +36,4 @@ Author: Vincent T van Hees [aut, cre],
   Joan Capdevila Pujol [ctb],
   Jairo H Migueles [ctb]
 Repository: CRAN
-Date/Publication: 2019-07-03 15:00:15 UTC
+Date/Publication: 2019-08-23 17:30:02 UTC

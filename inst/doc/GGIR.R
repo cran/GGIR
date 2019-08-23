@@ -51,6 +51,11 @@ knitr::include_graphics("sleeplogexample.jpg")
 #               visualreport=TRUE)
 
 ## ----eval=FALSE----------------------------------------------------------
+#  library(GGIR)
+#  g.shell.GGIR(datadir="C:/mystudy/mydata",
+#               outputdir="D:/myresults", configfile = "D:/myconfigfiles/config.csv")
+
+## ----eval=FALSE----------------------------------------------------------
 #  options(echo=TRUE)
 #  args = commandArgs(TRUE)
 #  if(length(args) > 0) {

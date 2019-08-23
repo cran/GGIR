@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -19,41 +20,67 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 
 </style>
 <script>
@@ -69,7 +96,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -80,7 +107,189 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -94,7 +303,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Accelerometer data processing with GGIR</h1>
 <h4 class="author">Vincent van Hees</h4>
-<h4 class="date">July 3 2019</h4>
+<h4 class="date">August 19 2019</h4>
 
 
 <div id="TOC">
@@ -114,6 +323,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#key-arguments-related-to-sleep-analysis"><span class="toc-section-number">2.3.2</span> Key arguments related to sleep analysis</a></li>
 <li><a href="#key-arguments-related-to-24-hour-time-use"><span class="toc-section-number">2.3.3</span> Key arguments related to 24 hour time use</a></li>
 <li><a href="#example-call"><span class="toc-section-number">2.3.4</span> Example call</a></li>
+<li><a href="#configuration-file"><span class="toc-section-number">2.3.5</span> Configuration file</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#time-for-action-how-to-run-your-analysis"><span class="toc-section-number">3</span> Time for action: How to run your analysis?</a><ul>
@@ -151,7 +361,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="who-has-been-using-ggir" class="section level2">
 <h2><span class="header-section-number">1.2</span> Who has been using GGIR?</h2>
 <p>GGIR is increasingly being used by a number of research groups acros the world. A non-exhaustive overview of academic publications related to GGIR can be found <a href="https://github.com/wadpac/GGIR/wiki/Publication-list">here</a>.</p>
-<p>A non-exhaustive list of academic institutes that have been using GGIR:</p>
+<p>A non-exhaustive list of academic institutes that have been using GGIR (I stopped updating it, because it is diffcut to keep track):</p>
 <p><strong>United Kingdom:</strong> University College London, University of Oxford, Exeter University, Newcastle University, Edge Hill University, University of Cambridge, University of Chester, Edinburgh Napier University, University of Birmingham, Liverpool John Moores University | <strong>United States:</strong> University College San Diego, Iowa State University, University of Southern California, University of Michican, West Virginia University, Arizona State University, University of Utah, National Institute of Health, Johns Hopkins University, Harvard University | <strong>The Netherlands:</strong> Erasmus Medical Centre Rotterdam, VU University Medical Centre, Leiden University Medical Centre, University of Groningen | <strong>France:</strong> French Institute for Health and Medical Research, Institute of Myology, University of Dijon, University of Montpellier | <strong>Brazil:</strong> Federal University of Pelotas | <strong>Australia:</strong> Newcastle University, Australian Catholic University, University of Sydney, Queensland University of Technology, University of Western Australia | <strong>Spain:</strong> University of Granada | <strong>Norway:</strong> University of Oslo | <strong>Sweden:</strong> University of Lund | <strong>Switszerland:</strong> Centre Hospitalier Universitaire Vaudois | <strong>Germany:</strong> Technische Universität Dresden, Technical University Munich.</p>
 </div>
 <div id="acknowledgements" class="section level2">
@@ -160,13 +370,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><strong>People:</strong></p>
 <ul>
 <li>Dr. Vincent van Hees as main developer &amp; maintainer.</li>
-<li>Jairo Migueles helps maintain and improve the code.</li>
+<li>Jairo Migueles has helped to improve sections of the code.</li>
 <li>Dr. Evgeny Mirkes and Dr. Jing Hua Zhao provided code to enable binary accelerometer data to be read in R.</li>
 <li>Dr. Zhou Fang contributed to a part of the code for the auto-calibration functionality.</li>
 <li>Joe Heywood contributed code to correctly extract specific time segments with correct timestamps from an GENEActiv recording.</li>
 <li>Joan Capdevila Pujol contributed with a couple of bug fixes.</li>
-<li>Dr. Severine Sabia tested and provided feedback on numerous aspects of the package</li>
-<li>Dr. Soren Brage provided supervision for a number of studies that formed the basis for GGIR</li>
+<li>Dr. Severine Sabia tested and provided feedback on numerous aspects of the package to make it research friendly.</li>
+<li>Dr. Soren Brage provided supervision for a number of studies that formed the basis for GGIR (2008-2013).</li>
 </ul>
 <p><strong>Institutions:</strong></p>
 <ul>
@@ -187,12 +397,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="how-can-i-contribute-to-the-ggir-development" class="section level2">
 <h2><span class="header-section-number">1.4</span> How can I contribute to the GGIR development?</h2>
-<p>The development version of GGIR can be found on <a href="https://github.com/wadpac/GGIR">github</a>, which is also where you will find guidance on how to contribute to the package development. We welcome contributions to GGIR in time investment, constructive feedback, financially, or otherwise.</p>
+<p>The development version of GGIR can be found on <a href="https://github.com/wadpac/GGIR">github</a>, which is also where you will find guidance on how to contribute to the package development. We welcome contributions to GGIR in time investment, constructive feedback, financially, or otherwise. Open source software may be for free, but the time investment to develop it is never for free.</p>
 </div>
 <div id="how-can-i-get-service-and-support" class="section level2">
 <h2><span class="header-section-number">1.5</span> How can I get service and support?</h2>
 <p>GGIR is open source software and does not come with service or support guarantees. As user-community you will have to help each other via the google group and GitHub issues as much as possible.</p>
-<p><strong>However, if you need dedicated support with the use of GGIR or need someone to adapt GGIR</strong> then Vincent van Hees is available as indpendent consultant, see also: <a href="https://movementdata.nl/" class="uri">https://movementdata.nl/</a>.</p>
+<p><strong>However, if you need dedicated support with the use of GGIR or need someone to adapt GGIR</strong> then Vincent van Hees is available as indpendent consultant, see also: <a href="https://www.movementdata.nl/" class="uri">https://www.movementdata.nl/</a>.</p>
 </div>
 </div>
 <div id="setting-up-your-work-environment" class="section level1">
@@ -202,7 +412,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><a href="https://cran.r-project.org/">Download and install R</a></p>
 <p><a href="https://www.rstudio.com/products/rstudio/download2/">Download and install RStudio</a> (optional, but recommended)</p>
 <p>Download GGIR with its dependencies, you can do this with one command from the console command line:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;GGIR&quot;</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;GGIR&quot;</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
 <div id="prepare-folder-structure" class="section level2">
 <h2><span class="header-section-number">2.2</span> Prepare folder structure</h2>
@@ -221,7 +431,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="ggir-shell-function" class="section level2">
 <h2><span class="header-section-number">2.3</span> GGIR shell function</h2>
 <p>GGIR comes with a large number of functions and optional settings (arguments) per functions. To ease interacting with GGIR there is one central function, named g.shell.GGIR, to talk to all the other functions. Being confronted with the amount of optional arguments might feel like stepping inside the cockpit of an airplane:</p>
-<p><code>mode=c(1,2), f0=c(), f1=c(), selectdaysfile = c(), overwrite = FALSE, strategy = 1, maxdur = 7, do.cal = TRUE,  hrs.del.start = 0, hrs.del.end = 0, loglocation = c(), , acc.metric = &quot;ENMO&quot;, storefolderstructure = FALSE, windowsizes = c(5,900,3600), minloadcrit = 72, desiredtz = &quot;Europe/London&quot;, chunksize = 1, do.enmo = TRUE, do.lfenmo = FALSE, do.en = FALSE,  do.bfen = FALSE, do.hfen = FALSE, do.hfenplus = FALSE, do.mad = FALSE, do.anglex = FALSE, do.angley = FALSE, do.anglez = FALSE, do.roll_med_acc_x=FALSE, do.roll_med_acc_y=FALSE, do.roll_med_acc_z=FALSE, do.dev_roll_med_acc_x=FALSE, do.dev_roll_med_acc_y=FALSE, do.dev_roll_med_acc_z=FALSE, do.enmoa = FALSE, dynrange = c(), printsummary = FALSE, includedaycrit = 16, M5L5res = 10, winhr = 5, qwindow = c(0,24), qlevels = c(), ilevels = c(), mvpathreshold = 100, boutcriter = 0.8, ndayswindow = 7, idloc = 1, do.imp = TRUE, anglethreshold = 5, timethreshold = 5, ignorenonwear = TRUE, colid=1, coln1=1, nnights=7, outliers.only=FALSE, excludefirstlast=FALSE, excludefirstlast.part5=FALSE, criterror=3, includenightcrit=16, relyonsleeplog=FALSE, sleeplogidnum=TRUE, def.noc.sleep=c(), do.visual=FALSE, viewingwindow = 1, dofirstpage = TRUE, visualreport = FALSE, print.filename = FALSE, backup.cal.coef = c(), bout.metric = 1, closedbout = FALSE, IVIS_windowsize_minutes=60, IVIS_epochsize_seconds=30, constrain2range = TRUE, do.part3.pdf = TRUE, boutcriter.in = 0.9, boutcriter.lig = 0.8, boutcriter.mvpa = 0.8, threshold.lig = 40, threshold.mod = 100,   threshold.vig = 400, timewindow = c(&quot;MM&quot;,&quot;WW&quot;), boutdur.mvpa = c(1,5,10), boutdur.in = c(10,20,30), boutdur.lig = c(1,5,10), save_ms5rawlevels = FALSE,  mvpadur = c(1,5,10), epochvalues2csv = FALSE, bout.metric = 1, window.summary.size = 10, dayborder = 0, iglevels = c()</code></p>
+<p><code>mode=c(1,2), f0=c(), f1=c(), selectdaysfile = c(), configfile=c(), overwrite = FALSE, strategy = 1, maxdur = 7, do.cal = TRUE,  hrs.del.start = 0, hrs.del.end = 0, loglocation = c(), , acc.metric = &quot;ENMO&quot;, storefolderstructure = FALSE, windowsizes = c(5,900,3600), minloadcrit = 72, desiredtz = &quot;Europe/London&quot;, chunksize = 1, do.enmo = TRUE, do.lfenmo = FALSE, do.en = FALSE,  do.bfen = FALSE, do.hfen = FALSE, do.hfenplus = FALSE, do.mad = FALSE, do.anglex = FALSE, do.angley = FALSE, do.anglez = FALSE, do.roll_med_acc_x=FALSE, do.roll_med_acc_y=FALSE, do.roll_med_acc_z=FALSE, do.dev_roll_med_acc_x=FALSE, do.dev_roll_med_acc_y=FALSE, do.dev_roll_med_acc_z=FALSE, do.enmoa = FALSE, dynrange = c(), printsummary = FALSE, includedaycrit = 16, M5L5res = 10, winhr = 5, qwindow = c(0,24), qlevels = c(), ilevels = c(), mvpathreshold = 100, boutcriter = 0.8, ndayswindow = 7, idloc = 1, do.imp = TRUE, anglethreshold = 5, timethreshold = 5, ignorenonwear = TRUE, colid=1, coln1=1, nnights=7, outliers.only=FALSE, excludefirstlast=FALSE, excludefirstlast.part5=FALSE, criterror=3, includenightcrit=16, relyonsleeplog=FALSE, sleeplogidnum=TRUE, def.noc.sleep=c(), do.visual=FALSE, viewingwindow = 1, dofirstpage = TRUE, visualreport = FALSE, print.filename = FALSE, backup.cal.coef = c(), bout.metric = 1, closedbout = FALSE, IVIS_windowsize_minutes=60, IVIS_epochsize_seconds=30, constrain2range = TRUE, do.part3.pdf = TRUE, boutcriter.in = 0.9, boutcriter.lig = 0.8, boutcriter.mvpa = 0.8, threshold.lig = 40, threshold.mod = 100,   threshold.vig = 400, timewindow = c(&quot;MM&quot;,&quot;WW&quot;), boutdur.mvpa = c(1,5,10), boutdur.in = c(10,20,30), boutdur.lig = c(1,5,10), save_ms5rawlevels = FALSE,  mvpadur = c(1,5,10), epochvalues2csv = FALSE, bout.metric = 1, window.summary.size = 10, dayborder = 0, iglevels = c()</code></p>
 <p>In this paragraph we will guide you through the main arguments relevant for 99% of research. First of all, it is important to understand that GGIR is structured in five parts and that g.shell.GGIR controls each of these parts:</p>
 <ul>
 <li>Part 1: Loads the data and stores derived features (aggregations) needed for the other parts. This is the time consuming part. Once this is done, parts 2-5 can be run (or re-run with different parameters in parts 2-5) relatively quickly.</li>
@@ -233,9 +443,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>By looking up the corresponding functions g.part1, g.part2, g.part3, g.part4, and g.part5 you can see what arguments are possible. All of these arguments are also accepted by g.shell.GGIR, because g.shell.GGIR is nothing more than a wrapper around those functions.</p>
 <p>You will probably never need to think about most of the arguments listed above, because the default values are fine and a lot of arguments are only included to facilitate methodological studies where researchers want to have control over everything.</p>
 <p>The bare minimum input needed for <code>g.shell.GGIR</code> is:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GGIR)
-<span class="kw">g.shell.GGIR</span>(<span class="dt">datadir=</span><span class="st">&quot;C:/mystudy/mydata&quot;</span>,
-             <span class="dt">outputdir=</span><span class="st">&quot;D:/myresults&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(GGIR)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">g.shell.GGIR</span>(<span class="dt">datadir=</span><span class="st">&quot;C:/mystudy/mydata&quot;</span>,</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">             <span class="dt">outputdir=</span><span class="st">&quot;D:/myresults&quot;</span>)</a></code></pre></div>
 <p>Argument <code>datadir</code> allows you to specify where you have stored your accelerometer data and <code>outputdir</code> allows you to specify where you would like the output of the analyses to be stored. If you copy paste the above code to a new R script (file ending with .R) and Source it in R(Studio) then the dataset will be processed and the output will be stored in the specified output directory.</p>
 <p>Below we have highlighted the key arguments you may want to be aware of. We are not giving a detailed explanation, please see the package manual for that.</p>
 <div id="key-general-arguments" class="section level3">
@@ -244,9 +454,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><code>mode</code> - which part of GGIR to run, GGIR is constructed in five parts.</li>
 <li><code>overwrite</code> - whether to overwrite previously produced milestone output. Between each GGIR part, GGIR stores milestone output to ease re-running parts of the pipeline.</li>
 <li><code>idloc</code> - tells GGIR where to find the participant ID (default: inside file header)</li>
-<li><code>strategy</code> - informs GGIR how to consider the design of the experiment.</li>
+<li><code>strategy</code> - informs GGIR how to consider the design of the experiment.
+<ul>
 <li>If <code>strategy</code> is set to value 1, then check out arguments <code>hrs.del.start</code> and <code>hrs.del.end</code>.</li>
 <li>If <code>strategy</code> is set to value 3, then check out arguments <code>ndayswindow</code>.</li>
+</ul></li>
 <li><code>maxdur</code> - maximum number of days you expect in a data file based on the study protocol.</li>
 <li><code>desiredtz</code> - time zone of the experiment.</li>
 <li><code>chunksize</code> - a way to tell GGIR to use less memomry, which can be useful on machines with limited memory.</li>
@@ -287,42 +499,52 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="example-call" class="section level3">
 <h3><span class="header-section-number">2.3.4</span> Example call</h3>
 <p>So, if you consider all the arguments above you me may end up with a call to g.shell.GGIR that could look as follows.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GGIR)
-<span class="kw">g.shell.GGIR</span>(
-             <span class="dt">mode=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>),
-             <span class="dt">datadir=</span><span class="st">&quot;C:/mystudy/mydata&quot;</span>,
-             <span class="dt">outputdir=</span><span class="st">&quot;D:/myresults&quot;</span>,
-             <span class="dt">do.report=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>),
-             <span class="co">#=====================</span>
-             <span class="co"># Part 2</span>
-             <span class="co">#=====================</span>
-             <span class="dt">strategy =</span> <span class="dv">1</span>,
-             <span class="dt">hrs.del.start =</span> <span class="dv">0</span>,          <span class="dt">hrs.del.end =</span> <span class="dv">0</span>,
-             <span class="dt">maxdur =</span> <span class="dv">9</span>,                 <span class="dt">includedaycrit =</span> <span class="dv">16</span>,
-             <span class="dt">qwindow=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">24</span>),
-             <span class="dt">mvpathreshold =</span><span class="kw">c</span>(<span class="dv">100</span>),
-             <span class="dt">bout.metric =</span> <span class="dv">4</span>,
-             <span class="dt">excludefirstlast =</span> <span class="ot">FALSE</span>,
-             <span class="dt">includenightcrit =</span> <span class="dv">16</span>,
-             <span class="co">#=====================</span>
-             <span class="co"># Part 3 + 4</span>
-             <span class="co">#=====================</span>
-             <span class="dt">def.noc.sleep =</span> <span class="dv">1</span>,
-             <span class="dt">outliers.only =</span> <span class="ot">TRUE</span>,
-             <span class="dt">criterror =</span> <span class="dv">4</span>,
-             <span class="dt">do.visual =</span> <span class="ot">TRUE</span>,
-             <span class="co">#=====================</span>
-             <span class="co"># Part 5</span>
-             <span class="co">#=====================</span>
-             <span class="dt">threshold.lig =</span> <span class="kw">c</span>(<span class="dv">30</span>), <span class="dt">threshold.mod =</span> <span class="kw">c</span>(<span class="dv">100</span>),  <span class="dt">threshold.vig =</span> <span class="kw">c</span>(<span class="dv">400</span>),
-             <span class="dt">boutcriter =</span> <span class="fl">0.8</span>,      <span class="dt">boutcriter.in =</span> <span class="fl">0.9</span>,     <span class="dt">boutcriter.lig =</span> <span class="fl">0.8</span>,
-             <span class="dt">boutcriter.mvpa =</span> <span class="fl">0.8</span>, <span class="dt">boutdur.in =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">10</span>,<span class="dv">30</span>), <span class="dt">boutdur.lig =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">10</span>),
-             <span class="dt">boutdur.mvpa =</span> <span class="kw">c</span>(<span class="dv">1</span>),
-             <span class="co">#=====================</span>
-             <span class="co"># Visual report</span>
-             <span class="co">#=====================</span>
-             <span class="dt">timewindow =</span> <span class="kw">c</span>(<span class="st">&quot;WW&quot;</span>),
-             <span class="dt">visualreport=</span><span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">library</span>(GGIR)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">g.shell.GGIR</span>(</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">             <span class="dt">mode=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">             <span class="dt">datadir=</span><span class="st">&quot;C:/mystudy/mydata&quot;</span>,</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">             <span class="dt">outputdir=</span><span class="st">&quot;D:/myresults&quot;</span>,</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">             <span class="dt">do.report=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">             <span class="co">#=====================</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">             <span class="co"># Part 2</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">             <span class="co">#=====================</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10">             <span class="dt">strategy =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb3-11" data-line-number="11">             <span class="dt">hrs.del.start =</span> <span class="dv">0</span>,          <span class="dt">hrs.del.end =</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">             <span class="dt">maxdur =</span> <span class="dv">9</span>,                 <span class="dt">includedaycrit =</span> <span class="dv">16</span>,</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">             <span class="dt">qwindow=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">24</span>),</a>
+<a class="sourceLine" id="cb3-14" data-line-number="14">             <span class="dt">mvpathreshold =</span><span class="kw">c</span>(<span class="dv">100</span>),</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15">             <span class="dt">bout.metric =</span> <span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">             <span class="dt">excludefirstlast =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb3-17" data-line-number="17">             <span class="dt">includenightcrit =</span> <span class="dv">16</span>,</a>
+<a class="sourceLine" id="cb3-18" data-line-number="18">             <span class="co">#=====================</span></a>
+<a class="sourceLine" id="cb3-19" data-line-number="19">             <span class="co"># Part 3 + 4</span></a>
+<a class="sourceLine" id="cb3-20" data-line-number="20">             <span class="co">#=====================</span></a>
+<a class="sourceLine" id="cb3-21" data-line-number="21">             <span class="dt">def.noc.sleep =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb3-22" data-line-number="22">             <span class="dt">outliers.only =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-23" data-line-number="23">             <span class="dt">criterror =</span> <span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb3-24" data-line-number="24">             <span class="dt">do.visual =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-25" data-line-number="25">             <span class="co">#=====================</span></a>
+<a class="sourceLine" id="cb3-26" data-line-number="26">             <span class="co"># Part 5</span></a>
+<a class="sourceLine" id="cb3-27" data-line-number="27">             <span class="co">#=====================</span></a>
+<a class="sourceLine" id="cb3-28" data-line-number="28">             <span class="dt">threshold.lig =</span> <span class="kw">c</span>(<span class="dv">30</span>), <span class="dt">threshold.mod =</span> <span class="kw">c</span>(<span class="dv">100</span>),  <span class="dt">threshold.vig =</span> <span class="kw">c</span>(<span class="dv">400</span>),</a>
+<a class="sourceLine" id="cb3-29" data-line-number="29">             <span class="dt">boutcriter =</span> <span class="fl">0.8</span>,      <span class="dt">boutcriter.in =</span> <span class="fl">0.9</span>,     <span class="dt">boutcriter.lig =</span> <span class="fl">0.8</span>,</a>
+<a class="sourceLine" id="cb3-30" data-line-number="30">             <span class="dt">boutcriter.mvpa =</span> <span class="fl">0.8</span>, <span class="dt">boutdur.in =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">10</span>,<span class="dv">30</span>), <span class="dt">boutdur.lig =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">10</span>),</a>
+<a class="sourceLine" id="cb3-31" data-line-number="31">             <span class="dt">boutdur.mvpa =</span> <span class="kw">c</span>(<span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb3-32" data-line-number="32">             <span class="co">#=====================</span></a>
+<a class="sourceLine" id="cb3-33" data-line-number="33">             <span class="co"># Visual report</span></a>
+<a class="sourceLine" id="cb3-34" data-line-number="34">             <span class="co">#=====================</span></a>
+<a class="sourceLine" id="cb3-35" data-line-number="35">             <span class="dt">timewindow =</span> <span class="kw">c</span>(<span class="st">&quot;WW&quot;</span>),</a>
+<a class="sourceLine" id="cb3-36" data-line-number="36">             <span class="dt">visualreport=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<p>Once you have used g.shell.GGIR and the output directory (outputdir) will be filled with milestone data and results.</p>
+</div>
+<div id="configuration-file" class="section level3">
+<h3><span class="header-section-number">2.3.5</span> Configuration file</h3>
+<p>Function g.shell.GGIR stores all the explicitely entered argument values and default values for the argument that are not explicitely provided in a csv-file named config.csv stored in the root of the output folder. The config.csv file is accepted as input to g.shell.GGIR with argument <code>configfile</code> to replace the specification of all the arguments, except <code>datadir</code> and <code>outputdir</code>, see example below.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">library</span>(GGIR)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">g.shell.GGIR</span>(<span class="dt">datadir=</span><span class="st">&quot;C:/mystudy/mydata&quot;</span>,</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">             <span class="dt">outputdir=</span><span class="st">&quot;D:/myresults&quot;</span>, <span class="dt">configfile =</span> <span class="st">&quot;D:/myconfigfiles/config.csv&quot;</span>)</a></code></pre></div>
+<p>The practical value of this is that it eases the replication of analysis, because instead of having to share you R script, sharing your config.csv file will be sufficient. Further, the config.csv file contribute to the reproducibility of your data analysis.</p>
+<p>Note 1: When combining a configuration file with explicitely provided argument values, the explicitely provided argument values will overrule the argument values in the configuration file. Note 2: The config.csv file in the root of the output folder will be overwritten every time you use g.shell.GGIR. So, if you would like to add annotations in the file, e.g. in the fourth column, then you will need to store it somewhere outside the output folder and explicitely point to it with <code>configfile</code> argument.</p>
 </div>
 </div>
 </div>
@@ -336,28 +558,28 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="in-a-cluster" class="section level2">
 <h2><span class="header-section-number">3.2</span> In a cluster</h2>
-<p>It is possible to run GGIR on a computing cluster to process multiple files in parallel. The way we did it on a Sun Grid Engine cluster is shown below, please note that some of these commands are specific to the computing cluster you are working on. Please consult your local cluster specilist to tailor this to your situation. In our case, we had three files:</p>
+<p>GGIR by default support multi-thread processing, which can be turned off byseting argument do.parallel = FALSE. If this is still not fast enough then I advise using a GGIR on a computing cluster. The way I did it on a Sun Grid Engine cluster is shown below, please note that some of these commands are specific to the computing cluster you are working on. For example, I had to update the bash scripts when working on PBS cluster, and the R package clustermq can be of value. Please consult your local cluster specilist to tailor this to your situation. In my case, I had three files for the SGE setting:</p>
 <p><strong>submit.sh</strong></p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..707}</span><span class="kw">;</span> <span class="kw">do</span>
-    <span class="va">n=</span>1
-    <span class="va">s=$(($(($n</span> * $[<span class="va">$i</span>-1]<span class="va">))</span>+1<span class="va">))</span>
-    <span class="va">e=$(($i</span> * <span class="va">$n))</span>
-    <span class="ex">qsub</span> /home/nvhv/WORKING_DATA/bashscripts/run-mainscript.sh <span class="va">$s</span> <span class="va">$e</span>
-<span class="kw">done</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">for</span> <span class="ex">i</span> in <span class="dt">{1..707}</span><span class="kw">;</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">    <span class="va">n=</span>1</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">    <span class="va">s=$(($(($n</span> * $[<span class="va">$i</span>-1]<span class="va">))</span>+1<span class="va">))</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">    <span class="va">e=$(($i</span> * <span class="va">$n))</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">    <span class="ex">qsub</span> /home/nvhv/WORKING_DATA/bashscripts/run-mainscript.sh <span class="va">$s</span> <span class="va">$e</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="kw">done</span></a></code></pre></div>
 <p><strong>run-mainscript.sh</strong></p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#! /bin/bash</span>
-<span class="co">#$ -cwd -V</span>
-<span class="co">#$ -l h_vmem=12G</span>
-<span class="ex">/usr/bin/R</span> --vanilla --args f0=<span class="va">$1</span> f1=<span class="va">$2</span> <span class="op">&lt;</span> /home/nvhv/WORKING_DATA/test/myshellscript.R</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co">#! /bin/bash</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#$ -cwd -V</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#$ -l h_vmem=12G</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="ex">/usr/bin/R</span> --vanilla --args f0=<span class="va">$1</span> f1=<span class="va">$2</span> <span class="op">&lt;</span> /home/nvhv/WORKING_DATA/test/myshellscript.R</a></code></pre></div>
 <p><strong>myshellscript.R</strong></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">echo=</span><span class="ot">TRUE</span>)
-args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="ot">TRUE</span>)
-<span class="cf">if</span>(<span class="kw">length</span>(args) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {
-  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(args)) {
-    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> args[[i]]))
-  }
-}
-<span class="kw">g.shell.GGIR</span>(<span class="dt">f0=</span>f0,<span class="dt">f1=</span>f1,...)</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">echo=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="cf">if</span>(<span class="kw">length</span>(args) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(args)) {</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> args[[i]]))</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">  }</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="kw">g.shell.GGIR</span>(<span class="dt">f0=</span>f0,<span class="dt">f1=</span>f1,...)</a></code></pre></div>
 <p>You will need to update the … in the last line with the arguments you used for g.shell.GGIR. Note that <code>f0=f0,f1=f1</code> is essential for this to work. The values of <code>f0</code> and <code>f1</code> are passed on from the bash script.</p>
 <p>Once this is all setup you will need to call <code>bash submit.sh</code> from the command line. <em><strong>Note: Please make sure that you process one GGIR part at the same time on a cluster, because each part assumes that preceding parts have been ran. You can make sure of this by always specifying argument mode to a single part of GGIR. Once the analysis stops update argument mode to the next part until all parts are done.</strong></em> The speed of the parallel processing is obviously dependent on the capacity of your computing cluster and the size of your dataset. We have been able to process all 4000 files from the Whitehall II Study in just a couple of hours.</p>
 </div>
@@ -382,10 +604,10 @@ args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="
 </ul>
 <div id="dictionary-of-variables-in-part2_summary.csv" class="section level3">
 <h3><span class="header-section-number">4.1.1</span> Dictionary of variables in part2_summary.csv</h3>
-<table style="width:100%;">
+<table>
 <colgroup>
-<col width="31%"></col>
-<col width="68%"></col>
+<col width="30%"></col>
+<col width="69%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -568,10 +790,10 @@ args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="
 <div id="dictionary-of-variables-in-part2_daysummary.csv" class="section level3">
 <h3><span class="header-section-number">4.1.2</span> Dictionary of variables in part2_daysummary.csv</h3>
 <p>Tis is a non-exhaustive list, because most concepts have been explained in summary.csv</p>
-<table style="width:99%;">
+<table>
 <colgroup>
 <col width="34%"></col>
-<col width="63%"></col>
+<col width="65%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -653,10 +875,10 @@ args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="
 <li>file summary reports/Report_nameofdatafile.pdf</li>
 </ul>
 <p>Here is a beta-version of the variable dictionary, see GGIR package manual for more details</p>
-<table style="width:99%;">
+<table>
 <colgroup>
 <col width="34%"></col>
-<col width="63%"></col>
+<col width="65%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -869,7 +1091,7 @@ args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="
 <li>Has demonstrated value in describing variance in energy expenditure, correlated with questionnaire data, able to describe patterns in physical activity</li>
 <li>Easy to describe mathematically and by that higher chances of reproducibility</li>
 <li>Attempt to quantify the actual biomechanical acceleration in universal units. I prefer to avoid using abstract index for movement quantification</li>
-<li>The 2013 paper showed that when ENMO is used in combination with auto-calibration it has similar validity to filter-based metrics like HFEN (which is essentially the same as the MAD metric recently used in literature). The few studies I am aware of who contested this, did not use auto-calibration by which ENMO was evalauted under unrealistic conditions. Metric ENMO depends by design on well calibrated acceleration signals, while metrics like HFEN and MAD are not affected by calibration offset.</li>
+<li>The 2013 paper showed that when ENMO is used in combination with auto-calibration it has similar validity to filter-based metrics like HFEN (which is essentially the same as the MAD metric recently used in literature). The few studies I am aware of who contested this, did not use auto-calibration by which ENMO was evalauted under unrealistic conditions. Metric ENMO depends by design on well calibrated acceleration signals, while metrics like HFEN and MAD are not affected by calibration offset. The metric HFENplus proposed in the 2013 paper may actually be a better candidate, but is more computationally heavy and more difficult to describe and replicate.</li>
 </ol>
 </div>
 <div id="what-does-ggir-stand-for" class="section level2">
@@ -890,23 +1112,26 @@ args =<span class="st"> </span><span class="kw">commandArgs</span>(<span class="
 <p>Cite GGIR in publicationsa as R package GGIR version x.x-x. Additionally, please also cite:</p>
 <p>If you look at <strong>physical activity:</strong></p>
 <ol style="list-style-type: decimal">
-<li>van Hees VT, Gorzelniak L, et al. Separating Movement and Gravity Components in an Acceleration Signal and Implications for the Assessment of Human Daily Physical Activity. PLoS ONE 8(4) 2013. <a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0061691">link</a></li>
+<li>van Hees VT, Gorzelniak L, et al. Separating Movement and Gravity Components in an Acceleration Signal and Implications for the Assessment of Human Daily Physical Activity. PLoS ONE 8(4) 2013. <a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0061691">link</a></li>
 <li>Sabia S, van Hees VT, Shipley MJ, Trenell MI, Hagger-Johnson G, Elbaz A, Kivimaki M, Singh-Manoux A. Association between questionnaire- and accelerometer-assessed physical activity: the role of sociodemographic factors. Am J Epidemiol. 2014 Mar 15;179(6):781-90. doi: 10.1093/aje/kwt330. Epub 2014 Feb 4. PMID: 24500862 <a href="https://www.ncbi.nlm.nih.gov/pubmed/24500862">link</a></li>
 </ol>
 <p>If you used the <strong>auto-calibration functionality:</strong></p>
 <ol start="3" style="list-style-type: decimal">
-<li>van Hees VT, Fang Z, et al. Auto-calibration of accelerometer data for free-living physical activity assessment using local gravity and temperature: an evaluation on four continents. J Appl Physiol 2014. <a href="https://www.physiology.org/doi/10.1152/japplphysiol.00421.2014">link</a></li>
+<li>van Hees VT, Fang Z, et al. Auto-calibration of accelerometer data for free-living physical activity assessment using local gravity and temperature: an evaluation on four continents. J Appl Physiol 2014. <a href="https://www.physiology.org/doi/10.1152/japplphysiol.00421.2014">link</a></li>
 </ol>
 <p>If you used the <strong>sleep detection:</strong></p>
 <ol start="4" style="list-style-type: decimal">
-<li>van Hees VT, Sabia S, et al. A novel, open access method to assess sleep duration using a wrist-worn accelerometer, PLoS ONE, 2015 <a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533">link</a></li>
+<li>van Hees VT, Sabia S, et al. A novel, open access method to assess sleep duration using a wrist-worn accelerometer, PLoS ONE, 2015 <a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533">link</a></li>
 </ol>
 <p>If you used the <strong>sleep detection without relying on sleep diary:</strong></p>
 <ol start="5" style="list-style-type: decimal">
-<li>van Hees VT, Sabia S, et al. Estimating sleep parameters using an accelerometer without sleep diary. Scientific Reports 2018. doi: 10.1038/s41598-018-31266-z. <a href="https://www.nature.com/articles/s41598-018-31266-z">link</a></li>
+<li>van Hees VT, Sabia S, et al. Estimating sleep parameters using an accelerometer without sleep diary. Scientific Reports 2018. doi: 10.1038/s41598-018-31266-z. <a href="https://www.nature.com/articles/s41598-018-31266-z">link</a></li>
 </ol>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
