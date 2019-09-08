@@ -1,6 +1,17 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 1.10-3 (release date:06-09-2019)}{
+\itemize{
+  \item Fixed bug introduced in version 1.10-1 in the conversion from numeric to character sleep times
+  \item Dependencies of dependencies removed from the DESCRIPTION file
+  \item Fixed 1to6am variables, which was wrong in version 1.10-1
+  \item Added functionality to handle accelerometer data from any accelerometer brand
+  stored in csv files via read.myacc.csv. Pass on the arguments of this function to
+  g.shell.GGIR to use this functionality.
+  \item Added reference to new GGIR paper to the documentation
+}
+}
 \section{Changes in version 1.10-1 (release date:23-08-2019)}{
 \itemize{
   \item Configuration file option now added to g.shell.GGIR and documented in vignette

@@ -303,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Accelerometer data processing with GGIR</h1>
 <h4 class="author">Vincent van Hees</h4>
-<h4 class="date">August 19 2019</h4>
+<h4 class="date">September 6 2019</h4>
 
 
 <div id="TOC">
@@ -388,7 +388,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </ul>
 <p><strong>Funders:</strong></p>
 <ul>
-<li>Medical Research Council (MRC) grants MR/P012167/1, MC_UU_12015/3, and MR/P012167/1.</li>
+<li>Medical Research Council (MRC) grants MR/P012167/1, MC_UU_12015/3</li>
 <li>Economic and Social Research Council (ESRC) grant ES/K005987 for ‘Millennium Cohort Study Sweep 6 (Age 14) Survey’ (MCS6)</li>
 <li>Biotechnology and Biological Sciences Research Council (BBSRC) and Unilever Discover Ltd funded a CASE studentship</li>
 <li>National Institute of Health grants HL-094307 (AIP).</li>
@@ -1093,6 +1093,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <li>Attempt to quantify the actual biomechanical acceleration in universal units. I prefer to avoid using abstract index for movement quantification</li>
 <li>The 2013 paper showed that when ENMO is used in combination with auto-calibration it has similar validity to filter-based metrics like HFEN (which is essentially the same as the MAD metric recently used in literature). The few studies I am aware of who contested this, did not use auto-calibration by which ENMO was evalauted under unrealistic conditions. Metric ENMO depends by design on well calibrated acceleration signals, while metrics like HFEN and MAD are not affected by calibration offset. The metric HFENplus proposed in the 2013 paper may actually be a better candidate, but is more computationally heavy and more difficult to describe and replicate.</li>
 </ol>
+<p>I recently wrote a blog post on this topic that you may find interesting: <a href="https://medium.com/@vincentvanhees/ten-misunderstandings-surrounding-information-extraction-from-wearable-accelerometer-data-a4f767a865b6" class="uri">https://medium.com/@vincentvanhees/ten-misunderstandings-surrounding-information-extraction-from-wearable-accelerometer-data-a4f767a865b6</a></p>
 </div>
 <div id="what-does-ggir-stand-for" class="section level2">
 <h2><span class="header-section-number">5.7</span> What does GGIR stand for?</h2>
@@ -1109,22 +1110,26 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </div>
 <div id="citing-ggir" class="section level1">
 <h1><span class="header-section-number">7</span> Citing GGIR</h1>
-<p>Cite GGIR in publicationsa as R package GGIR version x.x-x. Additionally, please also cite:</p>
-<p>If you look at <strong>physical activity:</strong></p>
+<p>A correct citation of research software is important to make your research reproducible and to acknowledge the effort that goes into the development of the software.</p>
+<p>To do so, please report the GGIR version you used in the text. Additionally, please also cite:</p>
 <ol style="list-style-type: decimal">
+<li>Migueles JH, Rowlands AV, et al. GGIR: A Research Community–Driven Open Source R Package for Generating Physical Activity and Sleep Outcomes From Multi-Day Raw Accelerometer Data. Journal for the Measurement of Physical Behaviour. 2(3) 2019. <a href="https://doi.org/10.1123/jmpb.2018-0063">link</a></li>
+</ol>
+<p>If your work depends on the quantification of <strong>physical activity</strong> then also cite:</p>
+<ol start="2" style="list-style-type: decimal">
 <li>van Hees VT, Gorzelniak L, et al. Separating Movement and Gravity Components in an Acceleration Signal and Implications for the Assessment of Human Daily Physical Activity. PLoS ONE 8(4) 2013. <a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0061691">link</a></li>
 <li>Sabia S, van Hees VT, Shipley MJ, Trenell MI, Hagger-Johnson G, Elbaz A, Kivimaki M, Singh-Manoux A. Association between questionnaire- and accelerometer-assessed physical activity: the role of sociodemographic factors. Am J Epidemiol. 2014 Mar 15;179(6):781-90. doi: 10.1093/aje/kwt330. Epub 2014 Feb 4. PMID: 24500862 <a href="https://www.ncbi.nlm.nih.gov/pubmed/24500862">link</a></li>
 </ol>
-<p>If you used the <strong>auto-calibration functionality:</strong></p>
-<ol start="3" style="list-style-type: decimal">
+<p>If you used the <strong>auto-calibration functionality</strong> then also cite:</p>
+<ol start="4" style="list-style-type: decimal">
 <li>van Hees VT, Fang Z, et al. Auto-calibration of accelerometer data for free-living physical activity assessment using local gravity and temperature: an evaluation on four continents. J Appl Physiol 2014. <a href="https://www.physiology.org/doi/10.1152/japplphysiol.00421.2014">link</a></li>
 </ol>
-<p>If you used the <strong>sleep detection:</strong></p>
-<ol start="4" style="list-style-type: decimal">
+<p>If you used the <strong>sleep detection</strong> then also cite:</p>
+<ol start="5" style="list-style-type: decimal">
 <li>van Hees VT, Sabia S, et al. A novel, open access method to assess sleep duration using a wrist-worn accelerometer, PLoS ONE, 2015 <a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533">link</a></li>
 </ol>
-<p>If you used the <strong>sleep detection without relying on sleep diary:</strong></p>
-<ol start="5" style="list-style-type: decimal">
+<p>If you used the <strong>sleep detection without relying on sleep diary</strong> then also cite:</p>
+<ol start="6" style="list-style-type: decimal">
 <li>van Hees VT, Sabia S, et al. Estimating sleep parameters using an accelerometer without sleep diary. Scientific Reports 2018. doi: 10.1038/s41598-018-31266-z. <a href="https://www.nature.com/articles/s41598-018-31266-z">link</a></li>
 </ol>
 </div>
