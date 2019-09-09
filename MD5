@@ -1,4 +1,4 @@
-f8e505721be4b42b1cb3b05652619c79 *DESCRIPTION
+5181ea96b100639b4a63c50360e4c890 *DESCRIPTION
 e6a600fd5e1d9cbde2d983680233ad02 *LICENSE
 f84cc1224861c207eb8dbadf75049a91 *NAMESPACE
 48918779e31fcb4d8771b9da934c49d5 *R/POSIXtime2iso8601.R
@@ -68,15 +68,15 @@ b699d25a79846a60bf6b4aede2bdf20f *R/is_this_a_dst_night.R
 70d52d29d1fa61fe80c9c498ebd7a6c7 *data/data.getmeta.RData
 0cb14c60e18f5bd4c15fb942c95aea2b *data/data.inspectfile.RData
 491b9d2d9479915953a86a28c56d759a *inst/CITATION
-57d82daea6d0473e2bdf5455af6ca47f *inst/NEWS.Rd
+18af6de4be4d2f12cde61e3ad30048d4 *inst/NEWS.Rd
 3f3aafa55068d5cdb334e326d287c6dd *inst/doc/GGIR.R
-7870142068255c9ed5af9366c4203668 *inst/doc/GGIR.Rmd
-2b4c70d13c74bc9c057a00db365f9a9d *inst/doc/GGIR.html
+5a140fb36124f9763a6d38b156bc7e8f *inst/doc/GGIR.Rmd
+135782f0c05002fbe0f4b6c19b4b17d7 *inst/doc/GGIR.html
 e1b96702a817baaaef2a1a52c2ae5f2f *inst/testfiles/GENEActiv_testfile.bin
 e29bc72556997d930507c0dba8135904 *inst/testfiles/ax3_testfile.cwa
 7042f294a3a4af3aada3d4a3ebc827d2 *inst/testfiles/ax3test.wav
 3898e642b0d46a94cc2b25739e0d55cf *inst/testfiles/genea_testfile.bin
-4d733a212bd4c470b85e0e0a4a971f35 *man/GGIR-package.Rd
+09d41355c337b45065f225170bf8ec84 *man/GGIR-package.Rd
 02209cee65544d54b26a34114f42e085 *man/POSIXtime2iso8601.Rd
 9c0310ad4076a9de8fdeaa9fa386d08c *man/chartime2iso8601.Rd
 3106c89212540378f6315e9d435776e0 *man/createConfigFile.Rd
@@ -166,7 +166,7 @@ bf0f463d3373e64c9b668086e403929b *tests/testthat/test_isISO8601.R
 e74b78cac537626bb362828a7b18a695 *tests/testthat/test_part1_with_allmetrics.R
 b8657eaa2ee30f03d0ec9ab17d4e24b1 *tests/testthat/test_read.myacc.csv.R
 cfbd5e1c76a466079b2de9570e01db21 *tests/testthat/test_updateBlocksize.R
-7870142068255c9ed5af9366c4203668 *vignettes/GGIR.Rmd
+5a140fb36124f9763a6d38b156bc7e8f *vignettes/GGIR.Rmd
 2a35c09fabdd1281f5f2cd16495ba490 *vignettes/example_dovisual.jpg
 8c287b9ab4c89d7c8583cfa0d806ad9c *vignettes/nonwearimage.jpg
 05e900f359b12126db6817a3dbb566f2 *vignettes/reportexample.jpg
