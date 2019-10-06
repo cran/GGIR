@@ -1,7 +1,7 @@
 library(GGIR)
 context("read.myacc.csv")
 test_that("read.myacc.csv can read a variety of csv file formats", {
-  
+  skip_on_cran()
   # create test files
   N = 30
   sf = 30
@@ -15,6 +15,7 @@ test_that("read.myacc.csv can read a variety of csv file formats", {
   accz = rnorm(N)
   set.seed(400)
   temp = rnorm(N)
+  wear = c(rep(TRUE,N/3),rep(FALSE,N/6),rep(TRUE,N/3),rep(TRUE,N/6))
   # create test file 1: No header, with temperature, with time
   S1 = data.frame(x=accx, time=timestamps,y=accy,z=accz,temp=temp+20)
   testfile[1] = "testcsv1.csv"
@@ -23,8 +24,8 @@ test_that("read.myacc.csv can read a variety of csv file formats", {
   S2 = data.frame(x=accx, time=timestamps,y=accy,z=accz)
   testfile[2] = "testcsv2.csv"
   write.csv(S2, file= testfile[2], row.names = FALSE)
-  # create test file 3: No header, without temperature, without time
-  S3 = data.frame(x=accx, y=accy, z=accz)
+  # create test file 3: No header, without temperature, without time, with wear channel
+  S3 = data.frame(x=accx, y=accy, z=accz, wear=wear)
   testfile[3] = "testcsv3.csv"
   write.csv(S3, file= testfile[3], row.names = FALSE)
   # create test file 4: With header, with temperature, with time
@@ -39,7 +40,7 @@ test_that("read.myacc.csv can read a variety of csv file formats", {
   S4 = rbind(hd,S4)
   S4[hd_NR+1,] = colnames(S4)
   colnames(S4) = NULL
-  testfile[4] = "~/testcsv4.csv"
+  testfile[4] = "testcsv4.csv"
   write.table(S4, file= testfile[4], col.names=FALSE, row.names = FALSE)
   
   
@@ -65,7 +66,7 @@ test_that("read.myacc.csv can read a variety of csv file formats", {
   S5 = rbind(hd,S5)
   S5[hd_NR+1,] = colnames(S5)
   colnames(S5) = NULL
-  testfile[5] = "~/testcsv5.csv"
+  testfile[5] = "testcsv5.csv"
   write.table(S5, file= testfile[5], col.names=FALSE, row.names = FALSE)
   
   # create test file 7
@@ -93,7 +94,7 @@ test_that("read.myacc.csv can read a variety of csv file formats", {
   S7 = rbind(hd,S7)
   S7[hd_NR+1,] = colnames(S7)
   colnames(S7) = NULL
-  testfile[6] = "~/testcsv7.csv"
+  testfile[6] = "testcsv7.csv"
   write.table(S7, file= testfile[6], col.names=FALSE, row.names = FALSE)
   
   #------------------------
@@ -135,9 +136,11 @@ test_that("read.myacc.csv can read a variety of csv file formats", {
                       rmc.desiredtz = "Europe/London", rmc.sf = 100,
                       rmc.headername.sf = "sample_frequency",
                       rmc.headername.sn = "serial_number",
-                      rmc.headername.recordingid = "ID")
+                      rmc.headername.recordingid = "ID",
+                      rmc.col.wear=4)
   expect_that(nrow(D3$data),equals(20))
-  expect_that(ncol(D3$data),equals(3))
+  expect_true(D3$data[1,4])
+  expect_that(ncol(D3$data),equals(4))
   expect_that(D3$header,equals("no header"))
   D4 = read.myacc.csv(rmc.file=testfile[4], rmc.nrow=20, rmc.dec=".",
                       rmc.firstrow.acc = 11, rmc.firstrow.header=1,
@@ -187,10 +190,10 @@ test_that("read.myacc.csv can read a variety of csv file formats", {
                       rmc.bit = "bit", rmc.dynamic_range = "dynamic_range",
                       rmc.header.structure = c(), rmc.check4timegaps = TRUE)
   
-  expect_that(round(sum(D7$data[2:120,2]), digits=3), equals(27.609))
-  expect_that(round(sum(D7$data[2:120,3]), digits=3), equals(11.578))
-  expect_that(round(sum(D7$data[2:120,4]), digits=3), equals(-6.844))
-  expect_that(round(sum(D7$data[2:120,5]), digits=1), equals(161.1))
+  expect_that(round(mean(D7$data[2:120,2]), digits=3), equals(0.232))
+  expect_that(round(mean(D7$data[2:120,3]), digits=3), equals(0.097))
+  expect_that(round(mean(D7$data[2:120,4]), digits=3), equals(-0.058))
+  expect_that(round(mean(D7$data[2:120,5]), digits=1), equals(1.4))
   expect_that(round(D7$data[2,2], digits=3), equals(5.578))
   expect_that(ncol(D7$data), equals(5))
   expect_that(nrow(D7$header), equals(5))

@@ -46,6 +46,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   if (length(which(ls() == "rmc.header.structure")) == 0) rmc.header.structure = c()
   if (length(which(ls() == "rmc.check4timegaps")) == 0) rmc.check4timegaps = FALSE
   if (length(which(ls() == "rmc.noise")) == 0) rmc.noise = c()
+  if (length(which(ls() == "rmc.col.wear")) == 0) rmc.col.wear = c()
+  
   
   if (length(datadir) == 0 | length(outputdir) == 0) {
     if (length(datadir) == 0) {
@@ -214,9 +216,24 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   if (do.parallel == TRUE) {
     cat(paste0('\n Busy processing ... see ', outputdir, outputfolder,'/meta/basic', ' for progress\n'))
   }
+  # check whether we are indevelopment mode:
+  GGIRinstalled = is.element('GGIR', installed.packages()[,1])
+  packages2passon = functions2passon = NULL
+  GGIRloaded = "GGIR" %in% .packages()
+  if (GGIRloaded) { #pass on package
+    packages2passon = 'GGIR'
+  } else { # pass on functions
+    functions2passon = c("g.inspectfile", "g.calibrate","g.getmeta", "g.dotorcomma", "g.applymetrics",
+                         "g.binread", "g.cwaread", "g.readaccfile", "g.wavread", "g.downsample", "updateBlocksize",
+                         "g.getidfromheaderobject", "g.getstarttime", "POSIXtime2iso8601", "chartime2iso8601",
+                         "iso8601chartime2POSIX", "g.metric", "datadir2fnames", "read.myacc.csv")
+    # Note: This will not work for cwa files, because those also need Rcpp functions.
+    # So, it is probably best to turn off parallel when debugging cwa data.
+  }
   `%myinfix%` = ifelse(do.parallel, foreach::`%dopar%`, foreach::`%do%`) # thanks to https://stackoverflow.com/questions/43733271/how-to-switch-programmatically-between-do-and-dopar-in-foreach
   #,'GENEAread','mmap', 'signal'
-  output_list =foreach::foreach(i=f0:f1, .packages = 'GGIR', .errorhandling='pass') %myinfix% {
+  output_list =foreach::foreach(i=f0:f1, .packages = packages2passon,
+                                .export=functions2passon, .errorhandling='pass') %myinfix% {
     tryCatchResult = tryCatch({
       # for (i in f0:f1) { #f0:f1 #j is file index (starting with f0 and ending with f1)
       if (print.filename == TRUE) {
@@ -317,7 +334,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
         #data_quality_report.csv does not exist and there is also no ot
         if (assigned.backup.cal.coef == FALSE) backup.cal.coef = c()
         #--------------------------------------
-        if (do.cal ==TRUE & useRDA == FALSE) {
+        if (do.cal ==TRUE & useRDA == FALSE & length(backup.cal.coef) == 0) {
           # cat(paste0("\n",rep('-',options()$width),collapse=''))
           cat("\n")
           cat("\nInvestigate calibration of the sensors with function g.calibrate:\n")
@@ -343,7 +360,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                           rmc.headername.recordingid = rmc.headername.sn,
                           rmc.header.structure = rmc.header.structure,
                           rmc.check4timegaps = rmc.check4timegaps,
-                          rmc.noise=rmc.noise)
+                          rmc.noise=rmc.noise,
+                          rmc.col.wear=rmc.col.wear)
         } else {
           C = list(cal.error.end=0,cal.error.start=0)
           C$scale=c(1,1,1)
@@ -480,7 +498,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                       rmc.headername.recordingid = rmc.headername.sn,
                       rmc.header.structure = rmc.header.structure,
                       rmc.check4timegaps = rmc.check4timegaps,
-                      rmc.noise=rmc.noise)
+                      rmc.noise=rmc.noise,
+                      rmc.col.wear=rmc.col.wear)
         #------------------------------------------------
         cat("\nSave .RData-file with: calibration report, file inspection report and all signal features...\n")
         # remove directory in filename if present
