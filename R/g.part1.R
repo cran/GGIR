@@ -47,7 +47,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   if (length(which(ls() == "rmc.check4timegaps")) == 0) rmc.check4timegaps = FALSE
   if (length(which(ls() == "rmc.noise")) == 0) rmc.noise = c()
   if (length(which(ls() == "rmc.col.wear")) == 0) rmc.col.wear = c()
-  
+  if (length(which(ls() == "rmc.doresample")) == 0) rmc.doresample = FALSE
   
   if (length(datadir) == 0 | length(outputdir) == 0) {
     if (length(datadir) == 0) {
@@ -222,18 +222,20 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   GGIRloaded = "GGIR" %in% .packages()
   if (GGIRloaded) { #pass on package
     packages2passon = 'GGIR'
+    errhand = 'pass'
   } else { # pass on functions
     functions2passon = c("g.inspectfile", "g.calibrate","g.getmeta", "g.dotorcomma", "g.applymetrics",
                          "g.binread", "g.cwaread", "g.readaccfile", "g.wavread", "g.downsample", "updateBlocksize",
                          "g.getidfromheaderobject", "g.getstarttime", "POSIXtime2iso8601", "chartime2iso8601",
                          "iso8601chartime2POSIX", "g.metric", "datadir2fnames", "read.myacc.csv")
+    errhand = 'stop'
     # Note: This will not work for cwa files, because those also need Rcpp functions.
     # So, it is probably best to turn off parallel when debugging cwa data.
   }
   `%myinfix%` = ifelse(do.parallel, foreach::`%dopar%`, foreach::`%do%`) # thanks to https://stackoverflow.com/questions/43733271/how-to-switch-programmatically-between-do-and-dopar-in-foreach
   #,'GENEAread','mmap', 'signal'
   output_list =foreach::foreach(i=f0:f1, .packages = packages2passon,
-                                .export=functions2passon, .errorhandling='pass') %myinfix% {
+                                .export=functions2passon, .errorhandling=errhand) %myinfix% {
     tryCatchResult = tryCatch({
       # for (i in f0:f1) { #f0:f1 #j is file index (starting with f0 and ending with f1)
       if (print.filename == TRUE) {
@@ -361,7 +363,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                           rmc.header.structure = rmc.header.structure,
                           rmc.check4timegaps = rmc.check4timegaps,
                           rmc.noise=rmc.noise,
-                          rmc.col.wear=rmc.col.wear)
+                          rmc.col.wear=rmc.col.wear,
+                          rmc.doresample=rmc.doresample)
         } else {
           C = list(cal.error.end=0,cal.error.start=0)
           C$scale=c(1,1,1)
@@ -499,7 +502,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                       rmc.header.structure = rmc.header.structure,
                       rmc.check4timegaps = rmc.check4timegaps,
                       rmc.noise=rmc.noise,
-                      rmc.col.wear=rmc.col.wear)
+                      rmc.col.wear=rmc.col.wear,
+                      rmc.doresample=rmc.doresample)
         #------------------------------------------------
         cat("\nSave .RData-file with: calibration report, file inspection report and all signal features...\n")
         # remove directory in filename if present

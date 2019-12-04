@@ -1,6 +1,21 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 1.11-0 (release date:03-12-2019)}{
+\itemize{
+  \item Fixed bug that emerged in previous version with GENEActiv .bin data not
+  being processed by g.getmeta for some files.
+  \item read.myacc.csv is now able to resample data with irregular sample rates 
+  and handle timestamps in character format.
+  \item function resample can now handle any matrix size, previous only 3 columns.
+  \item Fixed bug when using multiple non-angle metrics in part1 and trying to calculate
+  1to6am average metric value in part 2.
+  \item Expanded Actigraph date format recognition ability.
+  \item visualisationreport (function g.plot5) enhanced with colour coding for activity
+  classes.
+  \item Fixed bug in sleep period time recognition for first day of measurement.
+}
+}
 \section{Changes in version 1.10-7 (release date:06-10-2019)}{
 \itemize{
   \item Fixed functionality to supply calibration coefficients file to backup.cal.coef.

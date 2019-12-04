@@ -262,16 +262,18 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (length(which(ls() == "rmc.check4timegaps")) == 0) rmc.check4timegaps = FALSE
   if (length(which(ls() == "rmc.noise")) == 0) rmc.noise = FALSE
   if (length(which(ls() == "rmc.col.wear")) == 0) rmc.col.wear = c()
+  if (length(which(ls() == "rmc.doresample")) == 0) rmc.doresample = FALSE
+  
   # VISUAL REPORT
   
   if (exists("viewingwindow") == FALSE)  viewingwindow = 1
   if (exists("dofirstpage") == FALSE)  dofirstpage = TRUE
   if (exists("visualreport") == FALSE)  visualreport = FALSE
 
-  cat("\n   Please refer to GGIR by reporting the version number and citing\n")
-  cat("   Migueles et al. 2019 J Meas Phys Beh. See also: \n")
-  cat("   https://cran.r-project.org/package=GGIR/vignettes/GGIR.html#citing-ggir \n")
-
+  cat("\n   Do not forget to cite GGIR in your publications via a version number and\n")
+  cat("   Migueles et al. 2019 JMPB. doi: 10.1123/jmpb.2018-0063. \n")
+  cat("   See also: https://cran.r-project.org/package=GGIR/vignettes/GGIR.html#citing-ggir \n")
+  
   if (dopart1 == TRUE) {
     cat('\n')
     cat(paste0(rep('_',options()$width),collapse=''))
@@ -315,7 +317,8 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
             rmc.headername.recordingid = rmc.headername.sn,
             rmc.header.structure = rmc.header.structure,
             rmc.check4timegaps = rmc.check4timegaps, rmc.noise=rmc.noise,
-            rmc.col.wear=rmc.col.wear)
+            rmc.col.wear=rmc.col.wear,
+            rmc.doresample=rmc.doresample)
   }
   if (dopart2 == TRUE) {
     cat('\n')
@@ -405,7 +408,7 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
     } else {
       cat("Warning: First run g.shell.GGIR with mode = 4 to generate required milestone data\n")
       cat("before you can use argument visualreport or create a report for part 4\n")
-      stop()
+      # stop()
     }
   }
   if (length(which(do.report == 2)) > 0) {
@@ -446,6 +449,7 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
     cat("\nGenerate visual reports\n")
     f1 = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
     g.plot5(metadatadir=metadatadir,dofirstpage=dofirstpage,
-            viewingwindow=viewingwindow,f0=f0,f1=f1,overwrite=overwrite,desiredtz = desiredtz)
+            viewingwindow=viewingwindow,f0=f0,f1=f1,overwrite=overwrite,desiredtz = desiredtz,
+            metric=acc.metric,threshold.lig,threshold.mod,threshold.vig)  
   }
 }
