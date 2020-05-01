@@ -13,7 +13,7 @@ from GENEA and GENEActiv. Further, the function should be able to cope with csv-
 data procuded by GENEActiv and Actigraph
 }
 \usage{
-g.getmeta(datafile, desiredtz = c(), 
+g.getmeta(datafile, desiredtz = "", 
 windowsizes = c(5, 900, 3600),daylimit = FALSE, 
 offset = c(0,0,0), scale = c(1,1,1),
 tempoffset = c(0,0,0),do.bfen = FALSE, do.enmo = TRUE,
@@ -25,7 +25,8 @@ do.roll_med_acc_z=FALSE,do.dev_roll_med_acc_x=FALSE,
 do.dev_roll_med_acc_y=FALSE,do.dev_roll_med_acc_z=FALSE,
 do.enmoa = FALSE, do.lfen = FALSE, lb = 0.2,hb = 15, n = 4,
 meantempcal=c(),chunksize=c(),
-selectdaysfile=c(),dayborder=0,dynrange=c(),configtz=c(),...)
+selectdaysfile=c(),dayborder=0,dynrange=c(),configtz=c(),
+myfun=c(),...)
 }
 \arguments{
   \item{datafile}{name of accelerometer file
@@ -135,6 +136,10 @@ below 1 is recommended.
   Only functional for AX3 cwa data at the moment. Timezone in which the accelerometer
   was configured. Only use this argument if the timezone of configuration and
   timezone in which recording took place are different.
+  }
+  \item{myfun}{
+    External function object to be applied to raw data. 
+    See details \link{applyExtFunction}.
   }
   \item{...}{
    Please ignore. Only used by the code internally when called from within

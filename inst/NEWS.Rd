@@ -1,11 +1,56 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 2.0-0 (release date:30-04-2020)}{
+\itemize{
+  \item Now R version 4.0 compatible
+  \item Part 1 Clipping detection expanded: If any value in block more than 150 percent 
+  dynamic range then ignore entire block.
+  \item Part 2 report now able to handle changing variable count due to missing data
+  \item Part 2 L5M5 better able to handle small qwindow intervals
+  \item Part 3 HDCZA algorithm expanded to be able to detect daysleepers
+  \item Part 3 various improvements to qc plots.
+  \item Part 5 now also stores full and cleaned output
+  \item Part 5 now better handles missing days in part 4 output.
+  \item Part 5 behavioral class SIB removed from daytime
+  \item Part 5 time series export more user-friendly.
+  \item Part 5 function code split up in 7 new functions.
+  \item Part 4 + 5 argument data_cleaning_file added.
+  \item Part 4 + 5 output variable names improved and documented in vignette
+  \item Numunpack function moved back to c++
+  \item Various updates to visualreport (plot5 function)
+  \item External function embedding feature added
+  \item We now consistently refer to ID (not id) and calendar_date, spelling was 
+  inconsistent.
+  \item Vignette now has documentation on sleep and time-use analysis.
+}
+}
+
+\section{Changes in version 1.11-1 (GitHub-only-release date:28-02-2020)}{
+\itemize{
+  \item Metric ENMOa now facilitated for MVPA calculation
+  \item Bug fixed with part4 daysleeper handling
+  \item Part5 WW window calculation improved, first day now uses sleeplog or
+  HDCZA algorithm estimate, and last day is ignored if no sleep estimates are
+  available. This also affects csv exports by argument save_ms5rawlevels.
+  \item Added explanation to vignette on how to use published cut-points.
+  \item Axivity AX6 (acc + gyro) in cwa format now supported for file reading,
+  actually using the gyro data for feature calculation is future work.
+  In the mean time, gyro signal will be ignored by the rest of GGIR.
+  \item Axivity AX3 acc data in cwa format can now also be read if dynamic
+  range is not 8g. Previously this was not possible.
+  \item Fixed bug related to visual report generation when qwindow is set to
+  non-default value.
+  \item Added way to handle Actigraph files which start with several days of
+  zeros which complicates the auto-calibration.
+  \item Default for desiredtz to timezone of machine.
+}
+}
 \section{Changes in version 1.11-0 (release date:03-12-2019)}{
 \itemize{
   \item Fixed bug that emerged in previous version with GENEActiv .bin data not
   being processed by g.getmeta for some files.
-  \item read.myacc.csv is now able to resample data with irregular sample rates 
+  \item read.myacc.csv is now able to resample data with irregular sample rates
   and handle timestamps in character format.
   \item function resample can now handle any matrix size, previous only 3 columns.
   \item Fixed bug when using multiple non-angle metrics in part1 and trying to calculate

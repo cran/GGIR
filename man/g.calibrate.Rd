@@ -10,18 +10,15 @@ average acceleration per axis per window is used to estimate calibration error
 to address the calibration error and a summary of the callibration procedure.
 }
 \usage{
-g.calibrate(datafile, use.temp = TRUE, spherecrit = 0.3,
+g.calibrate(datafile, spherecrit = 0.3,
 minloadcrit = 72, 
 printsummary = TRUE,chunksize=c(),windowsizes=c(5,900,3600),
 selectdaysfile=c(),
-dayborder=0, desiredtz = c(), ...)
+dayborder=0, desiredtz = "", ...)
 }
 \arguments{
   \item{datafile}{
   name of accelerometer file
-  }
-  \item{use.temp}{
-  use temperature sensor data if available (Geneactive only)
   }
   \item{spherecrit}{
   the minimum required acceleration value (in g) on both sides of 0 g
