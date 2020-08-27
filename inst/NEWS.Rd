@@ -1,10 +1,47 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 2.1-0 (release date:27-08-2020)}{
+\itemize{
+  \item Actigraph serial number now extracted from the csv fileheader
+  \item Actigraph serial number now used to assign correct dynamic range per
+  Actigraph generation (6 and 8 g respectively). Previously 8 assumed.
+  \item Part 2 indicator added of which axis is most correlated with itself
+  over 24 hours, for hip data this may be indicator of vertical axis orientation.
+  \item Part 1 bug fixed in timestamp generation that caused measurements 
+  that start exactly at the hour and 0 minutes to have a 1 minute offset in time.
+  \item Part 1 to reduce data storage size epoch level metric values are now
+  rounded to 4 decimal places.
+  \item Part 4 report, issue fixed with double night entries.
+  \item Bug fixed with Actigraph starttime recognition when machine language
+  is not English and months are expressed in b or hh format.
+  \item Bug fixed in accounting for daysleeper in first night ofr recording.
+}
+}
+\section{Changes in version 2.0-2 (GitHub-only-release date:18-06-2020)}{
+\itemize{
+  \item Visual report, fixed argument viewingwindow for g.plot5 (visualreport)
+  \item Part 1 rmc.myacc.csv now raises warning when timestamps are not recognised
+  \item Part 1 fixed rmc.dynamic_range not correctly passed on in 2.0-1
+  \item Part 5 sub-function round_seconds_to_ws3new now handles missing values
+}
+}
+\section{Changes in version 2.0-1 (GitHub-only-release date:04-06-2020)}{
+\itemize{
+  \item Now able to read gzipped csv files
+  \item Part 2 Fixed midnight selection being off by one sample
+  \item Part 1 tidied up metric calculation and added a few metrics
+  \item Part 2 Added strategy 4 (ignore data before first midnight)
+  \item Data from movisens accelerometers can be now processe
+  \item Part 5 timestamps in timeseries output in RData format (new since 2.0)
+  now correctly accounts for timezone
+  \item Part 4 now has option to only exclude the first or only the last night
+}
+}
 \section{Changes in version 2.0-0 (release date:30-04-2020)}{
 \itemize{
   \item Now R version 4.0 compatible
-  \item Part 1 Clipping detection expanded: If any value in block more than 150 percent 
+  \item Part 1 Clipping detection expanded: If any value in block more than 150 percent
   dynamic range then ignore entire block.
   \item Part 2 report now able to handle changing variable count due to missing data
   \item Part 2 L5M5 better able to handle small qwindow intervals
@@ -20,7 +57,7 @@
   \item Numunpack function moved back to c++
   \item Various updates to visualreport (plot5 function)
   \item External function embedding feature added
-  \item We now consistently refer to ID (not id) and calendar_date, spelling was 
+  \item We now consistently refer to ID (not id) and calendar_date, spelling was
   inconsistent.
   \item Vignette now has documentation on sleep and time-use analysis.
 }

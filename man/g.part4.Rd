@@ -16,7 +16,8 @@ sleeplogidnum=FALSE,do.visual=FALSE,outliers.only = FALSE,
     excludefirstlast=FALSE,criterror = 1,includenightcrit=16,
     relyonguider=FALSE, relyonsleeplog=FALSE, def.noc.sleep=1,
     storefolderstructure=FALSE,overwrite=FALSE,
-    desiredtz="",data_cleaning_file=c())
+    desiredtz="",data_cleaning_file=c(),
+    excludefirst.part4=FALSE,excludelast.part4=FALSE)
 }
 \arguments{
   \item{datadir}{
@@ -134,12 +135,25 @@ sleeplogidnum=FALSE,do.visual=FALSE,outliers.only = FALSE,
     See \link{g.getmeta}
   }
   \item{data_cleaning_file}{
-  Optional path to a csv file you create as used 
-  that holds three columns: ID, day_part5, and relyonguider_part4
-  This to facilitate forced exclusion of specific days in the output
-  and/or forced relying on guider in part 4 output.
-  Columns day_part5 and relyonguider_part4 do not both have to have
-  a value.
+  Optional path to a csv file you create that holds four
+  columns: ID, day_part5, relyonguider_part4, 
+  and night_part4. ID should hold the participant ID.
+  Columns day_part5 and night_part4 allow you to 
+  specify which day(s) and night(s) need to be excluded from
+  part 5 and 4, respectively. So, this will be done regardless
+  of whether the rest of GGIR thinks those day(s)/night(s)
+  are valid.
+  Column relyonguider_part4 allows you to specify for
+  which nights part 4 should fully rely on the guider. See
+  also package vignette.
+  }
+  \item{excludefirst.part4}{
+  If TRUE then the first night of the measurement are
+  ignored for the sleep assessment.
+  }
+  \item{excludelast.part4}{
+  If TRUE then the last night of the measurement are
+  ignored for the sleep assessment.
   }
 }
 \value{
@@ -160,7 +174,7 @@ g.part4(metadatadir=metadatadir)
 }
 }
 \author{
-  Vincent T van Hees <vincentvanhees@gmail.com>
+  Vincent T van Hees <v.vanhees@accelting.com>
 }
 \references{
 \itemize{

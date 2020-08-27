@@ -116,6 +116,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   firstmidnight=dmidn$firstmidnight;  firstmidnighti=dmidn$firstmidnighti
   lastmidnight=dmidn$lastmidnight;    lastmidnighti=dmidn$lastmidnighti
   midnights=dmidn$midnights;          midnightsi=dmidn$midnightsi
+  
   starttimei = 1
   endtimei = nrow(M$metalong)
   if (strategy == 2) {
@@ -154,12 +155,40 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
   #===============================================
   # Extract features from the imputed data
   qcheck = r5long
-  LW = length(which(as.numeric(qcheck) != 1)) / (60/ws3) #number of minutes wear time between first and last midnights
+  # LW = length(which(as.numeric(qcheck) != 1)) / (60/ws3) #number of minutes wear time between first and last midnights
   nfulldays = (lastmidnighti - firstmidnighti) / ((3600/ws2)*24)
   ndays = length(midnights) + 1 #ceiling(nfulldays + 2) # ceiling to cope with days with 23 hours
   if (ndays != round(ndays)) { #day saving time causing trouble?
     cat("One day in this measurement is longer or shorter than 24 hours (probably related to day saving time)")
   }
+  #-------------------------------------
+  # Detect orientation (at the moment only desighned for hip with accelerometer):
+  # assess which angle per axis is most strongly 24 hour correlated:
+  # for hip worn devices this will be the vertical axis
+  longitudinal_axis_id = ""
+  epochday = 24*6*(60/ws3)
+  Ndays = floor(nrow(IMP$metashort)/epochday)
+  if (length(which(c("anglex","angley","anglez") %in% colnames(IMP$metashort) == FALSE)) == 0 &
+      Ndays >= 2) {
+    CorrA = rep(0,3)
+    cnt = 1
+    for (anglename in  c("anglex","angley","anglez")) {
+      CorrA[cnt] = stats::cor(IMP$metashort[1:((Ndays-1)*epochday), anglename],
+                       IMP$metashort[(epochday+1):(Ndays*epochday), anglename])
+      # # if 5th and 95th percentile do not differ by more than 45 degree than ignore this axis
+      # (Commented out, because this was experimental, never used in a GGIR release)
+      # if (abs(diff(quantile(IMP$metashort[, anglename], probs=c(0.05,0.95)))) < 45) {
+      #   CorrA[cnt] = 0
+      # }
+      cnt = cnt + 1
+    }
+    longitudinal_axis_id = which.max(CorrA)
+    # TO DO:
+    # - Estimate main time in bed period per day
+    # - Adjust qwindow accordingly, such that it indicates: daytime, nighttime
+    
+  }
+  
   #--------------------------------------
   # Analysis of the average day
   # Derivation of distribution characteristics of the average day: quantiles (percentiles) and L5M5 method
@@ -205,7 +234,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
     }
   }
   ND = nrow(metashort) / n_ws3_perday #update this because of reduction in datapoints (added on 20-11-2012)
-  LW = length(which(r5 < 1)) * (ws2/60) #length wear in minutes (for entire signal)
+  # LW = length(which(r5 < 1)) * (ws2/60) #length wear in minutes (for entire signal)
   LWp = length(which(r5[which(r4 == 0)] < 1)) * (ws2/60) #length wear in minutes (for protocol)
   LMp = length(which(r4 == 0)) * (ws2/60) #length protocol
   #====================================================================
@@ -253,7 +282,7 @@ g.analyse =  function(I,C,M,IMP,qlevels=c(),qwindow=c(0,24),quantiletype = 7,L5M
                                      daysummary, ds_names, includedaycrit, strategy, hrs.del.start,
                                      hrs.del.end, maxdur, windowsizes, idloc, snloc, wdayname, doquan,
                                      qlevels_names, doiglevels, tooshort, InterdailyStability, IntradailyVariability,
-                                     IVIS_windowsize_minutes, IVIS_epochsize_seconds,qwindow)
+                                     IVIS_windowsize_minutes, IVIS_epochsize_seconds,qwindow, longitudinal_axis_id)
   filesummary = output_perfile$filesummary
   daysummary = output_perfile$daysummary
   if (length(selectdaysfile) > 0) {

@@ -1,4 +1,13 @@
 g.metric= function(data,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),gravity = 1) {
+  
+  #============================================================
+  # WARNING: this function (g.metric) is not used any more
+  # ...all functionality has moved to function g.applymetrics. 
+  # ... g.metric will be removed from GGIR in 2021
+  #============================================================
+  warning("\nFunction g.metric is no longer used internally by GGIR")
+  warning("\nand will be removed from GGIR in 2021")
+  
   #--------------------------------------
   #Input:
   # G = acceleration signal
@@ -19,6 +28,8 @@ g.metric= function(data,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),gravity = 1) {
   GyCP = matrix(0,durexp,1)
   GzCP = matrix(0,durexp,1)
   GCP = matrix(0,durexp,1)
+  #------------------------
+  # WARNING: THIS FUNCTION IS NOT USED ANYMORE BY GGIR (g.applymetrics), I WILL BE REMOVED IN 2021
   if (ii == 1) {
     # high pass filter
     bf = signal::butter(n,c(lb/(sf/2)),type=c("high")) #creating filter coefficients
@@ -29,6 +40,11 @@ g.metric= function(data,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),gravity = 1) {
   } else if (ii == 3) { # no subtraction, just vector magnitude
     Gfil[,1] = sqrt((data[,1]^2) + (data[,2]^2) + (data[,3]^2))
   } else if (ii == 5) { # filter + correction for centripital acc
+    #============================================================
+    # WARNING: this function (g.metric) is not used any more
+    # ...all functionality has moved to function g.applymetrics. 
+    # ... g.metric will be removed from GGIR in 2021
+    #============================================================
     bf = signal::butter(n,c(lb/(sf/2)),type=c("low")) #creating filter coefficients
     GxCP[,1] = signal::filter(bf,data[,1])
     GyCP[,1] = signal::filter(bf,data[,2])
@@ -49,6 +65,11 @@ g.metric= function(data,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),gravity = 1) {
     Gzfil[,1] = signal::filter(bf,data[,3])
     Gfil[,1] = sqrt((Gxfil[,1]^2) + (Gyfil[,1]^2) + (Gzfil[,1]^2))
   } else if (ii == 9) { #Low pass filtered followed by ENMO
+    #============================================================
+    # WARNING: this function (g.metric) is not used any more
+    # ...all functionality has moved to function g.applymetrics. 
+    # ... g.metric will be removed from GGIR in 2021
+    #============================================================
     bf = signal::butter(n,c(hb/(sf/2)),type=c("low")) #creating filter coefficients
     Gxfil[,1] = signal::filter(bf,data[,1])
     Gyfil[,1] = signal::filter(bf,data[,2])
@@ -63,11 +84,17 @@ g.metric= function(data,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),gravity = 1) {
     Gxm[which(is.na(Gxm[1:1000]) ==T)] = Gxm[which(is.na(Gxm[1:1000]) ==F)[1]]
     Gym[which(is.na(Gym[1:1000]) ==T)] = Gym[which(is.na(Gym[1:1000]) ==F)[1]]
     Gzm[which(is.na(Gzm[1:1000]) ==T)] = Gzm[which(is.na(Gzm[1:1000]) ==F)[1]]
+    
     if (length(which(is.na(Gxm) ==T | is.na(Gym) == T | is.na(Gzm) == T)) > 0) {
       p1 = which(is.na(Gxm) ==F); Gxm[which(is.na(Gxm) ==T)] = Gxm[p1[length(p1)]]
       p1 = which(is.na(Gym) ==F); Gym[which(is.na(Gym) ==T)] = Gym[p1[length(p1)]]
       p1 = which(is.na(Gzm) ==F); Gzm[which(is.na(Gzm) ==T)] = Gzm[p1[length(p1)]]
     }
+    #============================================================
+    # WARNING: this function (g.metric) is not used any more
+    # ...all functionality has moved to function g.applymetrics. 
+    # ... g.metric will be removed from GGIR in 2021
+    #============================================================
     if (ii == 11) { # angles
       anglex = (atan(Gxm / (sqrt(Gym^2 + Gzm^2)))) / (pi/180)
       angley = (atan(Gym / (sqrt(Gxm^2 + Gzm^2)))) / (pi/180)
@@ -97,4 +124,9 @@ g.metric= function(data,n=c(),sf,ii,TW=c(),lb=c(),hb=c(),gravity = 1) {
   } else {
     g.metric = Gfil[,1]
   }
+  #============================================================
+  # WARNING: this function (g.metric) is not used any more
+  # ...all functionality has moved to function g.applymetrics. 
+  # ... g.metric will be removed from GGIR in 2021
+  #============================================================
 }

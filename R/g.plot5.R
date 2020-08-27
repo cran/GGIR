@@ -10,6 +10,7 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
   # Note VvH: I put the following two lines here, which come from g.shell.GGIR
   N_milestone_data_p4 = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
   if (f1 > N_milestone_data_p4) f1 = N_milestone_data_p4
+  if (f1 == 0) f1 = N_milestone_data_p4
   # directories
   meta = paste(metadatadir,"/meta/basic",sep="")
   metasleep = paste(metadatadir,"/meta/ms3.out",sep="")
@@ -204,16 +205,16 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
           time = as.character(iso8601chartime2POSIX(time,desiredtz))
           nw_time = as.character(iso8601chartime2POSIX(nw_time,desiredtz))
         }
-
-        sec = unclass(as.POSIXlt(time))$sec
-        min_vec = unclass(as.POSIXlt(time))$min
-        hour = unclass(as.POSIXlt(time))$hour
-
+        time_unclassed = unclass(as.POSIXlt(time,desiredtz)) # Updated by by VvH: now doing this step once, and re-using the output
+        sec = time_unclassed$sec
+        min_vec = time_unclassed$min
+        hour = time_unclassed$hour
         # Prepare nonwear information for plotting
         NONWEAR = rep(NA,length(ACC))
-        day = unclass(as.POSIXlt(time))$mday
-        month = unclass(as.POSIXlt(time))$mon + 1
-        year = unclass(as.POSIXlt(time))$year + 1900
+        day = time_unclassed$mday
+        month = time_unclassed$mon + 1
+        year = time_unclassed$year + 1900
+        rm(time_unclassed)
         # take instances where nonwear was detected (on ws2 time vector) and map results onto a ws3 length vector for plotting purposes
         if (sum(which(nonwearscore > 1))) {
           nonwear_elements = which(nonwearscore > 1)
@@ -314,7 +315,7 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
         night_wake_full[is.na(detection)] <- 1 # for plotting wake during SPT window
 
         # prepare to search for sleeplog_onst / sleeplog_wake
-        sleep_dates = as.Date(summarysleep_tmp$calendar_date,format='%d/%m/%Y')
+        sleep_dates = as.Date(summarysleep_tmp$calendar_date,format='%d/%m/%Y', origin="1970-1-1")
 
         # detect midnights
         if (viewingwindow == 1) {
@@ -367,35 +368,56 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
             annot_mat[,5] <- MODPA[t0:t1]              # moderate pa
             annot_mat[,6] <- VIGPA[t0:t1]              # vigorous pa
 
-            # check to see if there are any sleep onset or wake annotations on this day (only works for noon - noon detection style)
+            # check to see if there are any sleep onset or wake annotations on this day 
             sleeponset_loc = 0
             wake_loc = 0
+            
+            
+            if (viewingwindow == 1) {  # use different search coefficients for noon or midnight centered plots
+              sw_coefs = c(0,24)  
+            } else if (viewingwindow == 2) {
+              sw_coefs = c(12,36)  
+            }
+            
             # check for sleeponset & wake time that is logged on this day before midnight
-            curr_date = as.Date(substr(time[t0],start=1,stop=10),format = '%Y-%m-%d')  # what day is it?
+            curr_date = as.Date(substr(time[t0],start=1,stop=10),format = '%Y-%m-%d', origin="1970-1-1")  # what day is it?
+            
+            if (viewingwindow == 2) {
+              # check to see if it is the first day that has less than 24 and starts after midnight
+              if ((t1 - t0) < ((60*60*12)/ws3)) { # if there is less than half a days worth of data
+                curr_date = curr_date - 1
+              }
+            }
+            
             check_date = match(curr_date,sleep_dates)
             if (is.na(check_date) == FALSE) {
-              sleeponset_time = summarysleep_tmp$sleeponset_ts[check_date]  # get the time of sleep_onset
-              # find the first index that matches sleeponset_hour and _min
-              sleeponset_hour = as.integer(substr(sleeponset_time,start=1,stop=2))
-              if (sleeponset_hour > 12) {   # only add the annotation here if sleeponset is before midnight, otherwise, check it next day
-                sleeponset_min = as.integer(substr(sleeponset_time,start=4,stop=5))
-                sleeponset_loc = which(hour[t0:t1] == sleeponset_hour & min_vec[t0:t1] == sleeponset_min) # will not find it, if it occurs after midnight, check prev day in next section
-                sleeponset_loc = sleeponset_loc[1]
-                if (is.na(sleeponset_loc)) sleeponset_loc = 0
-              }
-              # check to see if wake time is before midnight
-              wake_time = summarysleep_tmp$wakeup_ts[check_date]
-              wake_hour = as.integer(substr(wake_time,start=1,stop=2))
-              if (length(wake_hour) > 0) {
-                if (wake_hour > 12) {
-                  # wake annotation on the current days plot before midnight
-                  wake_min = as.integer(substr(wake_time,start=4,stop=5))
-                  wake_loc = which(hour[t0:t1] == wake_hour & min_vec[t0:t1] == wake_min)
-                  wake_loc = wake_loc[1]
-                  if (is.na(wake_loc)) wake_loc = 0
+              #sleeponset_time = summarysleep_tmp$sleeponset_ts[check_date]  # get the time of sleep_onset
+              sleeponset_time = summarysleep_tmp$sleeponset[check_date]  # get the time of sleep_onset
+              #if (sleeponset_time < 24) {
+              if (sleeponset_time >= sw_coefs[1] & sleeponset_time < sw_coefs[2]) {
+                sleeponset_hour = trunc(sleeponset_time)
+                if (sleeponset_hour == 24) sleeponset_hour = 0
+                if (sleeponset_hour > 24) sleeponset_hour = sleeponset_hour - 24 # only with viewingwindow==2
+                sleeponset_min = round((sleeponset_time - trunc(sleeponset_time)) * 60)
+                sleeponset_locations = which(hour[t0:t1] == sleeponset_hour & min_vec[t0:t1] == sleeponset_min)
+                if (!is.na(sleeponset_locations[1])) { 
+                  sleeponset_loc = sleeponset_locations[1]
                 }
-              } else {
-                wake_loc = 0
+              }
+              
+              wake_time = summarysleep_tmp$wakeup[check_date]
+              if (wake_time >= sw_coefs[1] & wake_time < sw_coefs[2]) {
+              #if (wake_time < 24) {
+                wake_hour = trunc(wake_time)
+                if (wake_hour == 24) wake_hour = 0
+                if (wake_hour > 24) {
+                  wake_hour = wake_hour - 24
+                }
+                wake_min = round((wake_time - trunc(wake_time)) * 60)
+                wake_locations = which(hour[t0:t1] == wake_hour & min_vec[t0:t1] == wake_min)
+                if (!is.na(wake_locations[1])) {
+                  wake_loc = wake_locations[1]
+                }
               }
             }
 
@@ -403,37 +425,52 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
             prev_date = curr_date - 1
             check_date = match(prev_date,sleep_dates)
             if (is.na(check_date) == FALSE) {
-              wake_time = summarysleep_tmp$wakeup_ts[check_date] # get wake time
-              # find the first index that matches wake time hour and min
-              wake_hour = as.integer(substr(wake_time,start=1,stop=2))
-              wake_min = as.integer(substr(wake_time,start=4,stop=5))
-              if (wake_hour < 12) {
-                if (wake_loc > 0) { # check to see if there is already a wake loc on this day
-                  wake_prev_loc = which(hour[t0:t1] == wake_hour & min_vec[t0:t1] == wake_min)
-                  if (!is.na(wake_prev_loc[1])) wake_loc[2] = wake_prev_loc[1]
-                } else if (wake_loc == 0) { # two wake locations on this 24hr period
-                  wake_loc = which(hour[t0:t1] == wake_hour & min_vec[t0:t1] == wake_min)
-                  wake_loc = wake_loc[1]
-                  if (is.na(wake_loc)) wake_loc = 0
+              wake_time = summarysleep_tmp$wakeup[check_date]
+              if (wake_time >= sw_coefs[2]) {
+              #if (wake_time > 24) {
+                wake_hour = trunc(wake_time) - 24
+              #  if (viewingwindow==2) {
+              #    wake_hour = wake_hour + 24
+              #  }
+                wake_min = round((wake_time - trunc(wake_time)) * 60)
+                wake_locations = which(hour[t0:t1] == wake_hour & min_vec[t0:t1] == wake_min)
+                if (wake_loc > 0) {
+                  if (!is.na(wake_locations[1])) {
+                    wake_loc[2] = wake_locations[1]
+                  }
+                } else if (wake_loc == 0) {
+                  if (!is.na(wake_locations[1])) {
+                    wake_loc = wake_locations[1]
+                  }
                 }
               }
-              # check for a late sleeponset time registered in previous day
-              sleeponset_time = summarysleep_tmp$sleeponset_ts[check_date]  # get the time of sleep_onset
-              # find the first index that matches sleeponset_hour and _min
-              sleeponset_hour = as.integer(substr(sleeponset_time,start=1,stop=2))
-              sleeponset_min = as.integer(substr(sleeponset_time,start=4,stop=5))
-              if (sleeponset_hour < 12) {  # the prev-day had a sleeponset time after midnight
-                if (sleeponset_loc > 0) { # check to see if there is already a sleeponset on this day
-                  # sleeponset found after midnight, reported on previous day
-                  sleeponset_prev_loc = which(hour[t0:t1] == sleeponset_hour & min_vec[t0:t1] == sleeponset_min)
-                  if (!is.na(sleeponset_prev_loc[1])) sleeponset_loc[2] = sleeponset_prev_loc[1]
+              
+              # new way 
+              sleeponset_time = summarysleep_tmp$sleeponset[check_date]
+              if (sleeponset_time >= sw_coefs[2]) {
+              #if (sleeponset_time > 24) {
+                sleeponset_hour = trunc(sleeponset_time) - 24
+                sleeponset_min = round((sleeponset_time - trunc(sleeponset_time)) * 60)
+                sleeponset_locations = which(hour[t0:t1] == sleeponset_hour & min_vec[t0:t1] == sleeponset_min)
+                if (sleeponset_loc > 0) {
+                  if (!is.na(sleeponset_locations[1])) {
+                    sleeponset_loc[2] = sleeponset_locations[1]  
+                  }
                 } else if (sleeponset_loc == 0) {
-                  sleeponset_loc = which(hour[t0:t1] == sleeponset_hour & min_vec[t0:t1] == sleeponset_min) # will not find it, if it occurs after midnight, check prev day in next section
-                  sleeponset_loc = sleeponset_loc[1]
-                  if (is.na(sleeponset_loc)) sleeponset_loc = 0
+                  if (!is.na(sleeponset_locations[1])) { 
+                    sleeponset_loc = sleeponset_locations[1]
+                  }
                 }
               }
             }
+            # if midnight centered plots, then search next day as well
+            if (viewingwindow==2) {
+              next_day = curr_date + 1
+              check_date = match(next_day,sleep_dates)
+              
+              
+            }
+            
 
             # add extensions if <24hr of data
             first_day_adjust = 0 # hold adjustment amounts on first and last day plots
@@ -568,13 +605,15 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
                 if (length(which(n2exclude == g)) > 0) skip = TRUE
               }
             }
+            #VvH I have moved unclass to one location, to avoid doing this computation several times:
+            curr_date_unclassed = unclass(as.POSIXlt(curr_date,desiredtz))
             title = paste("Day ",daycount,": ",
-                          wdaynames[unclass(as.POSIXlt(time[t0]))$wday+1],
+                          wdaynames[curr_date_unclassed$wday+1],
                           " ",
-                          unclass(as.POSIXlt(time[t0]))$mday,"/",
-                          unclass(as.POSIXlt(time[t0]))$mon+1,"/",
-                          unclass(as.POSIXlt(time[t0]))$year+1900,sep="")
-
+                          curr_date_unclassed$mday,"/",
+                          curr_date_unclassed$mon+1,"/",
+                          curr_date_unclassed$year+1900,sep="")
+            rm(curr_date_unclassed)
             if (skip == FALSE) {
               YXLIM = c(-230,300)
               LJ = 2
@@ -669,7 +708,7 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
               plot_loc = -length(x)*0.05 # x-axis coordinate for plotting text on the plot adaptable to different short epoch lengths
               text(x=plot_loc,y=285,labels=title,pos=4,font=2,cex=1)
               text(x=plot_loc,y=-120,labels="Arm movement:",pos=4,font=1.8,cex=0.9)
-              text(x=plot_loc,y=80,labels="Angle of sensor's z-axis relative to horizontal plane:",pos=4,font=1.8,cex=0.9)
+              text(x=plot_loc,y=100,labels="Angle of sensor's z-axis relative to horizontal plane:",pos=4,font=1.8,cex=0.9)
               box("figure",col="black")
               legend("topright",legend=c( "SPT Window: Sleep", "SPT Window: Wake", "Inactivity", #"arm angle (top) activity (bottom)",
                                             "Light PA","Moderate PA","Vigorous PA","Non-Wear"),

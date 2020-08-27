@@ -1,16 +1,19 @@
 get_starttime_weekday_meantemp_truncdata = function(temp.available, monc, dformat, data, selectdaysfile,
                                                     P, header, desiredtz, sf, i, datafile,
                                                     ws2, starttime, wday, weekdays, wdayname) {
-  start_meas = ws2/60 #ensures that first window starts at logical timepoint relative to its size (15,30,45 or 60 minutes of each hour)
+  #ensures that first window starts at logical timepoint relative to its size
+  # (15,30,45 or 60 minutes of each hour)
+  start_meas = ws2/60 
   if (temp.available == TRUE) {
     use.temp = TRUE
   } else {
     use.temp = FALSE
   }
   meantemp =c()
-  if (monc == 2 | (monc == 4 & dformat == 4) | (monc == 5 & use.temp == TRUE)) {
+  if (monc == 2 | (monc == 4 & dformat == 4) | monc == 5 | (monc == 0 & use.temp == TRUE)) {
     if (monc == 2) tempcolumn = 7
-    if (monc == 4 | monc == 5) tempcolumn = 5
+    if (monc == 4 | monc == 0) tempcolumn = 5
+    if (monc == 5) tempcolumn = 4
     meantemp = mean(as.numeric(data[,tempcolumn]),na.rm=TRUE)
     if (is.na(meantemp) == T) { #mean(as.numeric(data[1:10,7]))
       cat("\ntemperature is NA\n")
@@ -64,16 +67,22 @@ get_starttime_weekday_meantemp_truncdata = function(temp.available, monc, dforma
     start_hr = as.numeric(starttime2[1])
     start_min = as.numeric(starttime2[2])
     start_sec = as.numeric(starttime2[3])
+    
     secshift = 60 - start_sec #shift in seconds needed
     if (secshift != 60) {
       start_min = start_min +1 #shift in minutes needed (+1 one to account for seconds comp)
     }
     #-----------
     minshift = start_meas - (((start_min/start_meas) - floor(start_min/start_meas)) * start_meas)
-    if (minshift == start_meas) minshift = 0;
+    if (minshift == start_meas) {
+      minshift = 0;
+      if (secshift == 60) secshift = 0 # if starttime is 00:00 then we do not want to remove data
+    }
     #-----------
     sampleshift = ((minshift)*60*sf) + (secshift*sf) #derive sample shift
-    data = data[-c(1:floor(sampleshift)),] #delete data accordingly
+    if (floor(sampleshift) > 1) {
+      data = data[-c(1:floor(sampleshift)),] #delete data accordingly
+    }
     newmin = start_min+minshift #recalculate first timestamp
     newsec = 0
     remem2add24 = FALSE
