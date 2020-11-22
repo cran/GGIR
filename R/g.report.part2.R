@@ -1,4 +1,4 @@
-g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7,selectdaysfile=c()) {
+g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7,selectdaysfile=c(), store.long=FALSE) {
   ms2.out = "/meta/ms2.out"
   if (file.exists(paste0(metadatadir,ms2.out))) {
     if (length(dir(paste0(metadatadir,ms2.out))) == 0) {
@@ -126,7 +126,7 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7,selectdaysfil
         if (I$dformn == "csv") { #if it was stored in csv-format then underscores were replaced by spaces (by company)
           deviceSerialNumber = hvalues[which(hnames == "Device Unique Serial Code")] #serial number
         }
-      } else if (mon == "actigraph" | mon == "axivity") { #todo: create automatic extraction of information from actigraph fileheader
+      } else if (mon == "actigraph" | mon == "axivity" | mon == "verisense") { #todo: create automatic extraction of information from actigraph fileheader
         deviceSerialNumber = "not extracted"
       } else if (I$monc == 5) { #todo: create automatic extraction of information from monc fileheader
         deviceSerialNumber = "not extracted"
@@ -186,6 +186,10 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7,selectdaysfil
     # store final matrices again
     write.csv(SUMMARY,paste0(metadatadir,"/results/part2_summary.csv"),row.names=F)
     write.csv(daySUMMARY,paste0(metadatadir,"/results/part2_daysummary.csv"),row.names=F)
+    if (store.long == TRUE) { # Convert daySUMMARY to long format if there are multiple segments per day
+      df = g.convert.part2.long(daySUMMARY)
+      write.csv(df,paste0(metadatadir,"/results/part2_daysummary_longformat.csv"), row.names=F)
+    }
     if (length(selectdaysfile) > 0) {
       write.csv(winSUMMARY,paste0(metadatadir,"/results/part2_windowsummary.csv"),row.names=F)
     }

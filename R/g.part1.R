@@ -244,7 +244,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                          "g.binread", "g.cwaread", "g.readaccfile", "g.wavread", "g.downsample", "updateBlocksize",
                          "g.getidfromheaderobject", "g.getstarttime", "POSIXtime2iso8601", "chartime2iso8601",
                          "iso8601chartime2POSIX", "g.metric", "datadir2fnames", "read.myacc.csv",
-                         "get_nw_clip_block_params", "get_starttime_weekday_meantemp_truncdata", "ismovisens")
+                         "get_nw_clip_block_params", "get_starttime_weekday_meantemp_truncdata", "ismovisens",
+                         "g.extractheadervars")
     errhand = 'stop'
     # Note: This will not work for cwa files, because those also need Rcpp functions.
     # So, it is probably best to turn off parallel when debugging cwa data.
@@ -582,22 +583,6 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
       if (is.null(unlist(output_list[oli])) == FALSE) {
         cat(paste0("\nErrors and warnings for ",fnames[oli]))
         print(unlist(output_list[oli])) # print any error and warnings observed
-      }
-    }
-  }
-  if (exists("metadatadir")) { # do this because foreach may not use all cores at the end of a loop and then metadatadir can be missing
-    if (length(metadatadir) > 0) {
-      SI = sessionInfo()
-      sessionInfoFile = paste(metadatadir,"/results/QC/sessioninfo_part1.RData",sep="")
-      if (file.exists(sessionInfoFile)) {
-        FI = file.info(sessionInfoFile)
-        timesincecreation = abs(as.numeric(difftime(FI$ctime,Sys.time(),units="secs")))
-        # if file is older than 2 hours plus a random number of seconds (max 1 hours) then overwrite it
-        if (timesincecreation > (2*3600 + (sample(seq(1,3600,by=0.1),size = 1)))) {
-          save(SI,file=sessionInfoFile)
-        }
-      } else {
-        save(SI,file=sessionInfoFile)
       }
     }
   }

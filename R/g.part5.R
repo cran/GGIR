@@ -76,7 +76,7 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
   cnt = 1
   fnames.ms3 = sort(fnames.ms3)
   if (f1 == 0) length(fnames.ms4)
-  if (f1 > length(fnames.ms4)) f1 = length(fnames.ms4)
+  if (f1 > length(fnames.ms3)) f1 = length(fnames.ms3) # this is intentionally ms3 and not ms4, do not change!
   boutdur.mvpa = sort(boutdur.mvpa,decreasing = TRUE)
   boutdur.lig = sort(boutdur.lig,decreasing = TRUE)
   boutdur.in = sort(boutdur.in,decreasing = TRUE)
@@ -348,7 +348,9 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                                                       #nightsi = nightsi[which(nightsi >= startend_sleep[1] & nightsi <= startend_sleep[length(startend_sleep)])]
                                                     }
                                                     if (timewindowi == "MM") {
-                                                      Nwindows = nrow(summarysleep_tmp2)
+                                                    #  Nwindows = nrow(summarysleep_tmp2)
+                                                    #  Nwindows = length(which(diff(ts$diur) == -1)) + 1
+                                                       Nwindows = length(nightsi) + 1
                                                     } else {
                                                       Nwindows = length(which(diff(ts$diur) == -1))
                                                     }
@@ -357,7 +359,7 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                                                     add_one_day_to_next_date = FALSE
                                                     for (wi in 1:Nwindows) { #loop through 7 windows (+1 to include the data after last awakening)
                                                       # Define indices of start and end of the day window (e.g. midnight-midnight, or waking-up or wakingup
-                                                      defdays = g.part5.definedays(nightsi, wi, summarysleep_tmp2, indjump,
+                                                      defdays = g.part5.definedays(nightsi, wi, indjump,
                                                                                    nightsi_bu, ws3new, qqq_backup, ts, Nts,
                                                                                    timewindowi, Nwindows)
                                                       qqq = defdays$qqq
@@ -381,7 +383,7 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                                                           # from the new time series
                                                           # Note that this means that for MM windows there can be multiple or no wake or onsets
                                                           date = as.Date(ts$time[qqq[1]+1])
-                                                          if (add_one_day_to_next_date == TRUE) { # see below for explanation
+                                                          if (add_one_day_to_next_date == TRUE & timewindowi == "WW") { # see below for explanation
                                                             date = date + 1
                                                             add_one_day_to_next_date = FALSE
                                                           }
@@ -394,7 +396,7 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                                                           onset = onsetwaketiming$onset; wake = onsetwaketiming$wake
                                                           onseti = onsetwaketiming$onseti; wakei = onsetwaketiming$wakei
                                                           skiponset = onsetwaketiming$skiponset; skipwake = onsetwaketiming$skipwake
-                                                          if (wake < 24) { 
+                                                          if (wake < 24 & timewindowi == "WW") { 
                                                             # waking up before midnight means that next WW window
                                                             # will start a day before the day we refer to when discussing it's SPT
                                                             # So, for next window we have to do date = date + 1
@@ -642,7 +644,6 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                                                               ds_names[fi+(bci-1)] = paste0("Nbouts_day_MVPA_bts_",boutdur.mvpa[bci],"_",boutdur.mvpa[bci-1])
                                                             }
                                                           }
-                                                          
                                                           fi = fi + bci
                                                           bc.in = checkshape(bc.in)
                                                           for (bci in 1:nrow(bc.in)) {
@@ -652,7 +653,6 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
                                                             } else {
                                                               ds_names[fi+(bci-1)] = paste0("Nbouts_day_IN_bts_",boutdur.in[bci],"_",boutdur.in[bci-1])
                                                             }
-                                                            
                                                           }
                                                           fi = fi + bci
                                                           bc.lig = checkshape(bc.lig)
@@ -782,17 +782,5 @@ g.part5 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy=1,maxdur=7
         print(unlist(output_list[oli])) # print any error and warnings observed
       }
     }
-  }
-  SI = sessionInfo()
-  sessionInfoFile = paste(metadatadir,"/results/QC/sessioninfo_part5.RData",sep="")
-  if (file.exists(sessionInfoFile)) {
-    FI = file.info(sessionInfoFile)
-    timesincecreation = abs(as.numeric(difftime(FI$ctime,Sys.time(),units="secs")))
-    # if file is older than 2 hours plus a random number of seconds (max 1 hours) then overwrite it
-    if (timesincecreation > (2*3600 + (sample(seq(1,3600,by=0.1),size = 1)))) {
-      save(SI,file=sessionInfoFile)
-    }
-  } else {
-    save(SI,file=sessionInfoFile)
   }
 }
