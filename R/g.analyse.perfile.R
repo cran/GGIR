@@ -116,8 +116,9 @@ g.analyse.perfile = function(ID, ID2, IDd, fname, deviceSerialNumber, BodyLocati
     vi = vi + 4
     # Variables per metric - summarise with stratification to weekdays and weekend days
     daytoweekvar = c(5:length(ds_names))
-    md = which(ds_names[daytoweekvar] %in% c("measurementday", "weekday") == TRUE)
+    md = unique(which(ds_names[daytoweekvar] %in% c("measurementday", "weekday") == TRUE), grep(x = ds_names, pattern="qwindow_timestamps|qwindow_names"))
     if (length(md) > 0) daytoweekvar = daytoweekvar[-md]
+
     dtwtel = 0
     if (length(daytoweekvar) >= 1) {
       sp = length(daytoweekvar) + 1
@@ -126,7 +127,7 @@ g.analyse.perfile = function(ID, ID2, IDd, fname, deviceSerialNumber, BodyLocati
         uncona = unique(daysummary[,dtwi])
         storevalue = !(length(uncona) == 1 & length(qwindow) > 2 & uncona[1] == "")
         if (is.na(storevalue) == TRUE) storevalue = FALSE
-        # Only do next 15-isch linges of code if:
+        # Only do next 15-isch lines of code if:
         # - there is more than 1 day of data
         # - there are multiple daysegments (qwindow)
         # - first value is not empty
@@ -194,7 +195,11 @@ g.analyse.perfile = function(ID, ID2, IDd, fname, deviceSerialNumber, BodyLocati
     #get GGIR version
     SI = sessionInfo()
     GGIRversion = c()
-    GGIRversion = SI$otherPkgs$GGIR$Version
+    try(expr = {GGIRversion = SI$loadedOnly$GGIR$Version},silent=TRUE)
+    if (length(GGIRversion) == 0) {
+      try(expr = {GGIRversion = SI$otherPkgs$GGIR$Version},silent=TRUE)
+    }
+    # GGIRversion = SI$otherPkgs$GGIR$Version
     if (length(GGIRversion) == 0) GGIRversion = "GGIR not used"
     filesummary[(vi+6)] = GGIRversion #"2014-03-14 12:14:00 GMT"
     s_names[vi:(vi+6)] = as.character(c(paste0("data exclusion stategy (value=1, ignore specific hours;",

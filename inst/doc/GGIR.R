@@ -1,3 +1,6 @@
+## ---- echo=FALSE, out.width = "100%", out.extra='style="border: 0; padding:20px"'----
+knitr::include_graphics("GGIR-MASTERLOGO-RGB.png")
+
 ## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -74,4 +77,7 @@ knitr::include_graphics("example_dovisual.jpg")
 
 ## ---- out.width = "400px",echo=FALSE------------------------------------------
 knitr::include_graphics("nonwearimage.jpg")
+
+## ---- echo=FALSE, out.width = "75%", out.extra='style="border: 0; padding:20px"'----
+knitr::include_graphics("GGIR-MASTERLOGO-RGB.png")
 

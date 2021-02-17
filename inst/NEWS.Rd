@@ -1,7 +1,33 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-\section{Changes in version 2.2-0 (GitHub-only-release date:22-11-2020)}{
+\section{Changes in version 2.3-0 (GitHub-only-release date:17-02-2021)}{
+\itemize{
+  \item Part5 bug fixed for g.part5.fixmissingnight when night is also missing in sleeplog
+  \item Part 1 Documentation for sensor fusion functionality improved
+  \item Part2 csv report generation speeded up
+}
+}
+\section{Changes in version 2.2-2 (GitHub-only-release date:13-02-2021)}{
+\itemize{
+  \item Part 5 bug fix in waking up time for first night, in WW mode and HDCZA guider
+  \item Various minor function expansions to documentation and vignette
+  \item Part 2 Earlier draft implementation of IV and IS metrics now better tested and bugs fixed.
+  \item Part 2 Default value for argument IVIS.activity.metric changed to 2.
+  \item Migrate codecoverage testing to Github Actions
+  \item Part 1 Implemented initial sensor fusion functionality for AX6 cwa data
+}
+}
+\section{Changes in version 2.2-1 (GitHub-only-release date:12-01-2021)}{
+\itemize{
+  \item Part 3 Fix bug introduced in 2.2-0 for recordings without sustained inactivity bouts
+  \item Transitioned from Travis+Appveyor CI to GitHub Actions
+  \item Part 5 fixed issue with expected max number of files to process
+  \item Enabled console display of GGIR version number when running g.shell.shell under Windows
+  \item Embedded new GGIR logo and update layout of vignette
+}
+}
+\section{Changes in version 2.2-0 (release date:22-11-2020)}{
 \itemize{
   \item Part 5 improved midnights identification when the recording starts at 0am
   \item Part 5 fixed days misclassification for MM output when recordings starts with some non-wear days

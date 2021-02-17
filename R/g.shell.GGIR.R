@@ -174,6 +174,10 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (exists("do.bfx") == FALSE)  do.bfx = FALSE
   if (exists("do.bfy") == FALSE)  do.bfy = FALSE
   if (exists("do.bfz") == FALSE)  do.bfz = FALSE
+  if (exists("do.sgAccEN") == FALSE)  do.sgAccEN = TRUE
+  if (exists("do.sgAnglex") == FALSE)  do.sgAnglex = FALSE
+  if (exists("do.sgAngley") == FALSE)  do.sgAngley = FALSE
+  if (exists("do.sgAnglez") == FALSE)  do.sgAnglez = FALSE
   if (exists("dynrange") == FALSE)  dynrange = c()
   if (exists("hb") == FALSE)  hb = 15
   if (exists("lb") == FALSE)  lb = 0.5
@@ -202,14 +206,18 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (exists("ndayswindow") == FALSE)  ndayswindow = 7
   if (exists("do.imp") == FALSE) do.imp = TRUE
   if (exists("IVIS_windowsize_minutes") == FALSE)  IVIS_windowsize_minutes=60
-  if (exists("IVIS_epochsize_seconds") == FALSE)  IVIS_epochsize_seconds=30
+  if (exists("IVIS_epochsize_seconds") == FALSE)  IVIS_epochsize_seconds=c()
   if (exists("mvpadur") == FALSE)  mvpadur = c(1,5,10) # related to part 2 (functionality to anticipate part 5)
+  if (length(mvpadur) != 3) {
+    mvpadur = c(1,5,10)
+    warning("mvpadur needs to be a vector with length three, value now reset to default c(1, 5, 10)")
+  }
   if (exists("epochvalues2csv") == FALSE)  epochvalues2csv = FALSE
   if (exists("window.summary.size") == FALSE) window.summary.size = 10
   if (exists("dayborder") == FALSE)  dayborder = 0
   if (exists("iglevels") == FALSE)  iglevels = c()
   if (exists("TimeSegments2ZeroFile") == FALSE) TimeSegments2ZeroFile = c()
-  if (exists("IVIS.activity.metric") == FALSE)  IVIS.activity.metric = 1
+  if (exists("IVIS.activity.metric") == FALSE)  IVIS.activity.metric = 2
   if (exists("qM5L5") == FALSE)  qM5L5 = c()
   if (exists("MX.ig.min.dur") == FALSE)  MX.ig.min.dur = 10
   
@@ -301,6 +309,9 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   GGIRversion = ""
   SI = sessionInfo()
   try(expr = {GGIRversion = SI$loadedOnly$GGIR$Version},silent=TRUE)
+  if (length(GGIRversion) == 0) {
+    try(expr = {GGIRversion = SI$otherPkgs$GGIR$Version},silent=TRUE)
+  }
   if (length(GGIRversion) == 0) GGIRversion = "could not extract version"
   GGIRversion = paste0(" ",GGIRversion)
   cat(paste0("\n   GGIR version: ",GGIRversion,"\n"))
@@ -331,6 +342,8 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
             do.lfx=do.lfx, do.lfy=do.lfy, do.lfz=do.lfz, 
             do.hfx=do.hfx, do.hfy=do.hfy, do.hfz=do.hfz,
             do.bfx=do.bfx, do.bfy=do.bfy, do.bfz=do.bfz,
+            do.sgAccEN=do.sgAccEN, do.sgAnglex=do.sgAnglex,
+            do.sgAngley=do.sgAngley, do.sgAnglez=do.sgAnglez,
             printsummary=printsummary,
             do.cal = do.cal,print.filename=print.filename,
             overwrite=overwrite,backup.cal.coef=backup.cal.coef,
@@ -409,7 +422,7 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
     cat('\n')
     cat(paste0(rep('_',options()$width),collapse=''))
     cat("\nPart 5\n")
-    if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/ms4.out",sep="")))
+    if (f1 == 0) f1 = length(dir(paste(metadatadir,"/meta/ms3.out",sep=""))) # this is intentionally ms3 and not ms4, do not change!
     g.part5(datadir=datadir,metadatadir=metadatadir,f0=f0,f1=f1,strategy=strategy,maxdur=maxdur,
             hrs.del.start=hrs.del.start,
             hrs.del.end=hrs.del.end,
