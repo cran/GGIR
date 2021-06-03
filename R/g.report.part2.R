@@ -133,10 +133,19 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7,selectdaysfil
         if (I$dformn == "csv") { #if it was stored in csv-format then underscores were replaced by spaces (by company)
           deviceSerialNumber = hvalues[which(hnames == "Device Unique Serial Code")] #serial number
         }
-      } else if (mon == "actigraph" | mon == "axivity" | mon == "verisense") { #todo: create automatic extraction of information from actigraph fileheader
+      } else if (mon == "actigraph" | mon == "axivity" | mon == "verisense") {
         deviceSerialNumber = "not extracted"
-      } else if (I$monc == 5) { #todo: create automatic extraction of information from monc fileheader
+      } else if (I$monc == 5) { #movisense
         deviceSerialNumber = "not extracted"
+      } else if (I$monc == 0) {
+        if (header != "no header") {
+          deviceSerialNumber = hvalues[which(hnames == "device_serial_number")]
+          if (length(deviceSerialNumber) == 0) {
+            deviceSerialNumber = "not extracted"
+          }
+        } else {
+          deviceSerialNumber = "not extracted"
+        }
       }
       if (length(C$offset) == 0) {
         C$offset = C$translate
@@ -146,6 +155,9 @@ g.report.part2 = function(metadatadir=c(),f0=c(),f1=c(),maxdur = 7,selectdaysfil
       }
       if (length(C$npoints) == 0) {
         C$npoints = " "
+      }
+      if (length(C$tempoffset) == 0) {
+        C$tempoffset = c(0, 0, 0)
       }
       if (length(M$NFilePagesSkipped) == 0) M$NFilePagesSkipped = 0 # to make the code work for historical part1 output.
       QC = data.frame(filename=fnames[i],

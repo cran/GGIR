@@ -10,6 +10,15 @@ g.inspectfile = function(datafile, desiredtz = "", ...) {
       eval(parse(text=txt))
     }
   }
+  # Although also documented in the package manuel files, here 
+  # for convenience the monitor codes (mon):
+  # 0 - ad-hoc file (currently only .csv format)
+  # 1 - GENEA (non-commercial); 2 - GENEActiv
+  # 3 - Actigraph; 4 - Axivity (AX3, AX6)
+  # 5 - Movisense; 6 - Verisense
+  # data formats:
+  # 1 - bin; 2 - csv; 3 - wav
+  # 4 - cwa; 5 - ad-hoc .csv
 
   if (length(which(ls() == "rmc.dec")) == 0) rmc.dec="."
   if (length(which(ls() == "rmc.firstrow.acc")) == 0) rmc.firstrow.acc = c()
@@ -230,7 +239,6 @@ g.inspectfile = function(datafile, desiredtz = "", ...) {
       H = genea$header
     } else if (mon == 2) { #geneactive
       H = GENEAread::header.info(binfile=datafile, more = F)
-      # on.exit(closeAllConnections())
     } else if (mon == 5) { #movisens
       H = "file does not have header" # these files have no header
     }
@@ -347,9 +355,6 @@ g.inspectfile = function(datafile, desiredtz = "", ...) {
   monn = ifelse(mon > 0, monnames[mon], "unknown")
   dformc = dformat
   dformn = fornames[dformat]
-  if ("gzfile" %in% showConnections(all = T)[,1] == TRUE) {
-    closeAllConnections()
-  }
   invisible(list(header=header,monc=monc,monn=monn,
                  dformc=dformc,dformn=dformn,sf=sf,filename=filename))
 }

@@ -96,7 +96,7 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
     cat(paste("\nshort windowsize has now been automatically adjusted to: ",ws3," seconds in order to meet this criteria.\n",sep=""))
   }
   windowsizes = c(ws3,ws2,ws)
-  data = PreviousEndPage = starttime = wday = weekdays = wdayname = c()
+  data = PreviousEndPage = PreviousStartPage = starttime = wday = weekdays = wdayname = c()
   
   monnames = c("genea","geneactive","actigraph","axivity","movisens","verisense") #monitor names
   filequality = data.frame(filetooshort=FALSE,filecorrupt=FALSE,
@@ -251,9 +251,11 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
       NFilePagesSkipped = filequality$NFilePagesSkipped
       switchoffLD = accread$switchoffLD
       PreviousEndPage = accread$endpage
-      PreviousStartPage = accread$startpage
+      options(warn=-1) # to ignore warnings relating to failed mmap.load attempt
       rm(accread); gc()
+      options(warn=0) # to ignore warnings relating to failed mmap.load attempt
       if(mon == 5) { # if movisens, then read temperature
+        PreviousStartPage = accread$startpage
         temperature = g.readtemp_movisens(datafile, desiredtz, PreviousStartPage, PreviousEndPage)
         P = cbind(P, temperature[1:nrow(P)])
         colnames(P)[4] = "temp"
@@ -420,11 +422,18 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
                 data = apply(data, 2,as.numeric)
               }
             }
+            if (ncol(data) >= 4 & mon == 0) {
+              columns_to_use = rmc.col.acc
+            } else {
+              columns_to_use = 1:3
+            }
+            data = data[,columns_to_use]
+            suppressWarnings(storage.mode(data) <- "numeric")
             if ((mon == 3 | mon == 0 | mon == 6) & use.temp == FALSE) {
-              data[,1:3] = scale(data[,1:3],center = -offset, scale = 1/scale)  #rescale data
+              data = scale(data,center = -offset, scale = 1/scale)  #rescale data
             } else if ((mon == 2 | mon == 0) & use.temp == TRUE) {
               # meantemp replaced by meantempcal # 19-12-2013
-              data[,1:3] = scale(data[,1:3],center = -offset, scale = 1/scale) +
+              data = scale(data,center = -offset, scale = 1/scale) +
                 scale(yy, center = rep(meantempcal,3), scale = 1/tempoffset)  #rescale data
               rm(yy); gc()
             }
@@ -652,7 +661,8 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
           NcolEF = ncol(OutputExternalFunction)-1 # number of extra columns needed
           metashort[count:(count-1+nrow(OutputExternalFunction)),col_msi:(col_msi+NcolEF)] = as.matrix(OutputExternalFunction); col_msi = col_msi + NcolEF + 1
         }
-        count = count + length(EN_shortepoch) #increasing "count" the indicator of how many seconds have been read
+        # count = count + length(EN_shortepoch) #increasing "count" the indicator of how many seconds have been read
+        count = count + length(accmetrics[[1]]) # changing indicator to whatever metric is calculated, EN produces incompatibility when deriving both ENMO and ENMOa 
         rm(accmetrics)
         # update blocksize depending on available memory
         BlocksizeNew = updateBlocksize(blocksize=blocksize, bsc_qc=bsc_qc)

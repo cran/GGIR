@@ -14,7 +14,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                    minloadcrit=72,printsummary=TRUE,print.filename=FALSE,overwrite=FALSE,
                    backup.cal.coef="retrieve",selectdaysfile=c(),dayborder=0,dynrange=c(),
                    configtz = c(), do.parallel = TRUE, minimumFileSizeMB = 2,myfun=c(),
-                   do.sgAccEN=TRUE, do.sgAnglex=FALSE, do.sgAngley=FALSE, do.sgAnglez=FALSE, ...) {
+                   do.sgAccEN=TRUE, do.sgAnglex=FALSE, do.sgAngley=FALSE, do.sgAnglez=FALSE, 
+                   maxNcores=c(), ...) {
   #get input variables (relevant when read.myacc.csv is used
   input = list(...)
   if (length(input) > 0) {
@@ -200,7 +201,6 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   # THE LOOP TO RUN THROUGH ALL BINARY FILES AND PROCES THEM
   fnames = sort(fnames)
   if (do.parallel == TRUE) {
-    closeAllConnections() # in case there is a still something running from last time, kill it.
     cores=parallel::detectCores()
     Ncores = cores[1]
     if (Ncores > 3) {
@@ -220,7 +220,9 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
       } else if (chunksize > 0.6 & Nmetrics2calc >= 6) { # if user wants to extract more than 5 metrics
         chunksize = 0.4 # put limit to chunksize, because when processing in parallel memory is more limited
       }
-      cl <- parallel::makeCluster(Ncores-1) #not to overload your computer
+      if (length(maxNcores) == 0) maxNcores = Ncores
+      Ncores2use = min(c(Ncores-1, maxNcores))
+      cl <- parallel::makeCluster(Ncores2use) #not to overload your computer
       doParallel::registerDoParallel(cl)
 
     } else {
@@ -582,11 +584,11 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
   }
   if (do.parallel == TRUE) {
     on.exit(parallel::stopCluster(cl))
-    for (oli in 1:length(output_list)) { # logged error and warning messages
-      if (is.null(unlist(output_list[oli])) == FALSE) {
-        cat(paste0("\nErrors and warnings for ",fnames[oli]))
-        print(unlist(output_list[oli])) # print any error and warnings observed
-      }
+  }
+  for (oli in 1:length(output_list)) { # logged error and warning messages
+    if (is.null(unlist(output_list[oli])) == FALSE) {
+      cat(paste0("\nErrors and warnings for ",fnames[oli]))
+      print(unlist(output_list[oli])) # print any error and warnings observed
     }
   }
 }
