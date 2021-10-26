@@ -1,7 +1,61 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-
+\section{Changes in version 2.5-0 (release date:25-10-2021)}{
+\itemize{
+  \item Minor updates to function documentation and vignettes
+  \item visualreport: Month now displayed by name rather than number to avoid confusion about format.
+}
+}
+\section{Changes in version 2.4-3 (GitHub-only-release date:20-10-2021)}{
+\itemize{
+  \item Vignette expanded with documentation on non-default variables in part 4 csv report
+  \item Vignette added with a tutorial on how to perform segmented day analysis
+  \item Part 1: The sensor fusion functionality introduced in version 2.2-2, as a bit
+  of an experimental development, has now been removed from GGIR as added value turned out
+  to be limited.
+  \item Part 2: Code for ID extraction tidied up, and new idloc argument options added.
+  \item Part 2: Activity log can now also have empty days.
+  \item Part 2: Now also exported in long format if qwindow has length longer than 2.
+  \item Part 3 and 4 expanded with Sleep Regularity Index.
+  \item Part 4 number of awakenings is now also in the output. 
+  \item Part 5 LUX per segment calculation bug fixes.
+  \item visualreport code modified such that it visualises any day with at least 30 minutes of data
+  unless sleep could not be estimated from the corresponding night.
+}
+}
+\section{Changes in version 2.4-2 (GitHub-only-release date:14-09-2021)}{
+\itemize{
+  \item Part 1 now able to derive zero-crossing counts needed for Sadeh algorithm
+  \item Part 2 function g.conv.actlog to use activity log to guide qwindow now able to tailor dateformat
+  \item Part 3 now option to tailor SPT detection for hip data by using horizontal
+    longitudinal angle as indicator of lying
+  \item Part 3 code restructured to estimate SPT and SIB in separated function (HASIB and HASPT)
+  such that g.sib.det is more readable.
+  \item Part 3 now option to select SIB algorithm, including: vanHees2015, Sadeh1994,
+  and Galland2012
+  \item Part 4 now able to handle more advance sleeplog format that also contain nap
+  and nonwear entries per date
+  \item Part 4 report now includes guider estimates also in 'cleaned' report
+  \item Part 4 WASO and NOA (Number of awakenings) added to output
+  \item Part 4 Able to handle time in bed diaries/algorithms, and generates sleep
+  latency and sleep efficiency estimate if available
+  \item Part 5 now able to export sustained inactivity bouts and self-reported
+  naps and nonwear to csv report to aid nap analysis
+  \item Part 5 numeric timing of MX-metrics changed to be hour of the day
+  \item Part 5 Lux per segment variables now turn LUX during SPT to zero
+  \item Part 4 legend added to visualisation
+  \item Part 5 bug fixed that caused part5 single row output to be stored as a single column
+}
+}
+\section{Changes in version 2.4-1 (GitHub-only-release date:12-07-2021)}{
+\itemize{
+  \item Part 1 fixed bug related to g.getmeta reading movisens files
+  \item Part 1 resampling function expanded with option to choose interpolation technique
+  \item Part 3 fixed bug introduced in 2.4-0 making it impossible to process long
+  recordings with many sustained inactivity bouts
+}
+}
 \section{Changes in version 2.4-0 (release date:03-06-2021)}{
 \itemize{
   \item Part 5 LUX variables per segment of the day improved

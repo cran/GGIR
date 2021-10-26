@@ -175,10 +175,9 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (exists("do.bfx") == FALSE)  do.bfx = FALSE
   if (exists("do.bfy") == FALSE)  do.bfy = FALSE
   if (exists("do.bfz") == FALSE)  do.bfz = FALSE
-  if (exists("do.sgAccEN") == FALSE)  do.sgAccEN = TRUE
-  if (exists("do.sgAnglex") == FALSE)  do.sgAnglex = FALSE
-  if (exists("do.sgAngley") == FALSE)  do.sgAngley = FALSE
-  if (exists("do.sgAnglez") == FALSE)  do.sgAnglez = FALSE
+  if (exists("do.zcx") == FALSE)  do.zcx = FALSE
+  if (exists("do.zcy") == FALSE)  do.zcy = FALSE
+  if (exists("do.zcz") == FALSE)  do.zcz = FALSE
   if (exists("dynrange") == FALSE)  dynrange = c()
   if (exists("hb") == FALSE)  hb = 15
   if (exists("lb") == FALSE)  lb = 0.5
@@ -186,6 +185,7 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (exists("idloc") == FALSE) idloc = 1
   if (exists("backup.cal.coef") == FALSE)  backup.cal.coef = "retrieve"
   if (exists("minimumFileSizeMB") == FALSE)  minimumFileSizeMB = 2
+  if (exists("interpolationType") == FALSE)  interpolationType=1
 
   if (length(myfun) != 0) { # Run check on myfun object
     check_myfun(myfun, windowsizes)
@@ -194,8 +194,17 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   # PART 2
   if (exists("strategy") == FALSE)  strategy = 1
   if (exists("maxdur") == FALSE)  maxdur = 0
+  
   if (exists("hrs.del.start") == FALSE)  hrs.del.start = 0
+  if (strategy != 1 & hrs.del.start != 0) {
+    warning("\nSetting argument hrs.del.start in combination with strategy = ", strategy," is not meaningful, because this is only used when straytegy = 1")
+    rm(hrs.del.start)
+  }
   if (exists("hrs.del.end") == FALSE)  hrs.del.end = 0
+  if (strategy != 1 & hrs.del.end != 0) {
+    warning("\nSetting argument hrs.del.end in combination with strategy = ", strategy," is not meaningful, because this is only used when straytegy = 1")
+    rm(hrs.del.end)
+  }
   if (exists("includedaycrit") == FALSE)  includedaycrit = 16
   if (exists("M5L5res") == FALSE)  M5L5res = 10
   if (exists("winhr") == FALSE)  winhr = 5
@@ -205,13 +214,16 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (exists("mvpathreshold") == FALSE)  mvpathreshold = 100
   if (exists("boutcriter") == FALSE)  boutcriter = 0.8
   if (exists("ndayswindow") == FALSE)  ndayswindow = 7
+  if (strategy != 3 & ndayswindow != 7) {
+    warning("\nSetting argument ndayswindow in combination with strategy = ", strategy," is not meaningful, because this is only used when straytegy = 3")
+  }
   if (exists("do.imp") == FALSE) do.imp = TRUE
   if (exists("IVIS_windowsize_minutes") == FALSE)  IVIS_windowsize_minutes=60
   if (exists("IVIS_epochsize_seconds") == FALSE)  IVIS_epochsize_seconds=NA
   if (exists("mvpadur") == FALSE)  mvpadur = c(1,5,10) # related to part 2 (functionality to anticipate part 5)
   if (length(mvpadur) != 3) {
     mvpadur = c(1,5,10)
-    warning("mvpadur needs to be a vector with length three, value now reset to default c(1, 5, 10)")
+    warning("\nmvpadur needs to be a vector with length three, value now reset to default c(1, 5, 10)")
   }
   if (exists("epochvalues2csv") == FALSE)  epochvalues2csv = FALSE
   if (exists("window.summary.size") == FALSE) window.summary.size = 10
@@ -224,13 +236,41 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (exists("IVIS.activity.metric") == FALSE)  IVIS.activity.metric = 2
   if (exists("qM5L5") == FALSE)  qM5L5 = c()
   if (exists("MX.ig.min.dur") == FALSE)  MX.ig.min.dur = 10
-
+  if (exists("qwindow_dateformat") == FALSE)  qwindow_dateformat = "%d-%m-%Y"
+  
 
   # PART 3
   if (exists("anglethreshold") == FALSE)  anglethreshold = 5
   if (exists("timethreshold") == FALSE)  timethreshold = 5
   if (exists("constrain2range") == FALSE) constrain2range = TRUE
   if (exists("do.part3.pdf") == FALSE) do.part3.pdf = TRUE
+  if (exists("HASPT.algo") == FALSE) HASPT.algo = "HDCZA"; def.noc.sleep=1
+  if (exists("HASIB.algo") == FALSE) HASIB.algo = "vanHees2015"; def.noc.sleep=1
+  if (exists("sensor.location") == FALSE) sensor.location = "wrist"
+  if (exists("HASPT.ignore.invalid") == FALSE) HASPT.ignore.invalid = FALSE
+  if (sensor.location == "hip") {
+    if (do.anglex == FALSE | do.angley == FALSE | do.anglez == FALSE) {
+      warning(paste0("\nWhen working with hip data all three angle metrics are needed,",
+                     "so GGIR now auto-sets arguments do.anglex, do.angley, and do.anglez to TRUE."))
+      do.anglex = do.angley = do.anglez = TRUE
+    }
+    if (HASPT.algo != "HorAngle") {
+      warning("\nChanging HASPT.algo to HorAngle, because sensor.location is set as hip")
+      HASPT.algo = "HorAngle"; def.noc.sleep=1
+    }
+  }
+  if (HASIB.algo %in% c("Sadeh1994", "Galland2012") == TRUE) {
+    if (exists("Sadeh_axis") == FALSE) Sadeh_axis = "Y"
+    if (Sadeh_axis %in% c("X","Y","Z") == FALSE) {
+      warning("\nArgument Sadeh_axis does not have meaningful value, it needs to be X, Y or Z (capital)")
+    }
+    if (Sadeh_axis == "X" & do.zcx == FALSE) do.zcx =  TRUE
+    if (Sadeh_axis == "Y" & do.zcy == FALSE) do.zcy =  TRUE
+    if (Sadeh_axis == "Z" & do.zcz == FALSE) do.zcz =  TRUE
+  } else { # vanHees2015
+    if (exists("Sadeh_axis") == FALSE) Sadeh_axis = "" # not used
+  }
+  if (exists("longitudinal_axis") == FALSE)  longitudinal_axis = c()
 
   # PART 4
   if (exists("loglocation") == FALSE)  loglocation = c()
@@ -252,7 +292,16 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (exists("data_cleaning_file") == FALSE) data_cleaning_file = c()
   if (exists("excludefirst.part4") == FALSE) excludefirst.part4 = FALSE
   if (exists("excludelast.part4") == FALSE)  excludelast.part4 = FALSE
-
+  if (exists("sleeplogsep") == FALSE)  sleeplogsep = ","
+  if (exists("sleepwindowType") == FALSE)  sleepwindowType = "SPT"
+  if (HASPT.algo == "HorAngle") {
+    warning("\nHASPT.algo is set to HorAngle, therefor auto-updating sleepwindowType to TimeInBed")
+    sleepwindowType = "TimeInBed"
+  }
+  if ((length(loglocation) == 0 | HASPT.algo != "HorAngle") & sleepwindowType != "SPT") {
+    warning("\nAuto-updating sleepwindowType to SPT because nog sleeplog used and neither HASPT.algo HorAngle used.")
+    sleepwindowType = "SPT"
+  }
   # PART 5
   if (exists("excludefirstlast.part5") == FALSE)  excludefirstlast.part5=FALSE
   if (exists("includenightcrit") == FALSE)  includenightcrit=16
@@ -275,7 +324,6 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (exists("minimum_MM_length.part5") == FALSE) minimum_MM_length.part5 = 23
   if (exists("frag.metrics") == FALSE) frag.metrics = c()
   if (exists("part5_agg2_60seconds") == FALSE) part5_agg2_60seconds = FALSE
-
   # Related to (r)ead (m)yacc (c)sv file:
   if (exists("rmc.dec") == FALSE) rmc.dec="."
   if (exists("rmc.firstrow.acc") == FALSE) rmc.firstrow.acc = c()
@@ -308,13 +356,14 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   if (exists("LUX_cal_constant") == FALSE) LUX_cal_constant = c()
   if (exists("LUX_cal_exponent") == FALSE) LUX_cal_exponent = c()
   if (exists("LUX_day_segments") == FALSE) LUX_day_segments = c()
-  
+
   if (length(LUX_day_segments) > 0) {
     LUX_day_segments = sort(unique(round(LUX_day_segments)))
     if (LUX_day_segments[1] != 0) LUX_day_segments = c(0, LUX_day_segments)
     if (LUX_day_segments[length(LUX_day_segments)] != 24) LUX_day_segments = c(LUX_day_segments, 24)
-    
+
   }
+  if (length(which(ls() == "do.sibreport")) == 0) do.sibreport = FALSE
   # VISUAL REPORT
 
   if (exists("viewingwindow") == FALSE)  viewingwindow = 1
@@ -334,8 +383,17 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
   cat(paste0("\n   GGIR version: ",GGIRversion,"\n"))
   cat("\n   Do not forget to cite GGIR in your publications via a version number and\n")
   cat("   Migueles et al. 2019 JMPB. doi: 10.1123/jmpb.2018-0063. \n")
-  cat("   See also: https://cran.r-project.org/package=GGIR/vignettes/GGIR.html#citing-ggir \n")
-
+  cat("   See also: https://cran.r-project.org/package=GGIR/vignettes/GGIR.html#citing-ggir")
+  cat("\n")
+  cat("\n   To make your research reproducible and interpretable always report:")
+  cat("\n     (1) Accelerometer brand and product name")
+  cat("\n     (2) How you configured the accelerometer")
+  cat("\n     (3) Study protocol and wear instructions given to the participants")
+  cat("\n     (4) GGIR version")
+  cat("\n     (5) How GGIR was used: Share the config.csv file or your R script.")
+  cat("\n     (6) How you post-processed / cleaned GGIR output")
+  cat("\n     (7) How reported outcomes relate to the specific variable names in GGIR")
+  
   if (dopart1 == TRUE) {
     cat('\n')
     cat(paste0(rep('_',options()$width),collapse=''))
@@ -359,8 +417,7 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
             do.lfx=do.lfx, do.lfy=do.lfy, do.lfz=do.lfz,
             do.hfx=do.hfx, do.hfy=do.hfy, do.hfz=do.hfz,
             do.bfx=do.bfx, do.bfy=do.bfy, do.bfz=do.bfz,
-            do.sgAccEN=do.sgAccEN, do.sgAnglex=do.sgAnglex,
-            do.sgAngley=do.sgAngley, do.sgAnglez=do.sgAnglez,
+            do.zcx=do.zcx, do.zcy=do.zcy, do.zcz=do.zcz,
             printsummary=printsummary,
             do.cal = do.cal,print.filename=print.filename,
             overwrite=overwrite,backup.cal.coef=backup.cal.coef,
@@ -387,7 +444,8 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
             rmc.check4timegaps = rmc.check4timegaps, rmc.noise=rmc.noise,
             rmc.col.wear=rmc.col.wear,
             rmc.doresample=rmc.doresample,
-            myfun=myfun, maxNcores=maxNcores)
+            myfun=myfun, maxNcores=maxNcores,
+            interpolationType=interpolationType)
   }
   if (dopart2 == TRUE) {
     cat('\n')
@@ -408,7 +466,7 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
             IVIS_epochsize_seconds = IVIS_epochsize_seconds, iglevels = iglevels,
             IVIS.activity.metric=IVIS.activity.metric, TimeSegments2ZeroFile = TimeSegments2ZeroFile,
             qM5L5=qM5L5, do.parallel = do.parallel, myfun=myfun, MX.ig.min.dur=MX.ig.min.dur,
-            maxNcores=maxNcores)
+            maxNcores=maxNcores, qwindow_dateformat=qwindow_dateformat)
   }
   if (dopart3 == TRUE) {
     cat('\n')
@@ -419,7 +477,9 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
             f1=f1,anglethreshold=anglethreshold,timethreshold=timethreshold,
             ignorenonwear=ignorenonwear,overwrite=overwrite,desiredtz=desiredtz,
             constrain2range=constrain2range, do.parallel = do.parallel,
-            myfun=myfun, maxNcores=maxNcores)
+            myfun=myfun, maxNcores=maxNcores, sensor.location=sensor.location,
+            HASPT.algo = HASPT.algo, HASIB.algo =HASIB.algo, Sadeh_axis=Sadeh_axis,
+            longitudinal_axis=longitudinal_axis, do.part3.pdf=do.part3.pdf)
   }
   if (dopart4 == TRUE) {
     cat('\n')
@@ -434,7 +494,8 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
             sleeplogidnum=sleeplogidnum,def.noc.sleep=def.noc.sleep,do.visual = do.visual, #
             storefolderstructure=storefolderstructure,overwrite=overwrite,desiredtz=desiredtz,
             data_cleaning_file=data_cleaning_file,
-            excludefirst.part4= excludefirst.part4,excludelast.part4=excludelast.part4)
+            excludefirst.part4= excludefirst.part4,excludelast.part4=excludelast.part4,
+            sleeplogsep=sleeplogsep, sleepwindowType=sleepwindowType, sensor.location=sensor.location)
   }
   if (dopart5 == TRUE) {
     cat('\n')
@@ -464,7 +525,8 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
             includedaycrit.part5=includedaycrit.part5, iglevels=iglevels,
             LUXthresholds=LUXthresholds, maxNcores=maxNcores,
             LUX_cal_constant=LUX_cal_constant, LUX_cal_exponent=LUX_cal_exponent,
-            LUX_day_segments=LUX_day_segments)
+            LUX_day_segments=LUX_day_segments, do.sibreport=do.sibreport,
+            sleeplogidnum=sleeplogidnum)
   }
   #--------------------------------------------------
   # Store configuration parameters in config file
@@ -518,7 +580,8 @@ g.shell.GGIR = function(mode=1:5,datadir=c(),outputdir=c(),studyname=c(),f0=1,f1
     if (N.files.ms4.out < f1) f1 = N.files.ms4.out
     if (f1 == 0) f1 = N.files.ms4.out
     g.report.part4(datadir=datadir,metadatadir=metadatadir,loglocation =loglocation,f0=f0,f1=f1,
-                   storefolderstructure=storefolderstructure, data_cleaning_file=data_cleaning_file)
+                   storefolderstructure=storefolderstructure, data_cleaning_file=data_cleaning_file,
+                   sleepwindowType=sleepwindowType)
   }
   if (length(which(do.report == 5)) > 0) {
     cat('\n')

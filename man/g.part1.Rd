@@ -29,16 +29,16 @@ g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),
         do.roll_med_acc_z=FALSE, do.dev_roll_med_acc_x=FALSE,
         do.dev_roll_med_acc_y=FALSE, do.dev_roll_med_acc_z=FALSE,
         do.lfen = FALSE, do.lfx=FALSE, do.lfy=FALSE, do.lfz=FALSE, 
-                   do.hfx=FALSE, do.hfy=FALSE, do.hfz=FALSE, 
-                    do.bfx=FALSE, do.bfy=FALSE, do.bfz=FALSE, 
+        do.hfx=FALSE, do.hfy=FALSE, do.hfz=FALSE, 
+        do.bfx=FALSE, do.bfy=FALSE, do.bfz=FALSE, 
+        do.zcx=FALSE, do.zcy=FALSE, do.zcz=FALSE,
         do.cal = TRUE,lb = 0.2, hb = 15, n = 4,
         spherecrit=0.3,minloadcrit=72,
         printsummary=TRUE,print.filename=FALSE,overwrite=FALSE,
         backup.cal.coef="retrieve",selectdaysfile=c(),dayborder=0,
         dynrange=c(), configtz=c(), do.parallel=TRUE, minimumFileSizeMB = 2,
         myfun=c(),
-        do.sgAccEN=TRUE, do.sgAnglex=FALSE, do.sgAngley=FALSE, do.sgAnglez=FALSE,
-        maxNcores=c(), ...)
+        maxNcores=c(), interpolationType=1, ...)
 }
 \arguments{
   \item{datadir}{
@@ -108,7 +108,7 @@ g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),
   if TRUE, calculate the angle of the z-axis relative to the horizontal plane
   (degrees) utilizing all three axes
   }
-  \item{do.enmoa}{if TRUE (default), calculate metric ENMOa which is equal to
+  \item{do.enmoa}{if TRUE, calculate metric ENMOa which is equal to
   metric ENMO but with the absolute taken from the Euclidean norm minus one.
   }
  \item{do.roll_med_acc_x}{ see \link{g.getmeta}
@@ -143,7 +143,12 @@ g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),
   }
   \item{do.bfz}{ see \link{g.getmeta}
   }
-  
+   \item{do.zcx}{ see \link{g.getmeta}
+  }
+  \item{do.zcy}{ see \link{g.getmeta}
+  }
+  \item{do.zcz}{ see \link{g.getmeta}
+  }
   \item{do.cal}{
   Whether to apply auto-calibration or not, see \link{g.calibrate}. Default and
   recommended setting is TRUE
@@ -168,43 +173,42 @@ g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),
   other values will be ceiled). After loading these hours only extra data is loaded
   if calibration error has not be reduced to under 0.01 g.
   }
-   \item{printsummary}{
-  see \link{g.calibrate} if TRUE will print a summary when done
+  \item{printsummary}{
+    see \link{g.calibrate} if TRUE will print a summary when done
   }
-
   \item{print.filename}{
-  Whether to print the filename before before analysing it (default is FALSE).
-  Printing the filename can be useful to investigate problems (e.g. to verify that
-  which file is being read).
+    Whether to print the filename before before analysing it (default is FALSE).
+    Printing the filename can be useful to investigate problems (e.g. to verify that
+    which file is being read).
   }
-   \item{overwrite}{
+  \item{overwrite}{
     Overwrite previously generated milestone data by this function for this
     particular dataset. If FALSE then it will skip the previously processed files
     (default = FALSE).
   }
   \item{backup.cal.coef}{
-  Default "retrieve". Option to use backed-up calibration coefficient instead of
-  deriving the calibration coefficients when analysing the same file twice, see details.
+    Default "retrieve". Option to use backed-up calibration coefficient instead of
+    deriving the calibration coefficients when analysing the same file twice, see details.
   }
   \item{selectdaysfile}{
-  Optional functionality. Character pointing at a csv file holding the relationship
-  between device serial numbers (first column) and measurement dates of interest
-  (second and third column). The date format should be dd/mm/yyyy. And the first row
-  if the csv file is assumed to have a character variable names, e.g. "serialnumber"
-  "Day1" and "Day2" respectively. Raw data will be extracted and stored in the output
-  directory in a new subfolder named 'raw'.
+    Optional functionality. Character pointing at a csv file holding the relationship
+    between device serial numbers (first column) and measurement dates of interest
+    (second and third column). The date format should be dd/mm/yyyy. And the first row
+    if the csv file is assumed to have a character variable names, e.g. "serialnumber"
+    "Day1" and "Day2" respectively. Raw data will be extracted and stored in the output
+    directory in a new subfolder named 'raw'.
   }
   \item{dayborder}{
-  Hour at which days start and end (default = 0), value = 4 would mean 4 am
+    Hour at which days start and end (default = 0), value = 4 would mean 4 am
   }
   \item{dynrange}{
    Optional, provide dynamic range for accelerometer data to overwrite hardcoded
    6 g for GENEA and 8 g for other brands
   }
   \item{configtz}{
-  Only functional for AX3 cwa data at the moment. Timezone in which the accelerometer
-  was configured. Only use this argument if the timezone of configuration and
-  timezone in which recording took place are different.
+    Only functional for AX3 cwa data at the moment. Timezone in which the accelerometer
+    was configured. Only use this argument if the timezone of configuration and
+    timezone in which recording took place are different.
   }
   \item{do.parallel}{
     Boolean whether to use multi-core processing (only works if at least 4 CPU cores are available.
@@ -218,29 +222,18 @@ g.part1(datadir=c(),outputdir=c(),f0=1,f1=c(),
     External function object to be applied to raw data.
     See details \link{applyExtFunction}.
   }
-  
-    \item{do.sgAccEN}{
-  Boolean, see \link{g.getmeta})
-  }
-  \item{do.sgAnglex}{
-  Boolean, see \link{g.getmeta})
-  }
-  \item{do.sgAngley}{
-  Boolean, see \link{g.getmeta})
-  }
-  \item{do.sgAnglez}{
-  Boolean, see \link{g.getmeta})
-  }
   \item{maxNcores}{
     Maximum number of cores to use when argument do.parallel is set to true.
     GGIR by default uses the maximum number of available cores, but this argument
     allows you to set a lower maximum.
   }
-  \item{...}{
-   Any input arguments needed for function \link{read.myacc.csv} if you
-   are working with a non-standard csv formatted files.
+  \item{interpolationType}{
+   Integer, see \link{g.getmeta}
   }
-
+  \item{...}{
+    Any input arguments needed for function \link{read.myacc.csv} if you
+    are working with a non-standard csv formatted files.
+  }
 }
 \details{
  Argument backup.cal.coef has two usecase. Use case 1: If the auto-calibration fails

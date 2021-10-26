@@ -17,7 +17,8 @@ sleeplogidnum=FALSE,do.visual=FALSE,outliers.only = FALSE,
     relyonguider=FALSE, relyonsleeplog=FALSE, def.noc.sleep=1,
     storefolderstructure=FALSE,overwrite=FALSE,
     desiredtz="",data_cleaning_file=c(),
-    excludefirst.part4=FALSE,excludelast.part4=FALSE)
+    excludefirst.part4=FALSE,excludelast.part4=FALSE, sleeplogsep=",",
+    sleepwindowType="SPT", sensor.location="wrist")
 }
 \arguments{
   \item{datadir}{
@@ -106,25 +107,26 @@ sleeplogidnum=FALSE,do.visual=FALSE,outliers.only = FALSE,
   during waking hours then set to TRUE, in all other scenarios
   set to FALSE (default).
   }
-   \item{relyonsleeplog}{
+  \item{relyonsleeplog}{
     Now replaced by relyonguider. Values provided to argument
     relyonsleeplog will be passed on to argument relyonguider to not
     preserve functionality of old R script.
   }
   \item{def.noc.sleep}{
-  The time window during which sustained inactivity will be assumed
-  to represent sleep, e.g. def.noc.sleep=c(21,9). This is only
-  used if no sleep log entry is available. If def.noc.sleep is
-  left blank 'def.noc.sleep=c()' then the 12 hour window centred
-  at the least active 5 hours of the 24 hour period will be used
-  instead. Here, L5 is hardcoded and will not change by changing
-  argument winhr in function \link{g.part2}. If def.noc.sleep is filled
-  with a single integer, e.g. def.noc.sleep=c(1) then the window
-  will be detected with the method as described in van Hees et al.
-  2018 Scientific Reports.
+    The time window during which sustained inactivity will be assumed
+    to represent sleep, e.g. def.noc.sleep=c(21,9). This is only
+    used if no sleep log entry is available. If def.noc.sleep is
+    left blank 'def.noc.sleep=c()' then the 12 hour window centred
+    at the least active 5 hours of the 24 hour period will be used
+    instead. Here, L5 is hardcoded and will not change by changing
+    argument winhr in function \link{g.part2}. If def.noc.sleep is filled
+    with a single integer, e.g. def.noc.sleep=c(1) then the window
+    will be detected with based on built in algorithms.
+    See argument HASPT.algo from \link{HASPT} for specifying which of those
+    algorithms to use.
   }
   \item{storefolderstructure}{
-  Store folder structure of the accelerometer data
+    Store folder structure of the accelerometer data
   }
   \item{overwrite}{
     Overwrite previously generated milestone data by this function
@@ -133,8 +135,8 @@ sleeplogidnum=FALSE,do.visual=FALSE,outliers.only = FALSE,
  }
  \item{desiredtz}{
     See \link{g.getmeta}
-  }
-  \item{data_cleaning_file}{
+ }
+ \item{data_cleaning_file}{
   Optional path to a csv file you create that holds four
   columns: ID, day_part5, relyonguider_part4, 
   and night_part4. ID should hold the participant ID.
@@ -152,18 +154,28 @@ sleeplogidnum=FALSE,do.visual=FALSE,outliers.only = FALSE,
   ignored for the sleep assessment.
   }
   \item{excludelast.part4}{
-  If TRUE then the last night of the measurement are
-  ignored for the sleep assessment.
+    If TRUE then the last night of the measurement are
+    ignored for the sleep assessment.
+  }
+  \item{sleeplogsep}{
+    See \link{g.loadlog}
+  }
+  \item{sleepwindowType}{
+    Character to indicate type of sleeplog, default "SPT".
+    Set to "TimeInBed" if sleep log recorded time in bed to enable calculation
+    of sleep latency and sleep efficiency.
+  }
+  \item{sensor.location}{
+    Character to indicate sensor location, used to help assess which heuristic 
+    lgorithm was used in part3 for SPT window detection.
   }
 }
 \value{
-
-The function does not produce values but generates an RData file
-in the milestone subfolder ms4.out which incudes a dataframe
-named \code{nightsummary}. This dataframe is used in g.report.part4 to create
-two reports one per night and one per person. See package vignette 
-paragraph "Output part 4" for description of all the variables.
-
+  The function does not produce values but generates an RData file
+  in the milestone subfolder ms4.out which incudes a dataframe
+  named \code{nightsummary}. This dataframe is used in g.report.part4 to create
+  two reports one per night and one per person. See package vignette 
+  paragraph "Output part 4" for description of all the variables.
 }
 
 \examples{

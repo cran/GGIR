@@ -17,16 +17,16 @@ combination with the epoch length as defined in g.getmeta.
 }
 \usage{
 g.analyse(I, C, M, IMP, qlevels = c(), qwindow = c(0, 24),
-quantiletype = 7, L5M5window = c(0, 24), M5L5res = 10,
-includedaycrit = 16, ilevels = c(),
-winhr = 5, idloc = 1,snloc=1,mvpathreshold = c(),
-boutcriter=c(),mvpadur=c(1,5,10),
-selectdaysfile=c(),window.summary.size=10,
-dayborder=0,bout.metric = 1,
-closedbout=FALSE,desiredtz = "",
-IVIS_windowsize_minutes = 60,
-IVIS_epochsize_seconds = NA, iglevels = c(),IVIS.activity.metric=2,
-qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
+ quantiletype = 7, L5M5window = c(0, 24), M5L5res = 10,
+ includedaycrit = 16, ilevels = c(),
+ winhr = 5, idloc = 1, snloc=1, mvpathreshold = c(),
+ boutcriter=c(), mvpadur=c(1,5,10),
+ selectdaysfile=c(), window.summary.size=10,
+ dayborder=0, bout.metric = 1,
+ closedbout=FALSE, desiredtz = "",
+ IVIS_windowsize_minutes = 60,
+ IVIS_epochsize_seconds = NA, iglevels = c(), IVIS.activity.metric=2,
+ qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
 }
 
 \arguments{
@@ -50,26 +50,19 @@ qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
     \link{g.getmeta}.
   }
   \item{qwindow}{
-  To specify windows over which all variables are calculated, e.g. acceleration
-  distirbution, number of valid hours, LXMX analysis, MVPA. If value = c(0,24), 
-  which is the default, all variables will only be calculated over the full 
-  24 hours in a day, If
-  value =c(8,24) variables will be calculated over the window 0-8, 8-24 and 0-24.
-  All days in the recording will be segmented based on these values. If you want
-  to use a day specific segmentation then you can set qwindow to the to be
-  the full path to activity diary file. Expectd format of the activity diary is:
-  First column headers followed by one row per recording, first column is recording ID,
-  which needs to match with the ID GGIR extracts from the accelerometer file.
-  Followed by date column in format "23-04-2017", followed by one or multiple columns
-  with start times for the activity types in that day format in 
-  hours:minutes:seconds. The header of the column will be used as label for each activity
-  type. Insert a new date column before continuing with activity types for next day.
-  Leave missing values empty. If an activitylog is used then individuals who do 
-  not appear in the activitylog will still be processed with value c(0,24).
+    To specify windows over which all variables are calculated, e.g. acceleration
+    distirbution, number of valid hours, LXMX analysis, MVPA. If value = c(0,24), 
+    which is the default, all variables will only be calculated over the full 
+    24 hours in a day, If
+    value =c(8,24) variables will be calculated over the window 0-8, 8-24 and 0-24.
+    All days in the recording will be segmented based on these values. If you want
+    to use a day specific segmentation then you can set qwindow to be
+    the full path to activity diary file. See documentation \link{g.conv.actlog}
+    for details.
   }
   \item{quantiletype}{
-  type of quantile function to use (default recommended). For details, see 
-  quantile function in STATS package
+    type of quantile function to use (default recommended). For details, see 
+    quantile function in STATS package
   }
   \item{L5M5window}{
     Argument depricated after version 1.5-24. This argument used to define the
@@ -77,7 +70,7 @@ qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
     calculated. Now this is done with argument qwindow.
   }
   \item{M5L5res}{
-  resoltion of L5 and M5 analysis in minutes (default: 10 minutes)
+    resoltion of L5 and M5 analysis in minutes (default: 10 minutes)
   }
   \item{includedaycrit}{
     minimum required number of valid hours in day specific analysis
@@ -93,11 +86,14 @@ qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
     Vector of window size(s) (unit: hours) of L5 and M5 analysis (dedault = 5 hours)
   }
   \item{idloc}{
-    If value = 1 (default) the code assumes that ID number is stored in the
-    obvious header field. If value = 2 the code uses the character string preceding
-    the character '_' in the filename as the ID number.
-    If value = 5 the code uses the character string preceding
-    the first space ' ' in the filename as the ID number
+    If idloc = 1 (default) the code assumes that ID number is stored in the
+    obvious header field. Note that for ActiGraph data the ID never stored in the file
+    header. 
+    For value set to 2, 5, 6, and 7, GGIR looks at the filename and extracts the
+    character string preceding the first occurance of a '_', ' ' (space), '.' (dot),
+    and '-', respecitvely.
+    You may have noticed that idloc 3 and 4 are skipped, they were used for one study
+    in 2012, and not actively maintained anymore, but because it is legacy code not omitted.
   }
   \item{snloc}{
     If value = 1 (default) the code assumes that device serial number is stored in
@@ -109,7 +105,7 @@ qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
     e.g. c(100,120). In the later case the code will estimate MVPA seperately for
     each threshold. If this variable is left blank c() then MVPA is not estimated
   }
-    \item{boutcriter}{
+  \item{boutcriter}{
     The variable boutcriter is a number between 0 and 1 and defines what fraction
     of a bout needs to be above the mvpathreshold
   }
@@ -117,29 +113,29 @@ qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
     default = c(1,5,10). Three bout duration for which MVPA will be calculated
   }
   \item{selectdaysfile}{
-  Functionality designed for the London Centre of Longidutinal studies.
-  Csv file holding the relation between device serial numbers and measurement days of interest.
+    Functionality designed for the London Centre of Longidutinal studies.
+    Csv file holding the relation between device serial numbers and measurement days of interest.
   }
-    \item{dayborder}{
-  Hour at which days start and end (default = 0), value = 4 would mean 4am
+  \item{dayborder}{
+    Hour at which days start and end (default = 0), value = 4 would mean 4am
   }
   \item{window.summary.size}{
     Functionality designed for the London Centre of Longidutinal studies.
-  Size in minutes of the summary window
+    Size in minutes of the summary window
   }
   \item{bout.metric}{
-  This argument used to be called mvpa.2014 and had TRUE or FALSE as its value.
-  However, it has now become clear that this aspect of the analyses is still very
-  much open for debate. Therefore, I have changed it into an argument where you
-  can specify a metric for bout detection based on a number. A description of these
-  bout metrics can be found in the new function \link{g.getbout}
+    This argument used to be called mvpa.2014 and had TRUE or FALSE as its value.
+    However, it has now become clear that this aspect of the analyses is still very
+    much open for debate. Therefore, I have changed it into an argument where you
+    can specify a metric for bout detection based on a number. A description of these
+    bout metrics can be found in the new function \link{g.getbout}
   }
   \item{closedbout}{
-  If TRUE then count breaks in a bout towards the bout duration. If FALSE then only count
-  time spent above the threshold towards the bout duration.
+    If TRUE then count breaks in a bout towards the bout duration. If FALSE then only 
+    count time spent above the threshold towards the bout duration.
   }
   \item{desiredtz}{
-  see \link{g.getmeta}
+    see \link{g.getmeta}
   }
   \item{IVIS_windowsize_minutes}{
     see \link{g.IVIS}
@@ -155,7 +151,7 @@ qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
     the bins c(seq(0,4000,by=25),8000) or the user could specify their own
     distribution. There is no constriction to the number of levels.
   }
-   \item{IVIS.activity.metric}{
+  \item{IVIS.activity.metric}{
     see function \link{g.IVIS}
   }
   \item{qM5L5}{
@@ -165,8 +161,6 @@ qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
     External function object to be applied to raw data, see \link{g.getmeta}.
   }
   \item{MX.ig.min.dur}{see \link{g.getM5L5}}
-  
-   
 }
 \value{
   g.analyse generated two data,franeL
@@ -176,8 +170,6 @@ qM5L5=c(), myfun=c(), MX.ig.min.dur=10)
   An exaplantion of all the columns in the data.frame and subsequent csv reports
   can be found in the package vignette (Output part 2).
 }
-
-
 \examples{
 data(data.getmeta)
 data(data.inspectfile)

@@ -10,9 +10,10 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
                      do.lfen=FALSE, do.lfx=FALSE, do.lfy=FALSE, do.lfz=FALSE,
                      do.hfx=FALSE, do.hfy=FALSE, do.hfz=FALSE,
                      do.bfx=FALSE, do.bfy=FALSE, do.bfz=FALSE,
+                     do.zcx=FALSE, do.zcy=FALSE, do.zcz=FALSE,
                      lb = 0.2, hb = 15,  n = 4,meantempcal=c(), chunksize=c(), selectdaysfile=c(),
                      dayborder=0,dynrange=c(),configtz=c(),myfun=c(),
-                     do.sgAccEN=TRUE, do.sgAnglex=FALSE, do.sgAngley=FALSE, do.sgAnglez=FALSE,
+                     interpolationType=1,
                      ...) {
   #get input variables
   input = list(...)
@@ -59,7 +60,8 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
                           do.dev_roll_med_acc_z, do.enmoa,do.lfen,
                           do.lfx, do.lfy, do.lfz,
                           do.hfx, do.hfy, do.hfz,
-                          do.bfx, do.bfy, do.bfz, stringsAsFactors = TRUE)
+                          do.bfx, do.bfy, do.bfz,
+                          do.zcx, do.zcy, do.zcz, stringsAsFactors = TRUE)
   if (length(chunksize) == 0) chunksize = 1
   if (chunksize > 1.5) chunksize = 1.5
   if (chunksize < 0.2) chunksize = 0.2
@@ -68,14 +70,15 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
                    do.anglex,do.angley,do.anglez,
                    do.roll_med_acc_x,do.roll_med_acc_y,do.roll_med_acc_z,
                    do.dev_roll_med_acc_x, do.dev_roll_med_acc_y, do.dev_roll_med_acc_z,do.enmoa, do.lfen,
-                   do.lfx, do.lfy, do.lfz,  do.hfx, do.hfy, do.hfz,  do.bfx, do.bfy, do.bfz))
+                   do.lfx, do.lfy, do.lfz,  do.hfx, do.hfy, do.hfz,  do.bfx, do.bfy, do.bfz,
+                   do.zcx, do.zcy, do.zcz))
   if (length(myfun) != 0) {
     nmetrics = nmetrics + length(myfun$colnames)
     # check myfun object already, because we do not want to discover
     # bugs after waiting for the data to be load
     check_myfun(myfun, windowsizes)
   }
-  
+
   if (length(nmetrics) == 0) {
     cat("\nWARNING: No metrics selected\n")
   }
@@ -97,7 +100,7 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
   }
   windowsizes = c(ws3,ws2,ws)
   data = PreviousEndPage = PreviousStartPage = starttime = wday = weekdays = wdayname = c()
-  
+
   monnames = c("genea","geneactive","actigraph","axivity","movisens","verisense") #monitor names
   filequality = data.frame(filetooshort=FALSE,filecorrupt=FALSE,
                            filedoesnotholdday = FALSE,NFilePagesSkipped = 0, stringsAsFactors = TRUE)
@@ -144,7 +147,7 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
   sf = INFI$sf
   hvars = g.extractheadervars(INFI)
   deviceSerialNumber = hvars$deviceSerialNumber
-  if (mon == 3) { 
+  if (mon == 3) {
     # If Actigraph then try to specify dynamic range based on Actigraph model
     if (length(grep(pattern = "CLE", x = deviceSerialNumber)) == 1) {
       dynrange = 6
@@ -170,7 +173,7 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
   options(warn=-1)
   if (useRDA == FALSE) decn =g.dotorcomma(datafile,dformat,mon=mon, desiredtz=desiredtz, rmc.dec = rmc.dec)
   options(warn=0)
-  
+
   ID = g.getidfromheaderobject(filename=filename,header=header,dformat=dformat,mon=mon)
   # get now-wear, clip, and blocksize parameters (thresholds)
   ncb_params = get_nw_clip_block_params(chunksize, dynrange, mon, rmc.noise, sf, dformat,  rmc.dynamic_range)
@@ -242,7 +245,8 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
                               rmc.header.structure = rmc.header.structure,
                               rmc.check4timegaps = rmc.check4timegaps,
                               rmc.col.wear=rmc.col.wear,
-                              rmc.doresample=rmc.doresample)
+                              rmc.doresample=rmc.doresample,
+                              interpolationType=interpolationType)
       P = accread$P
       filequality = accread$filequality
       filetooshort = filequality$filetooshort
@@ -251,12 +255,14 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
       NFilePagesSkipped = filequality$NFilePagesSkipped
       switchoffLD = accread$switchoffLD
       PreviousEndPage = accread$endpage
+      startpage = accread$startpage
       options(warn=-1) # to ignore warnings relating to failed mmap.load attempt
       rm(accread); gc()
       options(warn=0) # to ignore warnings relating to failed mmap.load attempt
       if(mon == 5) { # if movisens, then read temperature
-        PreviousStartPage = accread$startpage
-        temperature = g.readtemp_movisens(datafile, desiredtz, PreviousStartPage, PreviousEndPage)
+        PreviousStartPage = startpage
+        temperature = g.readtemp_movisens(datafile, desiredtz, PreviousStartPage,
+                                          PreviousEndPage, interpolationType=interpolationType)
         P = cbind(P, temperature[1:nrow(P)])
         colnames(P)[4] = "temp"
       }
@@ -290,11 +296,10 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
           if (P$header$hardwareType == "AX6") { # cwa AX6
             gyro_available = TRUE
           }
-          # if (P$header$hardwareType == "AX6") { # cwa AX6
-            # Note 18-Feb-2020: For the moment GGIR ignores the AX6 gyroscope signals until robust sensor
-            # fusion algorithms and gyroscope metrics have been prepared
-            # data = P$data[,-c(2:4)]
-          # }
+          if (P$header$hardwareType == "AX6") { # cwa AX6
+            # GGIR now ignores the AX6 gyroscope signals until added value has robustely been demonstrated
+            data = P$data[,-c(2:4)]
+          }
           data = P$data
           P$data = P$data[1:min(100,nrow(P$data)),-c(2:4)] # trim object, because rest of data is not needed anymore
         } else if (dformat == 5) {
@@ -470,40 +475,13 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
           data = cbind(rep(0,nrow(data)),data)
           LD = nrow(data)
         }
-        extract.sgmetrics = FALSE
-        if (ncol(data) == 6 & (do.sgAccEN + do.sgAnglex + do.sgAngley + do.sgAnglez) > 0) {
-          extract.sgmetrics = TRUE
-          # assumption here that gyroscope data is stored in columns 1:3 and accelerometer data in columns 4:6
-          sg = separategravity(acc=data[,4:6], gyr=data[,1:3] * (pi/180), sf=sf)
-          data = data[,4:6] # data is now just acceleration again, as with accelerometer-only approach
-          acclocal= sg$acclocal
-          gvector = sg$gvector
-          rm(sg)
-          # TO DO:
-          # - derive features from acclocal and gvector
-          # - add these new features to the output
-        } 
-        
         EN = sqrt(data[,1]^2 + data[,2]^2 + data[,3]^2) # Do not delete Used for long epoch calculation
         accmetrics = g.applymetrics(data = data,n=n,sf=sf,ws3=ws3,metrics2do=metrics2do, lb=lb,hb=hb)
-        if (extract.sgmetrics == TRUE) {
-          sg.metrics2do = data.frame(do.sgAccEN, 
-                                     do.sgAnglex, do.sgAngley, do.sgAnglez,
-                                                  stringsAsFactors = TRUE)
-          sgmetrics = g.applymetrics4sg(acclocal = acclocal, gvector=gvector, 
-                                        sf=sf,ws3=ws3,sg.metrics2do=sg.metrics2do)
-          sgmetrics = lapply(sgmetrics,round,n_decimal_places)
-          sgAccEN = sgmetrics$sgAccEN
-          sgAnglex = sgmetrics$sgAnglex
-          sgAngley = sgmetrics$sgAngley
-          sgAnglez = sgmetrics$sgAnglez
-        }
-
         # round decimal places, because due to averaging we get a lot of information
         # that only slows down computation and increases storage size
         accmetrics = lapply(accmetrics,round,n_decimal_places)
-        
-        
+
+
         BFEN = accmetrics$BFEN
         ENMO = accmetrics$ENMO
         ENMOa = accmetrics$ENMOa
@@ -531,7 +509,9 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
         BFX =  accmetrics$BFX
         BFY =  accmetrics$BFY
         BFZ =  accmetrics$BFZ
-
+        ZCX =  accmetrics$ZCX
+        ZCY =  accmetrics$ZCY
+        ZCZ =  accmetrics$ZCZ
         #--------------------------------------------------------------------
         if (length(myfun) != 0) { # apply external function to the data to extract extra features
           #starttime
@@ -542,7 +522,7 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
               myfun$timestamp = c()
             }
           }
-          OutputExternalFunction = applyExtFunction(data, myfun, sf, ws3)
+          OutputExternalFunction = applyExtFunction(data, myfun, sf, ws3, interpolationType=interpolationType)
         }
       }
       if (LD >= (ws*sf)) { #LD != 0
@@ -637,32 +617,21 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
         if (do.bfz == TRUE) {
           metashort[count:(count-1+length(BFZ)),col_msi] = BFZ; col_msi = col_msi + 1
         }
-        if (extract.sgmetrics == TRUE) {
-          if (ncol(metashort) < (col_msi + do.sgAccEN + do.sgAnglex + do.sgAngley + do.sgAnglez - 1)) {
-            Ncolsneeded =   (col_msi + do.sgAccEN + do.sgAnglex + do.sgAngley + do.sgAnglez - 1) - ncol(metashort)
-            new_columns = matrix(" ", nrow(metashort), Ncolsneeded) #add another day to metashort once you reach the end of it
-            metashort = cbind(metashort, new_columns)
-          }
-          if (do.sgAccEN == TRUE) {
-            metashort[count:(count-1+length(sgAccEN)),col_msi] = sgAccEN; col_msi = col_msi + 1
-          }
-          if (do.sgAnglex == TRUE) {
-            metashort[count:(count-1+length(sgAnglex)),col_msi] = sgAnglex; col_msi = col_msi + 1
-          }
-          if (do.sgAngley == TRUE) {
-            metashort[count:(count-1+length(sgAngley)),col_msi] = sgAngley; col_msi = col_msi + 1
-          }
-          if (do.sgAngley == TRUE) {
-            metashort[count:(count-1+length(sgAnglez)),col_msi] = sgAnglez; col_msi = col_msi + 1
-          }
-          rm(sgmetrics)
+        if (do.zcx == TRUE) {
+          metashort[count:(count-1+length(ZCX)),col_msi] = ZCX; col_msi = col_msi + 1
+        }
+        if (do.zcy == TRUE) {
+          metashort[count:(count-1+length(ZCY)),col_msi] = ZCY; col_msi = col_msi + 1
+        }
+        if (do.zcz == TRUE) {
+          metashort[count:(count-1+length(ZCZ)),col_msi] = ZCZ; col_msi = col_msi + 1
         }
         if (length(myfun) != 0) { # if an external function is applied.
           NcolEF = ncol(OutputExternalFunction)-1 # number of extra columns needed
           metashort[count:(count-1+nrow(OutputExternalFunction)),col_msi:(col_msi+NcolEF)] = as.matrix(OutputExternalFunction); col_msi = col_msi + NcolEF + 1
         }
         # count = count + length(EN_shortepoch) #increasing "count" the indicator of how many seconds have been read
-        count = count + length(accmetrics[[1]]) # changing indicator to whatever metric is calculated, EN produces incompatibility when deriving both ENMO and ENMOa 
+        count = count + length(accmetrics[[1]]) # changing indicator to whatever metric is calculated, EN produces incompatibility when deriving both ENMO and ENMOa
         rm(accmetrics)
         # update blocksize depending on available memory
         BlocksizeNew = updateBlocksize(blocksize=blocksize, bsc_qc=bsc_qc)
@@ -678,30 +647,30 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
         TS1W = TS2W = TS3W = TS4W = TS5W = TS6W = TS7W = CWav = NWav = matrix(0,nmin,1)
         crit = ((window/window2)/2)+1
         for (h in 1: nmin) { #number of windows
-          cliphoc1 = (((h-1)*window2)+ window2*0.5 ) - window2*0.5 #does not use "window"
-          cliphoc2 = (((h-1)*window2)+ window2*0.5 ) + window2*0.5
+          cliphoc1 = (((h-1)*window2) + window2*0.5 ) - window2*0.5 #does not use "window"
+          cliphoc2 = (((h-1)*window2) + window2*0.5 ) + window2*0.5
           if (h <= crit) {
             hoc1 = 1
             hoc2 = window
           } else if (h >= (nmin - crit)) {
-            hoc1 = (nmin-crit)*window2
+            hoc1 = (nmin - crit)*window2
             hoc2 = nmin*window2 #end of data
           } else if (h > crit & h < (nmin - crit)) {
-            hoc1=(((h-1)*window2)+ window2*0.5 ) - window*0.5
-            hoc2=(((h-1)*window2)+ window2*0.5 ) + window*0.5
+            hoc1 = (((h - 1)*window2) + window2*0.5 ) - window*0.5
+            hoc2 = (((h - 1)*window2) + window2*0.5 ) + window*0.5
           }
           if (length(rmc.col.wear) > 0) {
-            wearTable = table(wearcol[(1+hoc1):hoc2], useNA = FALSE)
+            wearTable = table(wearcol[(1 + hoc1):hoc2], useNA = FALSE)
             NWav[h,1] = as.logical(tail(names(sort(wearTable)), 1)) * 3 # times 3 to simulate heuristic approach
           }
           for (jj in  1:3) {
             #hoc1 & hoc2 = edges of windows
             #window is bigger& window2 is smaller one
-            sdwacc = sd(as.numeric(data[(1+hoc1):hoc2,jj]),na.rm=TRUE)
-            maxwacc = max(as.numeric(data[(1+hoc1):hoc2,jj]),na.rm=TRUE)
-            minwacc = min(as.numeric(data[(1+hoc1):hoc2,jj]),na.rm=TRUE)
-            CW[h,jj] = length(which(abs(as.numeric(data[(1+cliphoc1):cliphoc2,jj])) > clipthres))
-            if (length(which(abs(as.numeric(data[(1+cliphoc1):cliphoc2,jj])) > clipthres*1.5)) > 0) {
+            sdwacc = sd(as.numeric(data[(1 + hoc1):hoc2,jj]), na.rm = TRUE)
+            maxwacc = max(as.numeric(data[(1 + hoc1):hoc2,jj]), na.rm = TRUE)
+            minwacc = min(as.numeric(data[(1 + hoc1):hoc2,jj]), na.rm = TRUE)
+            CW[h,jj] = length(which(abs(as.numeric(data[(1 + cliphoc1):cliphoc2,jj])) > clipthres))
+            if (length(which(abs(as.numeric(data[(1 + cliphoc1):cliphoc2,jj])) > clipthres*1.5)) > 0) {
               CW[h,jj] = window2 # If there is a a value that is more than 150% the dynamic range then ignore entire block.
             }
             absrange = abs(maxwacc - minwacc)
@@ -722,8 +691,8 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
           CWav[h,1] = max(c(CW[h,1],CW[h,2],CW[h,3])) #indicator of clipping
         }
         col_mli = 2
-        metalong[count2:((count2-1)+nrow(NWav)),col_mli] = NWav; col_mli = col_mli + 1
-        metalong[(count2):((count2-1)+nrow(NWav)),col_mli] = CWav; col_mli = col_mli + 1
+        metalong[count2:((count2 - 1)+nrow(NWav)),col_mli] = NWav; col_mli = col_mli + 1
+        metalong[(count2):((count2 - 1)+nrow(NWav)),col_mli] = CWav; col_mli = col_mli + 1
         if (mon == 2 | (mon == 4 & dformat == 4) | mon == 5) { #going from sample to ws2
           if (mon == 2 | (mon == 4 & dformat == 4)) {
             #light (running mean)
@@ -909,29 +878,15 @@ g.getmeta = function(datafile,desiredtz = "",windowsizes = c(5,900,3600),
     metricnames_short = c("timestamp","BFEN","ENMO","LFENMO","EN","HFEN","HFENplus","MAD",
                           "anglex","angley","anglez","roll_med_acc_x","roll_med_acc_y","roll_med_acc_z",
                           "dev_roll_med_acc_x","dev_roll_med_acc_y","dev_roll_med_acc_z","ENMOa","LFEN",
-                          "LFX", "LFY", "LFZ", "HFX", "HFY", "HFZ", "BFX", "BFY", "BFZ")
-    if (extract.sgmetrics == TRUE) {
-      # metrics related to separated gravity (only available when using accelerometer+gyroscope data)
-      metricnames_short = c(metricnames_short, "sgAccEN", "sgAnglex", "sgAngley", "sgAnglez")
-    }
-    if (extract.sgmetrics == TRUE) {
-      # metrics related to separated gravity (only available when using accelerometer+gyroscope data)
-      metricnames_short = as.character(metricnames_short[c(TRUE,do.bfen,do.enmo,do.lfenmo,do.en,do.hfen,do.hfenplus,do.mad,
-                                                           do.anglex,do.angley,do.anglez,
-                                                           do.roll_med_acc_x,do.roll_med_acc_y,do.roll_med_acc_z,
-                                                           do.dev_roll_med_acc_x,do.dev_roll_med_acc_y,do.dev_roll_med_acc_z,
-                                                           do.enmoa,do.lfen,
-                                                           do.lfx, do.lfy, do.lfz, do.hfx, do.hfy, do.hfz,
-                                                           do.bfx, do.bfy, do.bfz, do.sgAccEN, do.sgAnglex, do.sgAngley, do.sgAnglez)])
-    } else {
-      metricnames_short = as.character(metricnames_short[c(TRUE,do.bfen,do.enmo,do.lfenmo,do.en,do.hfen,do.hfenplus,do.mad,
-                                                             do.anglex,do.angley,do.anglez,
-                                                             do.roll_med_acc_x,do.roll_med_acc_y,do.roll_med_acc_z,
-                                                             do.dev_roll_med_acc_x,do.dev_roll_med_acc_y,do.dev_roll_med_acc_z,
-                                                             do.enmoa,do.lfen,
-                                                             do.lfx, do.lfy, do.lfz, do.hfx, do.hfy, do.hfz,
-                                                             do.bfx, do.bfy, do.bfz)])
-    }
+                          "LFX", "LFY", "LFZ", "HFX", "HFY", "HFZ", "BFX", "BFY", "BFZ", 
+                          "ZCX", "ZCY", "ZCZ")
+    metricnames_short = as.character(metricnames_short[c(TRUE,do.bfen,do.enmo,do.lfenmo,do.en,do.hfen,do.hfenplus,do.mad,
+                                                         do.anglex,do.angley,do.anglez,
+                                                         do.roll_med_acc_x,do.roll_med_acc_y,do.roll_med_acc_z,
+                                                         do.dev_roll_med_acc_x,do.dev_roll_med_acc_y,do.dev_roll_med_acc_z,
+                                                         do.enmoa,do.lfen,
+                                                         do.lfx, do.lfy, do.lfz, do.hfx, do.hfy, do.hfz,
+                                                         do.bfx, do.bfy, do.bfz, do.zcx, do.zcy, do.zcz)])
     # Following code is needed to make sure that algorithms that produce character value
     # output are not assumed to be numeric
     NbasicMetrics = length(metricnames_short)

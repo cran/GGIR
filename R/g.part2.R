@@ -1,5 +1,5 @@
 g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.del.start = 0.5,hrs.del.end = 0.5,
-                   maxdur = 7, includedaycrit = 16,
+                   maxdur = 0, includedaycrit = 16,
                    L5M5window = c(0,24), M5L5res = 10, winhr = 5,
                    qwindow=c(0,24), qlevels = c(0.1),
                    ilevels = c(0,10), mvpathreshold = c(100),
@@ -8,12 +8,12 @@ g.part2 = function(datadir=c(),metadatadir=c(),f0=c(),f1=c(),strategy = 1, hrs.d
                    window.summary.size=10,dayborder=0,bout.metric=2,closedbout=FALSE,desiredtz="",
                    IVIS_windowsize_minutes = 60, IVIS_epochsize_seconds = NA, iglevels = c(),
                    IVIS.activity.metric=2, TimeSegments2ZeroFile=c(), qM5L5  = c(), do.parallel = TRUE,
-                   myfun=c(), MX.ig.min.dur=10, maxNcores=c()) {
+                   myfun=c(), MX.ig.min.dur=10, maxNcores=c(), qwindow_dateformat="%d-%m-%Y") {
   snloc= 1
   if (is.numeric(qwindow)) {
     qwindow = qwindow[order(qwindow)]
   } else if (is.character(qwindow)) { 
-    qwindow = g.conv.actlog(qwindow)
+    qwindow = g.conv.actlog(qwindow, qwindow_dateformat)
     # This will be an object with numeric qwindow values for all individuals and days
   }  
   #---------------------------------

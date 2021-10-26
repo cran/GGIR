@@ -9,13 +9,13 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                    do.lfen = FALSE, do.lfx=FALSE, do.lfy=FALSE, do.lfz=FALSE, 
                    do.hfx=FALSE, do.hfy=FALSE, do.hfz=FALSE, 
                    do.bfx=FALSE, do.bfy=FALSE, do.bfz=FALSE, 
+                   do.zcx=FALSE, do.zcy=FALSE, do.zcz=FALSE,
                    do.cal = TRUE,
                    lb = 0.2, hb = 15,  n = 4, spherecrit=0.3,
                    minloadcrit=72,printsummary=TRUE,print.filename=FALSE,overwrite=FALSE,
                    backup.cal.coef="retrieve",selectdaysfile=c(),dayborder=0,dynrange=c(),
                    configtz = c(), do.parallel = TRUE, minimumFileSizeMB = 2,myfun=c(),
-                   do.sgAccEN=TRUE, do.sgAnglex=FALSE, do.sgAngley=FALSE, do.sgAnglez=FALSE, 
-                   maxNcores=c(), ...) {
+                   maxNcores=c(), interpolationType=1, ...) {
   #get input variables (relevant when read.myacc.csv is used
   input = list(...)
   if (length(input) > 0) {
@@ -208,7 +208,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
         do.anglex + do.angley + do.anglez + do.roll_med_acc_x + do.roll_med_acc_y +
         do.roll_med_acc_z + do.dev_roll_med_acc_x + do.dev_roll_med_acc_y +
         do.dev_roll_med_acc_z + do.enmoa + do.lfx + do.lfy + do.lfz + do.hfx + 
-        do.hfy + do.hfz + do.bfx +  do.bfy + do.bfz
+        do.hfy + do.hfz + do.bfx +  do.bfy + do.bfz + do.zcx + do.zcy + do.zcz
       if (Nmetrics2calc > 4) { #Only give warning when user wants more than 4 metrics.
         warning(paste0("\nExtracting many metrics puts higher demands on memory. Please consider",
                        " reducing the value for argument chunksize or setting do.parallel to FALSE"))
@@ -248,7 +248,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                          "g.getidfromheaderobject", "g.getstarttime", "POSIXtime2iso8601", "chartime2iso8601",
                          "iso8601chartime2POSIX", "g.metric", "datadir2fnames", "read.myacc.csv",
                          "get_nw_clip_block_params", "get_starttime_weekday_meantemp_truncdata", "ismovisens",
-                         "g.extractheadervars", "separategravity", "g.applymetrics4sg")
+                         "g.extractheadervars")
     errhand = 'stop'
     # Note: This will not work for cwa files, because those also need Rcpp functions.
     # So, it is probably best to turn off parallel when debugging cwa data.
@@ -476,7 +476,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                               rmc.headername.recordingid = rmc.headername.sn,
                               rmc.header.structure = rmc.header.structure,
                               rmc.check4timegaps = rmc.check4timegaps,
-                              rmc.noise=rmc.noise)
+                              rmc.noise=rmc.noise,
+                              interpolationType=interpolationType)
             }
           }
         }
@@ -502,8 +503,7 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                       do.lfx=do.lfx, do.lfy=do.lfy, do.lfz=do.lfz, 
                       do.hfx=do.hfx, do.hfy=do.hfy, do.hfz=do.hfz,
                       do.bfx=do.bfx, do.bfy=do.bfy, do.bfz=do.bfz, 
-                      do.sgAccEN=do.sgAccEN, do.sgAnglex=do.sgAnglex,
-                      do.sgAngley=do.sgAngley, do.sgAnglez=do.sgAnglez,
+                      do.zcx=do.zcx, do.zcy=do.zcy, do.zcz=do.zcz,
                       lb = lb, hb = hb,  n = n,
                       desiredtz=desiredtz, daylimit=daylimit, windowsizes=windowsizes,
                       tempoffset=C$tempoffset, scale=C$scale, offset=C$offset,
@@ -533,7 +533,8 @@ g.part1 = function(datadir=c(),outputdir=c(),f0=1,f1=c(),windowsizes = c(5,900,3
                       rmc.noise=rmc.noise,
                       rmc.col.wear=rmc.col.wear,
                       rmc.doresample=rmc.doresample,
-                      myfun=myfun)
+                      myfun=myfun,
+                      interpolationType=interpolationType)
         #------------------------------------------------
         cat("\nSave .RData-file with: calibration report, file inspection report and all signal features...\n")
         # remove directory in filename if present
