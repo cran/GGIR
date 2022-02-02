@@ -250,9 +250,9 @@ div.tocify {
 <div id="what-is-ggir" class="section level2" number="1.1">
 <h2 number="1.1"><span class="header-section-number">1.1</span> What is GGIR?</h2>
 <p><a href="https://CRAN.R-project.org/package=GGIR">GGIR</a> is an R-package to process multi-day raw accelerometer data for physical activity and sleep research. The term <em><strong>raw</strong></em> refers to data being expressed in m/s<sup>2</sup> or gravitational acceleration as opposed to the previous generation accelerometers which stored data in accelerometer brand specific units. The signal processing includes automatic calibration, detection of sustained abnormally high values, detection of non-wear and calculation of average magnitude of dynamic acceleration based on a variety of metrics. Next, GGIR uses this information to describe the data per recording, per day of measurement, and (optionally) per segment of a day of measurement, including estimates of physical activity, inactivity and sleep. We published an overview paper of GGIR in 2019 <a href="https://doi.org/10.1123/jmpb.2018-0063">link</a>.</p>
-<p>This vignette provides a general introduction on how to use GGIR and interpret the output, additionally you can find a <a href="https://youtu.be/RuFBCAqFJ2M">introduction video</a> and a <a href="https://youtu.be/S8YPTrYNWdU">mini-tutorial</a> on YouTube. If you want to use your own algorithms for raw data then GGIR facilitates this with it’s external function embedding feature, documented in a separate vignette: <a href="https://CRAN.R-project.org/package=GGIR">Embedding external functions in GGIR</a>. GGIR is increasingly being used by research groups across the world. A non-exhaustive overview of academic publications related to GGIR can be found <a href="https://github.com/wadpac/GGIR/wiki/Publication-list">here</a>. R package GGIR would not have been possible without the support of the contributors listed in the author list at <a href="https://CRAN.R-project.org/package=GGIR">GGIR</a>, with specific code contributions over time since April 2016 (when GGIR development moved to git) shown <a href="https://github.com/wadpac/GGIR/graphs/contributors">here</a>.</p>
+<p>This vignette provides a general introduction on how to use GGIR and interpret the output, additionally you can find a <a href="https://youtu.be/RuFBCAqFJ2M">introduction video</a> and a <a href="https://youtu.be/S8YPTrYNWdU">mini-tutorial</a> on YouTube. If you want to use your own algorithms for raw data then GGIR facilitates this with it’s external function embedding feature, documented in a separate vignette: <a href="https://CRAN.R-project.org/package=GGIR">Embedding external functions in GGIR</a>. GGIR is increasingly being used by research groups across the world. A non-exhaustive overview of academic publications related to GGIR can be found <a href="https://github.com/wadpac/GGIR/wiki/Publication-list">here</a>. R package GGIR would not have been possible without the support of the contributors listed in the author list at <a href="https://CRAN.R-project.org/package=GGIR">GGIR</a>, with specific code contributions over time since April 2016 (when GGIR development moved to GitHub) shown <a href="https://github.com/wadpac/GGIR/graphs/contributors">here</a>.</p>
 <p><strong>Cite GGIR:</strong></p>
-<p>When you use GGIR in publications do not forget to cite it properly to make your analysis reproducible for others and to give credit to it’s developers. See paragraph on <a href="#CitingGGIR">Citing GGIR</a> for details.</p>
+<p>When you use GGIR in publications do not forget to cite it properly as that makes your research more reproducible and it gives credit to it’s developers. See paragraph on <a href="#CitingGGIR">Citing GGIR</a> for details.</p>
 </div>
 <div id="contributing-support-and-keeping-up-to-date" class="section level2" number="1.2">
 <h2 number="1.2"><span class="header-section-number">1.2</span> Contributing, Support, and Keeping up to date</h2>
@@ -260,9 +260,9 @@ div.tocify {
 <p>The development version of GGIR can be found on <a href="https://github.com/wadpac/GGIR">github</a>, which is also where you will find <a href="https://github.com/wadpac/GGIR/blob/master/CONTRIBUTING.md">guidance</a> on how to contribute.</p>
 <p><strong>How can I get service and support?</strong></p>
 <p>GGIR is open source software and does not come with service or support guarantees. However, as user-community you can help each other via the <a href="https://groups.google.com/forum/#!forum/RpackageGGIR">GGIR google group</a> or the <a href="https://github.com/wadpac/GGIR/issues">GitHub issue tracker</a>. Please use these public platform rather than private e-mails such that other users can learn from the conversations.</p>
-<p>If you need dedicated support with the use of GGIR or need someone to adapt GGIR then Vincent van Hees is available as <a href="https://www.accelting.com/">independent consultant</a>.</p>
+<p>If you need dedicated support with the use of GGIR or need someone to adapt GGIR to your needs then Vincent van Hees is available as <a href="https://www.accelting.com/">independent consultant</a>.</p>
 <p><strong>Change log</strong></p>
-<p>Our log of main changes is <a href="https://cran.r-project.org/package=GGIR/news.html">here</a>.</p>
+<p>Our log of main changes to GGIR over time can be found <a href="https://cran.r-project.org/package=GGIR/news.html">here</a>.</p>
 </div>
 </div>
 <div id="setting-up-your-work-environment" class="section level1" number="2">
@@ -271,8 +271,11 @@ div.tocify {
 <h2 number="2.1"><span class="header-section-number">2.1</span> Install R and RStudio</h2>
 <p><a href="https://cran.r-project.org/">Download and install R</a></p>
 <p><a href="https://www.rstudio.com/products/rstudio/">Download and install RStudio</a> (optional, but recommended)</p>
-<p>Download GGIR with its dependencies, you can do this with one command from the console command line:</p>
+<p>Install GGIR with its dependencies from CRAN. You can do this with one command from the console command line:</p>
 <pre class="r"><code>install.packages(&quot;GGIR&quot;, dependencies = TRUE)</code></pre>
+<p>Alternatively, to install the latest development version with the latest bug fixes use instead:</p>
+<pre class="r"><code>install.packages(&quot;remotes&quot;)
+remotes::install_github(&quot;wadpac/GGIR&quot;)</code></pre>
 </div>
 <div id="prepare-folder-structure" class="section level2" number="2.2">
 <h2 number="2.2"><span class="header-section-number">2.2</span> Prepare folder structure</h2>
@@ -280,11 +283,11 @@ div.tocify {
 <li>GGIR works with the following accelerometer brands and formats:
 <ul>
 <li><a href="https://www.activinsights.com/">GENEActiv</a> .bin and .csv</li>
-<li><a href="https://actigraphcorp.com/">ActiGraph</a> .csv. Note for Actigraph users: In ActiLife you have the option to export data with timestamps. Please do not do this as this causes memory issues. To cope with the absence of timestamps GGIR will re-caculate timestamps from the sample frequency and the start time and date as presented in the file header.</li>
 <li><a href="https://axivity.com/">Axivity</a> AX3 and AX6 .wav, .csv and .cwa</li>
+<li><a href="https://actigraphcorp.com/">ActiGraph</a> .csv and .gt3x (.gt3x only the newer format generated with firmware versions above 2.5.0). Note for Actigraph users: If you want to work with .csv exports via the ActiLife then note that you have the option to export data with timestamps. Please do not do this as this causes memory issues for GGIR. To cope with the absence of timestamps GGIR will re-caculate timestamps from the sample frequency and the start time and date as presented in the file header.</li>
 <li><a href="https://www.movisens.com/en/">Movisens</a> with data stored in folders.</li>
-<li>Genea (an accelerometer that is not available anymore, but which was used for some studies between 2007 and 2012) .bin and .csv</li>
-<li>Any other accelerometer brand that generates csv output, such as <a href="https://shimmersensing.com/">Shimmer</a>, see function documentation for function read.myacc.csv.</li>
+<li>Genea (an accelerometer that is not commercially available anymore, but which was used for some studies between 2007 and 2012) .bin and .csv</li>
+<li>Any other accelerometer brand that generates csv output, see documentation for functions <code>read.myacc.csv</code> and argument <code>rmc.noise</code> in the <a href="https://CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function documentation (pdf)</a>.</li>
 </ul></li>
 <li>All accelerometer data that needs to be analysed should be stored in one folder, or subfolders of that folder.</li>
 <li>Give the folder an appropriate name, preferable with a reference to the study or project it is related to rather than just ‘data’, because the name of this folder will be used later on as an identifier of the dataset.</li>
@@ -292,27 +295,47 @@ div.tocify {
 </div>
 <div id="ggir-shell-function" class="section level2" number="2.3">
 <h2 number="2.3"><span class="header-section-number">2.3</span> GGIR shell function</h2>
-<p>GGIR comes with a large number of functions and optional settings (arguments) per functions. To ease interacting with GGIR there is one central function, named <code>g.shell.GGIR</code>, to talk to all the other functions. Being confronted with the amount of optional arguments might feel like stepping inside the cockpit of an airplane:</p>
-<pre class="r"><code>`mode=c(1,2), f0=c(), f1=c(), selectdaysfile = c(), configfile=c(), overwrite = FALSE, strategy = 1, maxdur = 7, do.cal = TRUE,  hrs.del.start = 0, hrs.del.end = 0, loglocation = c(), , acc.metric = &quot;ENMO&quot;, storefolderstructure = FALSE, windowsizes = c(5,900,3600), minloadcrit = 72, desiredtz = &quot;Europe/London&quot;, chunksize = 1, do.enmo = TRUE, do.lfenmo = FALSE, do.en = FALSE,  do.bfen = FALSE, do.hfen = FALSE, do.hfenplus = FALSE, do.mad = FALSE, do.anglex = FALSE, do.angley = FALSE, do.anglez = FALSE, do.roll_med_acc_x=FALSE, do.roll_med_acc_y=FALSE, do.roll_med_acc_z=FALSE, do.dev_roll_med_acc_x=FALSE, do.dev_roll_med_acc_y=FALSE, do.dev_roll_med_acc_z=FALSE, do.enmoa = FALSE, dynrange = c(), printsummary = FALSE, includedaycrit = 16, M5L5res = 10, winhr = 5, qwindow = c(0,24), qlevels = c(), ilevels = c(), mvpathreshold = 100, boutcriter = 0.8, ndayswindow = 7, idloc = 1, do.imp = TRUE, anglethreshold = 5, timethreshold = 5, ignorenonwear = TRUE, colid=1, coln1=2, nnights=7, outliers.only=FALSE, excludefirstlast=FALSE, excludefirstlast.part5=FALSE, criterror=3, includenightcrit=16, relyonguider=FALSE, sleeplogidnum=TRUE, def.noc.sleep=c(), do.visual=FALSE, viewingwindow = 1, dofirstpage = TRUE, visualreport = FALSE, print.filename = FALSE, backup.cal.coef = c(), bout.metric = 1, closedbout = FALSE, IVIS_windowsize_minutes=60, IVIS_epochsize_seconds=30, constrain2range = TRUE, do.part3.pdf = TRUE, boutcriter.in = 0.9, boutcriter.lig = 0.8, boutcriter.mvpa = 0.8, threshold.lig = 40, threshold.mod = 100,   threshold.vig = 400, timewindow = c(&quot;MM&quot;,&quot;WW&quot;), boutdur.mvpa = c(1,5,10), boutdur.in = c(10,20,30), boutdur.lig = c(1,5,10), save_ms5rawlevels = FALSE,  mvpadur = c(1,5,10), epochvalues2csv = FALSE, bout.metric = 1, window.summary.size = 10, dayborder = 0, iglevels = c()`</code></pre>
-<p>In this paragraph we will guide you through the main arguments relevant for 99% of research. First of all, it is important to understand that GGIR is structured in five parts and that <code>g.shell.GGIR</code> controls each of these parts:</p>
+<p>GGIR comes with a large number of functions and optional settings (arguments) per functions.</p>
+<p>To ease interacting with GGIR there is one central function, named <code>g.shell.GGIR</code>, to talk to all the other functions.</p>
+<p>In this paragraph we will guide you through the main arguments relevant for 99% of research. First of all, it is important to understand that GGIR is structured in two ways. It has a computational structure of five parts which are applied sequentially to the data, and that <code>g.shell.GGIR</code> controls each of these parts:</p>
 <ul>
 <li>Part 1: Loads the data and stores derived features (aggregations) needed for the other parts. This is the time-consuming part. Once this is done, parts 2-5 can be run (or re-run with different parameters in parts 2-5) relatively quickly.</li>
 <li>Part 2: Data quality analyses and low-level description of signal features per day and per file. At this point a day is defined from midnight to midnight</li>
 <li>Part 3: Estimation of sustained inactivity and sleep periods, needed for input to Part 4 for sleep detection</li>
-<li>Part 4: o Labels the sustained inactive periods detected in Part 3 as sleep, or daytime sustained inactivity, per night and per file</li>
+<li>Part 4: Labels the sustained inactive periods detected in Part 3 as sleep, or daytime sustained inactivity, per night and per file</li>
 <li>Part 5: Derives sleep and physical activity characteristics by re-using information derived in part 2, 3 and 4. Total time in intensity categories, the number of bouts, time spent in bouts and average acceleration (overall activity) is calculated.</li>
 </ul>
-<p>The reason why it split up in parts is that it avoids having the re-do all analysis if you only want to make a small change in the more downstream parts.</p>
-<p>By looking up the documentation of the corresponding functions g.part1, g.part2, g.part3, g.part4, and g.part5 you can see what arguments are possible (<a href="https://CRAN.R-project.org/package=GGIR/GGIR.pdf">link to pdf manual</a>). All of these arguments are also accepted by <code>g.shell.GGIR</code>, because <code>g.shell.GGIR</code> is a shell around those functions.</p>
-<p>You will probably never need to think about most of the arguments listed above, because the default values are fine and a lot of arguments are only included to facilitate methodological studies where researchers want to have control over everything.</p>
+<p>The reason why it split up in parts is that it avoids having the re-do all analysis if you only want to make a small change in the more downstream parts. The specific order and content of the parts has grown for historical and computational reasons.</p>
+<p>Secondly, the function arguments which we will refer to as input parameters are structured thematically independently of the five parts they are used in:</p>
+<ul>
+<li>params_rawdata: parameters related to handling the raw data such as resampling or calibrating</li>
+<li>params_metrics: parameters related to aggregating the raw data to epoch level summary metrics</li>
+<li>params_sleep: parameters related to sleep detection</li>
+<li>params_physact: parameters related to physical activity</li>
+<li>params_247: parameters related to 24/7 behaviours that do not fall into the typical sleep or physical activity research category.</li>
+<li>params_output: parameters relating to how and whether output is stored.</li>
+<li>params_general: general parameters not covered by any of the above categories</li>
+</ul>
+<p>This structure was introduced in GGIR version 2.5-6 to make the GGIR code and documentation easier to navigate.</p>
+<p>To see the parameters in each parameter category and their default values do:</p>
+<pre class="r"><code>library(GGIR)
+print(load_params())</code></pre>
+<p>If you are only interested in one specific category like sleep:</p>
+<pre class="r"><code>library(GGIR)
+print(load_params()$params_sleep)</code></pre>
+<p>If you are only interested in parameter “HASIB.algo” from the sleep_params object:</p>
+<pre class="r"><code>library(GGIR)
+print(load_params()$params_sleep[[&quot;HASPT.algo&quot;]])</code></pre>
+<p>Documentation for this parameter objects can be found in the (<a href="https://CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function documentation (pdf)</a>). All of these are accepted as argument to function <code>g.shell.GGIR</code>, because <code>g.shell.GGIR</code> is a shell around all GGIR functionality. However, the <code>params_</code> objects themselves can not be provided as input to <code>g.shell.GGIR</code>.</p>
+<div id="key-general-arguments" class="section level3" number="2.3.1">
+<h3 number="2.3.1"><span class="header-section-number">2.3.1</span> Key general arguments</h3>
+<p>You will probably never need to think about most of the arguments listed above, because a lot of arguments are only included to facilitate methodological studies where researchers want to have control over every little detail. See previous paragraph for links to the documentation and how to find the default value of each parameter.</p>
 <p>The bare minimum input needed for <code>g.shell.GGIR</code> is:</p>
 <pre class="r"><code>library(GGIR)
 g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
              outputdir=&quot;D:/myresults&quot;)</code></pre>
 <p>Argument <code>datadir</code> allows you to specify where you have stored your accelerometer data and <code>outputdir</code> allows you to specify where you would like the output of the analyses to be stored. This cannot be equal to <code>datadir</code>. If you copy paste the above code to a new R script (file ending with .R) and Source it in R(Studio) then the dataset will be processed and the output will be stored in the specified output directory.</p>
 <p>Below we have highlighted the key arguments you may want to be aware of. We are not giving a detailed explanation, please see the package manual for that.</p>
-<div id="key-general-arguments" class="section level3" number="2.3.1">
-<h3 number="2.3.1"><span class="header-section-number">2.3.1</span> Key general arguments</h3>
 <ul>
 <li><code>mode</code> - which part of GGIR to run, GGIR is constructed in five parts.</li>
 <li><code>overwrite</code> - whether to overwrite previously produced milestone output. Between each GGIR part, GGIR stores milestone output to ease re-running parts of the pipeline.</li>
@@ -336,8 +359,858 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 <li><code>viewingwindow</code> and <code>visualreport</code> - to create a visual report, this only works when all five parts of GGIR have successfully run.</li>
 </ul>
 </div>
-<div id="key-arguments-related-to-sleep-analysis" class="section level3" number="2.3.2">
-<h3 number="2.3.2"><span class="header-section-number">2.3.2</span> Key arguments related to sleep analysis</h3>
+<div id="input-arguments-overview" class="section level3" number="2.3.2">
+<h3 number="2.3.2"><span class="header-section-number">2.3.2</span> Input arguments overview</h3>
+<p>The table below shows all GGIR input arguments, the GGIR part (1, 2, 3, 4 and/or 5) they are used in, and the parameter object they belong too. As you will see a few parameters are not part of any parameter object. Their default values can be found in the <a href="https://CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function documentation (pdf)</a>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Argument (parameter)</th>
+<th>Used in GGIR part</th>
+<th>Parameter object</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>datadir</td>
+<td>1, 2, 4, 5</td>
+<td>not in parameter objects</td>
+</tr>
+<tr class="even">
+<td>f0</td>
+<td>1, 2, 3, ,4 ,5</td>
+<td>not in parameter objects</td>
+</tr>
+<tr class="odd">
+<td>f1</td>
+<td>1, 2, 3, 4, 5</td>
+<td>not in parameter objects</td>
+</tr>
+<tr class="even">
+<td>windowsizes</td>
+<td>1, 5</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>desiredtz</td>
+<td>1, 2, 3, 4, 5</td>
+<td>params_general</td>
+</tr>
+<tr class="even">
+<td>overwrite</td>
+<td>1, 2, 3, 4, 5</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>do.parallel</td>
+<td>1, 2, 3, 5</td>
+<td>params_general</td>
+</tr>
+<tr class="even">
+<td>maxNcores</td>
+<td>1, 2, 3, 5</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>myfun</td>
+<td>1, 2, 3</td>
+<td>not in parameter objects</td>
+</tr>
+<tr class="even">
+<td>outputdir</td>
+<td>1</td>
+<td>not in parameter objects</td>
+</tr>
+<tr class="odd">
+<td>studyname</td>
+<td>1</td>
+<td>not in parameter objects</td>
+</tr>
+<tr class="even">
+<td>chunksize</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>do.enmo</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.lfenmo</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.en</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.bfen</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.hfen</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.hfenplus</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.mad</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.anglex</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.angley</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.angle</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.enmoa</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.roll_med_acc_x</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.roll_med_acc_y</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.roll_med_acc_z</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.dev_roll_med_acc_x</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.dev_roll_med_acc_y</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.dev_roll_med_acc_z</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.lfen</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.lfx</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.lfy</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.lfz</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.hfx</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.hfy</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.hfz</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.bfx</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.bfy</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.bfz</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.zcx</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>do.zcy</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.zcz</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>lb</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>hb</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="odd">
+<td>n</td>
+<td>1</td>
+<td>params_metrics</td>
+</tr>
+<tr class="even">
+<td>do.cal</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>spherecrit</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>minloadcrit</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>printsummary</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>print.filename</td>
+<td>1</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>backup.cal.coef</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.noise</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.dec</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.firstrow.acc</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.firstrow.header</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.col.acc</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.col.temp</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.col.time</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.unit.acc</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.unit.temp</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.origin</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.header.length</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>mc.format.time</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.bitrate</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.dynamic_range</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.unsignedbit</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.desiredtz</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.sf</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.headername.sf</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.headername.sn</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.headername.recordingid</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.header.structure</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.check4timegaps</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>rmc.col.wear</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>rmc.doresample</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>imputeTimegaps</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>selectdaysfile</td>
+<td>1, 2</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>dayborder</td>
+<td>1, 2, 5</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>dynrange</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>configtz</td>
+<td>1</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>minimumFileSizeMB</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="even">
+<td>interpolationType</td>
+<td>1</td>
+<td>params_rawdata</td>
+</tr>
+<tr class="odd">
+<td>metadatadir</td>
+<td>2, 3, 4, 5</td>
+<td>not in parameter objects</td>
+</tr>
+<tr class="even">
+<td>minimum_MM_length.part5</td>
+<td>5</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="odd">
+<td>strategy</td>
+<td>2, 5</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>hrs.del.start</td>
+<td>2, 5</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="odd">
+<td>hrs.del.end</td>
+<td>2, 5</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>maxdur</td>
+<td>2, 5</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="odd">
+<td>max_calendar_days</td>
+<td>2</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>includedaycrit</td>
+<td>2</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="odd">
+<td>L5M5window</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>M5L5res</td>
+<td>2, 5</td>
+<td>params_247</td>
+</tr>
+<tr class="odd">
+<td>winhr</td>
+<td>2, 5</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>qwindow</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="odd">
+<td>qlevels</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>ilevels</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="odd">
+<td>mvpathreshold</td>
+<td>2</td>
+<td>params_phyact</td>
+</tr>
+<tr class="even">
+<td>boutcriter</td>
+<td>2</td>
+<td>params_phyact</td>
+</tr>
+<tr class="odd">
+<td>ndayswindow</td>
+<td>2</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>idloc</td>
+<td>2, 4</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>do.imp</td>
+<td>2</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>storefolderstructure</td>
+<td>2, 4, 5</td>
+<td>params_output</td>
+</tr>
+<tr class="odd">
+<td>epochvalues2csv</td>
+<td>2</td>
+<td>params_output</td>
+</tr>
+<tr class="even">
+<td>mvpadur</td>
+<td>2</td>
+<td>params_phyact</td>
+</tr>
+<tr class="odd">
+<td>window.summary.size</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>bout.metric</td>
+<td>2, 5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="odd">
+<td>closedbout</td>
+<td>2</td>
+<td>params_phyact</td>
+</tr>
+<tr class="even">
+<td>IVIS_windowsize_minutes</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="odd">
+<td>IVIS_epochsize_seconds</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>IVIS.activity.metric</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="odd">
+<td>iglevels</td>
+<td>2, 5</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>TimeSegments2ZeroFile</td>
+<td>2</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="odd">
+<td>qM5L5</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>MX.ig.min.dur</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="odd">
+<td>qwindow_dateformat</td>
+<td>2</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>anglethreshold</td>
+<td>3</td>
+<td>params_sleep</td>
+</tr>
+<tr class="odd">
+<td>timethreshold</td>
+<td>3</td>
+<td>params_sleep</td>
+</tr>
+<tr class="even">
+<td>acc.metric</td>
+<td>3, 5</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>ignorenonwear</td>
+<td>3</td>
+<td>params_sleep</td>
+</tr>
+<tr class="even">
+<td>constrain2range</td>
+<td>3</td>
+<td>params_sleep</td>
+</tr>
+<tr class="odd">
+<td>do.part3.pdf</td>
+<td>3</td>
+<td>params_output</td>
+</tr>
+<tr class="even">
+<td>sensor.location</td>
+<td>3, 4</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>HASPT.algo</td>
+<td>3</td>
+<td>params_sleep</td>
+</tr>
+<tr class="even">
+<td>HASIB.algo</td>
+<td>3</td>
+<td>params_sleep</td>
+</tr>
+<tr class="odd">
+<td>Sadeh_axis</td>
+<td>3</td>
+<td>params_sleep</td>
+</tr>
+<tr class="even">
+<td>longitudinal_axis</td>
+<td>3</td>
+<td>params_sleep</td>
+</tr>
+<tr class="odd">
+<td>HASPT.ignore.invalid</td>
+<td>3</td>
+<td>params_sleep</td>
+</tr>
+<tr class="even">
+<td>loglocation</td>
+<td>4, 5</td>
+<td>params_sleep</td>
+</tr>
+<tr class="odd">
+<td>colid</td>
+<td>4</td>
+<td>params_sleep</td>
+</tr>
+<tr class="even">
+<td>coln1</td>
+<td>4</td>
+<td>params_sleep</td>
+</tr>
+<tr class="odd">
+<td>nnights</td>
+<td>4</td>
+<td>params_sleep</td>
+</tr>
+<tr class="even">
+<td>sleeplogidnum</td>
+<td>4, 5</td>
+<td>params_sleep</td>
+</tr>
+<tr class="odd">
+<td>do.visual</td>
+<td>4</td>
+<td>params_output</td>
+</tr>
+<tr class="even">
+<td>outliers.only</td>
+<td>4</td>
+<td>params_output</td>
+</tr>
+<tr class="odd">
+<td>excludefirstlast</td>
+<td>4</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>criterror</td>
+<td>4</td>
+<td>params_output</td>
+</tr>
+<tr class="odd">
+<td>includenightcrit</td>
+<td>4</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>relyonguider</td>
+<td>4</td>
+<td>params_sleep</td>
+</tr>
+<tr class="odd">
+<td>relyonsleeplog</td>
+<td>4</td>
+<td>not in parameter objects</td>
+</tr>
+<tr class="even">
+<td>def.noc.sleep</td>
+<td>4</td>
+<td>params_sleep</td>
+</tr>
+<tr class="odd">
+<td>data_cleaning_file</td>
+<td>4, 5</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>excludefirst.part4</td>
+<td>4</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="odd">
+<td>excludelast.part4</td>
+<td>4</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>sleeplogsep</td>
+<td>4</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="odd">
+<td>sleepwindowType</td>
+<td>4</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>excludefirstlast.part5</td>
+<td>5</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="odd">
+<td>boutcriter.mvpa</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="even">
+<td>boutcriter.in</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="odd">
+<td>boutcriter.lig</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="even">
+<td>threshold.lig</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="odd">
+<td>threshold.mod</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="even">
+<td>threshold.vig</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="odd">
+<td>timewindow</td>
+<td>5</td>
+<td>params_output</td>
+</tr>
+<tr class="even">
+<td>boutdur.mvpa</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="odd">
+<td>boutdur.in</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="even">
+<td>boutdur.lig</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="odd">
+<td>save_ms5rawlevels</td>
+<td>5</td>
+<td>params_output</td>
+</tr>
+<tr class="even">
+<td>part5_agg2_60seconds</td>
+<td>5</td>
+<td>params_general</td>
+</tr>
+<tr class="odd">
+<td>save_ms5raw_format</td>
+<td>5</td>
+<td>params_output</td>
+</tr>
+<tr class="even">
+<td>save_ms5raw_without_invalid</td>
+<td>5</td>
+<td>params_output</td>
+</tr>
+<tr class="odd">
+<td>includedaycrit.part5</td>
+<td>5</td>
+<td>params_cleaning</td>
+</tr>
+<tr class="even">
+<td>frag.metrics</td>
+<td>5</td>
+<td>params_phyact</td>
+</tr>
+<tr class="odd">
+<td>LUXthresholds</td>
+<td>5</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>LUX_cal_constant</td>
+<td>5</td>
+<td>params_247</td>
+</tr>
+<tr class="odd">
+<td>LUX_cal_exponent</td>
+<td>5</td>
+<td>params_247</td>
+</tr>
+<tr class="even">
+<td>LUX_day_segments</td>
+<td>5</td>
+<td>params_247</td>
+</tr>
+<tr class="odd">
+<td>do.sibreport</td>
+<td>5</td>
+<td>params_output</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="key-arguments-related-to-sleep-analysis" class="section level3" number="2.3.3">
+<h3 number="2.3.3"><span class="header-section-number">2.3.3</span> Key arguments related to sleep analysis</h3>
 <p>For an explanation on how sleep is detected and the specific role of the various function arguments see section <a href="#Sleep_analysis">Sleep analysis</a>.</p>
 <ul>
 <li>Arguments related to configuring the sleep detection algorithm: <code>anglethreshold</code>, <code>timethreshold</code>, <code>HASPT.algo</code>, <code>HASIB.algo</code>, <code>Sadeh_axis</code>, and <code>HASPT.ignore.invalid</code>.</li>
@@ -350,8 +1223,8 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 <li>If you want the sleep analysis to be guided by a sleeplog (diary) then check out arguments <code>loglocation</code> which specifies the location of the spreadsheet (csv) with sleep log information. Further, use arguments <code>colid</code>, <code>coln1</code>, <code>nnights</code>, and <code>sleeplogsep</code> to specify the details of your sleep log structure.</li>
 </ul>
 <p>GGIR facilitates two possible sleeplog file structures:</p>
-<div id="basic-sleep-log" class="section level4" number="2.3.2.1">
-<h4 number="2.3.2.1"><span class="header-section-number">2.3.2.1</span> Basic sleep log</h4>
+<div id="basic-sleep-log" class="section level4" number="2.3.3.1">
+<h4 number="2.3.3.1"><span class="header-section-number">2.3.3.1</span> Basic sleep log</h4>
 <p>Example of a basic sleeplog:</p>
 <table>
 <thead>
@@ -400,8 +1273,8 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 <li>First row: The first row of the spreadsheet needs to be filled with column names. For the basic sleep log format it does not matter what these column names are.</li>
 </ul>
 </div>
-<div id="advanced-sleep-log" class="section level4" number="2.3.2.2">
-<h4 number="2.3.2.2"><span class="header-section-number">2.3.2.2</span> Advanced sleep log</h4>
+<div id="advanced-sleep-log" class="section level4" number="2.3.3.2">
+<h4 number="2.3.3.2"><span class="header-section-number">2.3.3.2</span> Advanced sleep log</h4>
 <p>Example of an advanced sleeplog for two recordings:</p>
 <table style="width:100%;">
 <colgroup>
@@ -468,8 +1341,8 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 </ul>
 </div>
 </div>
-<div id="key-arguments-related-to-time-use-analysis" class="section level3" number="2.3.3">
-<h3 number="2.3.3"><span class="header-section-number">2.3.3</span> Key arguments related to time use analysis</h3>
+<div id="key-arguments-related-to-time-use-analysis" class="section level3" number="2.3.4">
+<h3 number="2.3.4"><span class="header-section-number">2.3.4</span> Key arguments related to time use analysis</h3>
 <p>For an explanation on how time use analysis is performed see section <a href="#Waking-waking_or_24_hour">Waking-waking or 24 hour time-use analysis</a>.</p>
 <ul>
 <li><code>excludefirstlast.part5</code> - whether to ignore the last and first day.</li>
@@ -487,8 +1360,8 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 <li>Configure durations of bouts: <code>boutdur.mvpa</code>, <code>boutdur.in</code>, and <code>boutdur.lig</code>. Note that this can be a vector of multiple values indicating the minimum and maximum duration of subsequent bout types, e.g. 1-5 minutes MVPA, 5-10 minutes MVPA, and longer than 10 minutes MVPA.</li>
 </ul>
 </div>
-<div id="published-cut-points-and-how-to-use-them" class="section level3" number="2.3.4">
-<h3 number="2.3.4"><span class="header-section-number">2.3.4</span> Published cut-points and how to use them</h3>
+<div id="published-cut-points-and-how-to-use-them" class="section level3" number="2.3.5">
+<h3 number="2.3.5"><span class="header-section-number">2.3.5</span> Published cut-points and how to use them</h3>
 <p>Cut-points to estimate time spent in acceleration levels that are roughly liked to levels of energy metabolism have been proposed by:</p>
 <ul>
 <li><a href="https://journals.lww.com/acsm-msse/Fulltext/2011/06000/Validation_of_the_GENEA_Accelerometer.22.aspx">Esliger et al 2011</a>: wrist and waist in adults.</li>
@@ -502,9 +1375,7 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 <li><a href="https://bmcsportsscimedrehabil.biomedcentral.com/articles/10.1186/s13102-020-00196-7">Dibben et al. 2020</a>: wrist- and hip in adults with heart failure (mean age 71)</li>
 <li>If you are aware of any additional publications then let us know.</li>
 </ul>
-<p><strong>Acceleration metric not available in GGIR?</strong> Some of the above publications make use of acceleration metrics that sum their values per epoch rather than average them per epoch like GGIR does. However, no need to worry: Those metrics are effectively the same as the metrics included in GGIR but sum rather than average their raw values per epoch. So, to use their cut-point we need to multiply the proposed cut-point by the sample frequency used in the study that proposed it. For each of the studies this is detailed below. Note that GGIR intentionally does not sum values per epoch because that approach makes the cut-point sample frequency dependent, which complicates comparisons and harmonisation of literature. The explained variance and accuracy remains identical because we are only multiplying with a constant.</p>
-<p><strong>Warning about validity in new studies</strong> In all of the studies above, excluding Hildebrand et al. 2016, no effort was made to calibrate the acceleration sensors relative to gravitational acceleration prior to cut-point development. Theoretically this can be expected to cause a bias in the cut-point estimates proportional to the calibration error in each device, especially for cut-points based on acceleration metrics which rely on the assumption of accurate calibration such as metrics: ENMO, EN, ENMOa, and by that also metric SVMgs used by studies such as Esliger 2011, Phillips 2013, and Dibben 2020.</p>
-<p>Furthermore, studies that aimed to independently evaluate cut-point methods also seem to be failing in recognising this challenge. Therefore, it seems best to interpret cut-points as a crude boundary between intensity levels that should be interpreted with caution. Future methodological studies around cut-points are advised to account for accelerometer calibration error.</p>
+<p><strong>Acceleration metric not available in GGIR?</strong> Some of the above publications make use of acceleration metrics that sum their values per epoch rather than average them per epoch like GGIR does. So, to use their cut-point value we need to multiply the proposed cut-point by the sample frequency used in the study that proposed it. For each of the studies this is detailed below. Note that GGIR intentionally does not sum values per epoch because that approach makes the cut-point sample frequency dependent, which complicates comparisons and harmonisation of literature. The explained variance and accuracy remains identical because we are only multiplying with a constant.</p>
 <p><strong>Esliger 2011, Phillips 2013, Fraysse 2020, Dibben2020:</strong></p>
 <ul>
 <li>In GGIR use metric ENMOa instead of ENMO with arguments <code>do.enmoa = TRUE</code>, <code>do.enmo = FALSE</code>, and <code>acc.metric=”ENMOa”</code>.</li>
@@ -512,9 +1383,9 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 <li><code>threshold.mod = (ModerateCutPointFromPaper_in_gmins/(sampleRateInStudy*60)) * 1000</code></li>
 <li><code>threshold.vig = (VigorousCutPointFromPaper_in_gmins/(sampleRateInStudy*60)) * 1000</code></li>
 <li><code>mvpathreshold = (ModerateCutPointFromPaper_in_gmins/(sampleRateInStudy*60)) * 1000</code></li>
-<li>The sampleRateInStudy was 80 for Esliger and Phillips and 100 for Fraysse.</li>
-<li><a href="https://bmcsportsscimedrehabil.biomedcentral.com/articles/10.1186/s13102-020-00196-7">Dibben et al. 2020</a> does not report sample frequency by which the proposed cut-points cannot be replias we need the original sample frequency for that.</li>
-<li>In the part2 results you will need the MVPA estimates that are related to ENMOa, not ENMO.</li>
+<li>The value for <code>sampleRateInStudy</code> was 80 for Esliger and Phillips and 100 for Fraysse.</li>
+<li><a href="https://bmcsportsscimedrehabil.biomedcentral.com/articles/10.1186/s13102-020-00196-7">Dibben et al. 2020</a> does not report sample frequency by which the proposed cut-points cannot be replicated.</li>
+<li>In the part 2 results you will need the MVPA estimates that are related to ENMOa, not ENMO.</li>
 <li>In the part 5 results everything will be based on the new cut-points.</li>
 </ul>
 <p><strong>Roscoe 2017:</strong></p>
@@ -524,7 +1395,7 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 <li><code>threshold.mod = (ModerateCutPointFromPaper_in_gsecs/85.7) * 1000</code></li>
 <li><code>threshold.vig = (VigorousCutPointFromPaper_in_gsecs/85.7) * 1000</code></li>
 <li><code>mvpathreshold = (ModerateCutPointFromPaper_in_gsecs/85.7) * 1000</code></li>
-<li>In the part2 results you will need the MVPA estimates that are related to ENMOa, not ENMO.</li>
+<li>In the part 2 results you will need the MVPA estimates that are related to ENMOa, not ENMO.</li>
 <li>In the part 5 results everything will be based on the new cut-points.</li>
 </ul>
 <p><strong>Schaeffer 2014:</strong></p>
@@ -534,7 +1405,8 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 <li><code>threshold.lig = (LightCutPointFromPaper/75) * 1000</code></li>
 <li><code>threshold.mod = (ModerateCutPointFromPaper/75) * 1000</code></li>
 <li><code>threshold.vig = (VigorousCutPointFromPaper/75) * 1000</code></li>
-<li><code>mvpathreshold = (ModerateCutPointFromPaper/75) * 1000</code>- In the part2 results you will need the MVPA estimates that are related to EN, not ENMO.</li>
+<li><code>mvpathreshold = (ModerateCutPointFromPaper/75) * 1000</code></li>
+<li>In the part2 results you will need the MVPA estimates that are related to EN, not ENMO.</li>
 <li>In the part 5 results everything will be based on the new cut-points.</li>
 </ul>
 <p><strong>Vaha-Ypya et al 2015:</strong></p>
@@ -547,9 +1419,18 @@ g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
 <li>Use default setting do.enmo= TRUE, acc.metric=”ENMO”</li>
 <li>Use the cut-points as provided by Hildebrand directly. No need for scaling.</li>
 </ul>
+<div id="notes-on-cut-point-validity-and-validation-studies" class="section level4" number="2.3.5.1">
+<h4 number="2.3.5.1"><span class="header-section-number">2.3.5.1</span> Notes on cut-point validity and ‘validation’ studies</h4>
+<p><strong>Sensor calibration</strong></p>
+<p>In all of the studies above, excluding Hildebrand et al. 2016, no effort was made to calibrate the acceleration sensors relative to gravitational acceleration prior to cut-point development. Theoretically this can be expected to cause a bias in the cut-point estimates proportional to the calibration error in each device, especially for cut-points based on acceleration metrics which rely on the assumption of accurate calibration such as metrics: ENMO, EN, ENMOa, and by that also metric SVMgs used by studies such as Esliger 2011, Phillips 2013, and Dibben 2020.</p>
+<p><strong>Idle sleep mode and ActiGraph</strong></p>
+<p>Studies done with ActiGraph devices when configured with ‘idle sleep mode’ on, will have zero-strings in all three axes during periods of no movement. Studies do not clarify how these zeros strings are accounted for. The insertion of zero strings is problematic as raw data accelerometers should always measure the gravitational component when not moving. This directly impacts metrics that rely on the presence of a gravitational component such as ENMO, EN, ENMOAa, and SVMgs. However, also other metrics may be affected as the sudden disappearance of gravitational acceleration will cause a spike at the start and end of the non-movement time segment. More generally speaking, we advise ActiGraph users to disable the ‘idle sleep mode’ as it harms the transparency and reproducibility since no mechanism exists to replicate it in other accelerometer brands, and it is likely to challenge accurate assessment of sleep and sedentary behaviour. We also advise that data collected with ‘idle sleep mode’ turned on is not be referred to as raw data accelerometry, because the data collection process has involved proprietary pre-processing steps which is violates the core principle of raw data collection.</p>
+<p><strong>Validity of validation studies</strong></p>
+<p>Several studies that aimed to independently evaluate cut-point methods failed at recognising these challenges. Further, validation studies are typically limited to laboratory conditions and a small population. Therefore, it is best to interpret cut-points with caution. Future methodological studies around cut-points are advised to account for accelerometer calibration error and the problematic time gaps in for example the ActiGraph when configured with ‘idle sleep mode’.</p>
 </div>
-<div id="example-call" class="section level3" number="2.3.5">
-<h3 number="2.3.5"><span class="header-section-number">2.3.5</span> Example call</h3>
+</div>
+<div id="example-call" class="section level3" number="2.3.6">
+<h3 number="2.3.6"><span class="header-section-number">2.3.6</span> Example call</h3>
 <p>If you consider all the arguments above you me may end up with a call to <code>g.shell.GGIR</code> that could look as follows.</p>
 <pre class="r"><code>library(GGIR)
 g.shell.GGIR(
@@ -590,8 +1471,8 @@ g.shell.GGIR(
              visualreport=TRUE)</code></pre>
 <p>Once you have used <code>g.shell.GGIR</code> and the output directory (outputdir) will be filled with milestone data and results.</p>
 </div>
-<div id="configuration-file" class="section level3" number="2.3.6">
-<h3 number="2.3.6"><span class="header-section-number">2.3.6</span> Configuration file</h3>
+<div id="configuration-file" class="section level3" number="2.3.7">
+<h3 number="2.3.7"><span class="header-section-number">2.3.7</span> Configuration file</h3>
 <p>Function <code>g.shell.GGIR</code> stores all the explicitly entered argument values and default values for the argument that are not explicitly provided in a csv-file named config.csv stored in the root of the output folder. The config.csv file is accepted as input to <code>g.shell.GGIR</code> with argument <code>configfile</code> to replace the specification of all the arguments, except <code>datadir</code> and <code>outputdir</code>, see example below.</p>
 <pre class="r"><code>library(GGIR)
 g.shell.GGIR(datadir=&quot;C:/mystudy/mydata&quot;,
@@ -1374,76 +2255,88 @@ g.shell.GGIR(f0=f0,f1=f1,...)</code></pre>
 <td>Duration this day window, including both waking hours and SPT.</td>
 </tr>
 <tr class="even">
+<td>sleep_efficiency</td>
+<td>sleep_efficiency in part 5 is not the same as in part 4, but calculated as the percentage of sleep within the sleep period time window. The conventional approach is the approach used in part 4.</td>
+</tr>
+<tr class="odd">
 <td>L5TIME</td>
 <td>Timing of least active 5hrs, expressed as timestamp in the day</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>M5TIME</td>
 <td>Timing of most active 5hrs</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>L5TIME_num, M5TIME_num</td>
 <td>Timing of least/most active 5hrs, expressed as hours in the day. Note that L5/M5 timing variables are difficult to average across days because 23:00 and 1:00 would average to noon and not to midnight. So, caution is needed when interpreting person averages.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>L5VALUE</td>
 <td>Acceleration value for least active 5hrs</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>M5VALUE</td>
 <td>Acceleration value for most active 5hrs</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>FRAG_</code></td>
 <td>All variables related to behavioural fragmentation analysis</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>TP_</code></td>
 <td>Transition probability</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>PA2IN</td>
 <td>Physical activity fragments followed by inactivity fragments</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>IN2PA</td>
 <td>Physical inactivity fragments followed by activity fragments</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Nfrag</td>
 <td>Number of fragments</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>IN2LIPA</td>
 <td>Inactivity fragments followed by LIPA</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>IN2MVPA</td>
 <td>Inactivity fragments followed by MVPA</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>mean_dur</code></td>
 <td>mean duration of a fragment category</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>Gini_dur</code></td>
 <td>Gini index</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>CoV_dur</code></td>
 <td>Coefficient of Variation</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>alpha</td>
 <td>Power law exponent</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>x0.5</code></td>
 <td>Derived from power law exponent alpha, see <a href="https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub">Chastin et al. 2010</a></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>W0.5</code></td>
 <td>Derived from power law exponent alpha, see <a href="https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub">Chastin et al. 2010</a></td>
+</tr>
+<tr class="odd">
+<td>nap_count</td>
+<td>Total number of naps, only calculated when argument do.sibreport = TRUE, currently optimised for 3.5-year olds. See function documentation for function <code>g.part5.classifyNaps</code> in the <a href="https://CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function documentation (pdf)</a>.</td>
+</tr>
+<tr class="even">
+<td>nap_totalduration</td>
+<td>Total nap duration, only calculated when argument do.sibreport = TRUE, currently optimised for 3.5-year old. See function documentation for function <code>g.part5.classifyNaps</code> in the <a href="https://CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function documentation (pdf)</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -1704,7 +2597,7 @@ g.shell.GGIR(f0=f0,f1=f1,...)</code></pre>
 <li>ENMO is easy to describe mathematically and by that improves reproducibility across studies and software tools</li>
 <li>ENMO attempts to quantify the actual biomechanical acceleration in universal units.</li>
 <li>The 2013 paper showed that when ENMO is used in combination with auto-calibration it has similar validity to filter-based metrics like HFEN and BFEN, which are conceptually similar to metrics proposed later such as MIMSunit, MAD, AI0.</li>
-<li>Studies who have criticised ENMO consistently failed to apply auto-calibration, or attempted to apply auto-calibration in a lab setting, ignoring the fact that the auto-calibration is not designed for short lasting lab settings. It needs free-living data to work properly.</li>
+<li>Studies who have criticised ENMO consistently failed to apply auto-calibration, or attempted to apply auto-calibration in a lab setting, ignoring the fact that the auto-calibration is not designed for short lasting lab settings. It needs free-living data to work properly. Further, studies are often not clear about how the problematic zero imputation during the idle sleep mode in ActiGraph devices is dealt with. See for a more detailed discussion on this the paragraph: <a href="#Published%20cut-points%20and%20how%20to%20use%20them">Published cut-points and how to use them</a>.</li>
 </ol>
 <p>See also <a href="https://medium.com/@vincentvanhees/ten-misunderstandings-surrounding-information-extraction-from-wearable-accelerometer-data-a4f767a865b6">this</a> blog post on this topic.</p>
 </div>
@@ -1744,6 +2637,10 @@ g.shell.GGIR(f0=f0,f1=f1,...)</code></pre>
 <p>If you used the <strong>sleep detection without relying on sleep diary</strong> then also cite:</p>
 <ol start="6" style="list-style-type: decimal">
 <li>van Hees VT, Sabia S, et al. Estimating sleep parameters using an accelerometer without sleep diary. Scientific Reports 2018. doi: 10.1038/s41598-018-31266-z. <a href="https://www.nature.com/articles/s41598-018-31266-z">link</a></li>
+</ol>
+<p>If you used the <strong>sleep regularity index</strong> then also cite:</p>
+<ol start="7" style="list-style-type: decimal">
+<li>Andrew J. K. Phillips, William M. Clerx, et al. Irregular sleep/wake patterns are associated with poorer academic performance and delayed circadian and sleep/wake timing. Scientific Reports. 2017 June 12 <a href="https://www.nature.com/articles/s41598-017-03171-4">link</a>.</li>
 </ol>
 <div id="copyright-for-ggir-logo" class="section level2" number="7.1">
 <h2 number="7.1"><span class="header-section-number">7.1</span> Copyright for GGIR logo</h2>

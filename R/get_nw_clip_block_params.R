@@ -3,6 +3,7 @@ get_nw_clip_block_params = function(chunksize, dynrange, monc, rmc.noise=c(), sf
   blocksize = round(14512 * (sf/50) * chunksize)
   if (monc == 1) blocksize = round(21467 * (sf/80)  * chunksize)
   if (monc == 3 & dformat == 2) blocksize = round(blocksize)#round(blocksize/5) # Actigraph
+  if (monc == 3 & dformat == 6) blocksize = (24 * 3600) * chunksize
   if (monc == 4 & dformat == 3) blocksize = round(1440 * chunksize)
   if (monc == 4 & dformat == 4) blocksize = round(blocksize * 1.0043)
   if (monc == 4 & dformat == 2) blocksize = round(blocksize)
@@ -47,12 +48,9 @@ get_nw_clip_block_params = function(chunksize, dynrange, monc, rmc.noise=c(), sf
     racriter = 0.20
   } else if (monc == 0) {
     if (length(rmc.noise) == 0) {
-      warning("Argument rmc.noise not specified, please specify expected noise level in g-units")
+      stop("Argument rmc.noise not specified, please specify expected noise level in g-units")
     }
     sdcriter = rmc.noise * 1.2
-    if (length(rmc.noise) == 0) {
-      stop("Please provide noise level for the acceleration sensors in g-units with argument rmc.noise to aid non-wear detection")
-    }
   }
   invisible(list(clipthres=clipthres, blocksize=blocksize, sdcriter=sdcriter, racriter=racriter))
 }

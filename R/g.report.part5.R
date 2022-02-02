@@ -66,16 +66,24 @@ g.report.part5 = function(metadatadir=c(),f0=c(),f1=c(),loglocation=c(),
     fnames.ms5 = list.files(paste0(metadatadir,ms5.out),full.names=TRUE)
     if(f1 > length(fnames.ms5)) f1 = length(fnames.ms5)
     cat(" loading all the milestone data from part 5 this can take a few minutes\n")
-    myfun = function(x) {
-      load(file=x)
+    myfun = function(x, expectedCols = c()) {
+      load(file = x)
       cut = which(output[,1] == "")
       if (length(cut) > 0 & length(cut) < nrow(output)) {
         output = output[-cut,which(colnames(output) != "")]
       }
       out = as.matrix(output)
+      if (length(expectedCols) > 0) {
+        tmp = as.data.frame(matrix(0, 0, length(expectedCols)))
+        colnames(tmp) = expectedCols
+        out = base::merge(tmp, out, all = TRUE)
+      }
       return(out)
     }
-    outputfinal = as.data.frame(do.call(rbind,lapply(fnames.ms5[f0:f1],myfun)),stringsAsFactors=FALSE)
+    out_try = myfun(fnames.ms5[f0])
+    expectedCols = colnames(out_try)
+    # print(fnames.ms5[f0:f1])
+    outputfinal = as.data.frame(do.call(rbind,lapply(fnames.ms5[f0:f1],myfun, expectedCols)), stringsAsFactors = FALSE)
     cut = which(sapply(outputfinal, function(x) all(x=="")) == TRUE) # Find columns filled with missing values which(output[1,] == "" & output[2,] == "")
     if (length(cut) > 0) {
       outputfinal = outputfinal[,-cut]
@@ -214,11 +222,13 @@ g.report.part5 = function(metadatadir=c(),f0=c(),f1=c(),loglocation=c(),
                     }
                     dummy_df = as.data.frame(matrix(NaN,1, (NLUXseg-1)))
                     colnames(dummy_df) = LUX_segment_vars_expected
-                    x = as.data.frame(merge(x, dummy_df, all.x = T))
-                    # re-order
-                    current_location = which(colnames(x) %in% LUX_segment_vars_expected == TRUE)
-                    neworder = sort(colnames(x)[current_location])
-                    x = cbind(x[,-current_location], x[,LUX_segment_vars_expected])
+                    if (length(which(LUX_segment_vars_expected %in% colnames(x))) > 0) {
+                      x = as.data.frame(merge(x, dummy_df, all.x = T))
+                      # re-order
+                      current_location = which(colnames(x) %in% LUX_segment_vars_expected == TRUE)
+                      neworder = sort(colnames(x)[current_location])
+                      x = cbind(x[,-current_location], x[,LUX_segment_vars_expected])
+                    }
                     return(x)
                   }
                   LUX_segment_vars = c()
