@@ -3,6 +3,15 @@ context("Chainof5parts")
 test_that("chainof5parts", {
   skip_on_cran()
 
+  
+  # dirR = "~/GGIR/R"
+  # ffnames = dir(dirR) # creating list of filenames of scriptfiles to load
+  # ffnames = ffnames[which(ffnames %in% c("g.cwaread.R", "read.gt3x_ggir.R") == FALSE)]
+  # for (i in 1:length(ffnames)) {
+  #   source(paste(dirR,"/",ffnames[i],sep="")) #loading scripts for reading geneactiv data
+  # }
+  # library(testthat)
+  
   Ndays = 2
   create_test_acc_csv(Nmin = Ndays*1440)
   create_test_sleeplog_csv(advanced = FALSE)
@@ -135,12 +144,12 @@ test_that("chainof5parts", {
   expect_that(ncol(TSFILE),equals(10))
   expect_that(length(unique(TSFILE$class_id)),equals(10))
  #--------------------------------------------
-  #g.shell.GGIR
-  suppressWarnings(g.shell.GGIR(mode = c(2,3,4,5), datadir = fn, outputdir = getwd(),
+  #GGIR
+  suppressWarnings(GGIR(mode = c(2,3,4,5), datadir = fn, outputdir = getwd(),
                                 studyname = "test", f0 = 1, f1 = 1,
                           do.report = c(2,4,5), overwrite = FALSE, visualreport = FALSE, viewingwindow = 1,
                           do.parallel = do.parallel, minimumFileSizeMB = minimumFileSizeMB))
-  suppressWarnings(g.shell.GGIR(mode = c(), datadir = fn, outputdir = getwd(), studyname = "test",
+  suppressWarnings(GGIR(mode = c(), datadir = fn, outputdir = getwd(), studyname = "test",
                                 f0 = 1, f1 = 1,
                                 do.report = c(), overwrite = FALSE, visualreport = TRUE, viewingwindow = 1,
                                 do.parallel = do.parallel, minimumFileSizeMB = minimumFileSizeMB))
@@ -174,12 +183,13 @@ test_that("chainof5parts", {
   # Different variations on part 4:
   #--------------------------------------------
   # part 4 without sleeplog
-  expect_warning(g.part4(datadir = fn, metadatadir = metadatadir, f0 = 1, f1 = 1,
+  g.part4(datadir = fn, metadatadir = metadatadir, f0 = 1, f1 = 1,
                          idloc = 2, loglocation = c(), do.visual = TRUE, outliers.only = FALSE,
                          excludefirstlast = FALSE, criterror = 1, includenightcrit = 0,
                          nnights = 7, colid = 1, coln1 = 2,
                          relyonguider = FALSE, desiredtz = desiredtz,
-                         storefolderstructure = TRUE, overwrite = TRUE))
+                         storefolderstructure = TRUE, overwrite = TRUE)
+
   dirname = "output_test/meta/ms4.out/"
   rn = dir(dirname,full.names = TRUE)
   load(rn[1])

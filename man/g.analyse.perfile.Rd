@@ -9,7 +9,7 @@
 }
 \usage{
 g.analyse.perfile(ID, fname, deviceSerialNumber,
-  BodyLocation, startt, I, LC2, LD, dcomplscore,
+  sensor.location, startt, I, LC2, LD, dcomplscore,
   LMp, LWp, C, lookat, AveAccAve24hr, 
   colnames_to_lookat, QUAN,  ML5AD,
   ML5AD_names, igfullr, igfullr_names,
@@ -17,14 +17,14 @@ g.analyse.perfile(ID, fname, deviceSerialNumber,
   hrs.del.end, maxdur, windowsizes, idloc, snloc, wdayname, doquan,
   qlevels_names, doiglevels, tooshort, InterdailyStability, 
   IntradailyVariability,
-  IVIS_windowsize_minutes, qwindow, longitudinal_axis_id)
+  IVIS_windowsize_minutes, qwindow, longitudinal_axis_id, cosinor_coef)
 }
 
 \arguments{
 \item{ID}{Person Identification number, this can be numeric or character}
 \item{fname}{see \link{g.analyse.perday}}
 \item{deviceSerialNumber}{As produced by \link{g.extractheadervars}}
-\item{BodyLocation}{as produced by \link{g.extractheadervars}}
+\item{sensor.location}{as produced by \link{g.extractheadervars}}
 \item{startt}{First timestamp in metalong}
 \item{I}{output \link{g.inspectfile}}
 \item{LC2}{see \link{g.impute}}
@@ -66,7 +66,8 @@ the average day produced by \link{g.analyse.avday}}
   strongly across 24 hoursas calculated inside g.analyse. For hip worn 
   accelerometer this helps to check which axis was the veritcal axis. 
   The estimate may not be informative for other attachment locations.}
-
+\item{cosinor_coef}{output from cosinorAnlayses passed on to be included in
+  file summary}
 }
 \value{
 \item{\code{filesummary}}{summary for the file that was analysed}

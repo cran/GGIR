@@ -10,7 +10,9 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
                           params_rawdata = params_rawdata,
                           params_cleaning = params_cleaning,
                           params_general = params_general,
-                          input = input) # load default parameters
+                          input = input, 
+                          params2check = c("metrics", "rawdata",
+                                           "cleaning", "general")) # load default parameters
   params_metrics = params$params_metrics
   params_rawdata = params$params_rawdata
   params_cleaning = params$params_cleaning
@@ -151,6 +153,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
     ffdone = c()
   }
   fnames = sort(fnames)
+  fnamesfull = sort(fnamesfull)
   
   #=========================================================
   # Declare core functionality, which at the end of this g.part1 is either
@@ -162,11 +165,12 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
     if (params_general[["print.filename"]] == TRUE) {
       cat(paste0("\nFile name: ",fnames[i]))
     }
-    if (filelist == TRUE) {
-      datafile = as.character(fnamesfull[i])
-    } else {
-      datafile = paste0(datadir,"/",fnames[i])
-    }
+    # if (filelist == TRUE) {
+    datafile = as.character(fnamesfull[i])
+    # } else {
+    #   # datafile = paste0(datadir,"/",fnames[i])
+    #   datafile = fnamesfull[i] #paste0(datadir,"/",fnames[i])
+    # }
     #=========================================================
     #check whether file has already been processed
     #by comparing filename to read with list of processed files
@@ -435,9 +439,14 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
         params_rawdata[["chunksize"]] = 0.4 # put limit to chunksize, because when processing in parallel memory is more limited
       }
       if (length(params_general[["maxNcores"]]) == 0) params_general[["maxNcores"]] = Ncores
-      Ncores2use = min(c(Ncores - 1, params_general[["maxNcores"]]))
-      cl <- parallel::makeCluster(Ncores2use) #not to overload your computer
-      doParallel::registerDoParallel(cl)
+      Ncores2use = min(c(Ncores - 1, params_general[["maxNcores"]], (f1 - f0) + 1))
+      if (Ncores2use > 1) {
+        cl <- parallel::makeCluster(Ncores2use) # not to overload your computer
+        doParallel::registerDoParallel(cl)
+      } else {
+        # Don't process in parallel if only one core
+        params_general[["do.parallel"]] = FALSE
+      }
       
     } else {
       cat(paste0("\nparallel processing not possible because number of available cores (",Ncores,") < 4"))
@@ -464,6 +473,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
     }
   } else { # simple loop to process files serially file by file
     for (i in f0:f1) {
+      cat(paste0(i, " "))
       main_part1(i, params_metrics, params_rawdata,
                  params_cleaning, params_general, datadir, fnames, fnamesfull,
                  outputdir, myfun, filelist, studyname, ffdone, tmp5, tmp6,

@@ -12,7 +12,7 @@ is part of a bout of MVPA. Light PA is a short window of time above threshold.li
 part of a bout of light PA.
 }
 \description{
-  Function called by \link{g.shell.GGIR} to generate report. Not intended
+  Function called by \link{GGIR} to generate report. Not intended
   for direct use by user
 }
 \usage{
@@ -22,23 +22,27 @@ part of a bout of light PA.
 }
 \arguments{
   \item{metadatadir}{
-    See \link{g.part2}
+    Directory that holds a folder 'meta' and inside this a folder 'basic'
+    which contains the milestone data produced by \link{g.part1}. The folderstructure
+    is normally created by \link{g.part1} and \link{GGIR} will recognise what
+    the value of metadatadir is.
   }
   \item{dofirstpage}{
     Boolean to indicate whether a first page with historgrams summarizing the whole
     measurement should be added
   }
   \item{viewingwindow}{
-    See \link{g.shell.GGIR}
+    See \link{GGIR}
   }
   \item{f0}{
-    See \link{g.shell.GGIR}
+    File index to start with (default = 1). Index refers to the filenames sorted
+    in alphabetical order
   }
   \item{f1}{
-    See \link{g.shell.GGIR}
+    File index to finish with (defaults to number of files available, i.e., f1 = 0)
   }
   \item{overwrite}{
-    See \link{g.shell.GGIR}
+    See \link{GGIR}
   }
   \item{metric}{
     Which one of the metrics do you want to consider to describe behaviour. The

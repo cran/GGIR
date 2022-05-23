@@ -19,7 +19,9 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                           params_cleaning = params_cleaning,
                           params_output = params_output,
                           params_general = params_general,
-                          input = input)
+                          input = input, params2check = c("sleep", "metrics", "247",
+                                                          "phyact", "cleaning",
+                                                          "general", "output"))
   params_sleep = params$params_sleep
   params_metrics = params$params_metrics
   params_247 = params$params_247
@@ -964,9 +966,14 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
     Ncores = cores[1]
     if (Ncores > 3) {
       if (length(params_general[["maxNcores"]]) == 0) params_general[["maxNcores"]] = Ncores
-      Ncores2use = min(c(Ncores - 1, params_general[["maxNcores"]]))
-      cl <- parallel::makeCluster(Ncores2use) #not to overload your computer
-      doParallel::registerDoParallel(cl)
+      Ncores2use = min(c(Ncores - 1, params_general[["maxNcores"]], (f1 - f0) + 1))
+      if (Ncores2use > 1) {
+        cl <- parallel::makeCluster(Ncores2use) # not to overload your computer
+        doParallel::registerDoParallel(cl)
+      } else {
+        # Don't process in parallel if only one core
+        params_general[["do.parallel"]] = FALSE
+      }
     } else {
       cat(paste0("\nparallel processing not possible because number of available cores (",Ncores,") < 4"))
       params_general[["do.parallel"]] = FALSE
@@ -986,7 +993,8 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                            "g.part5.definedays", "g.part5.fixmissingnight",
                            "g.part5.onsetwaketiming", "g.part5.wakesleepwindows",
                            "g.part5.savetimeseries", "g.fragmentation", "g.intensitygradient",
-                           "g.part5.handle_lux_extremes", "g.part5.lux_persegment", "g.sibreport")
+                           "g.part5.handle_lux_extremes", "g.part5.lux_persegment", "g.sibreport",
+                           "extract_params", "load_params", "check_params")
       errhand = 'stop'
     }
     fe_dopar = foreach::`%dopar%`
@@ -1017,6 +1025,7 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
     }
   } else {
     for (i in f0:f1) {
+      cat(paste0(i, " "))
       main_part5(i, metadatadir, f0, f1,
                  params_sleep, params_metrics,
                  params_247, params_phyact,

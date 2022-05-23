@@ -7,7 +7,10 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
   input = list(...)
   params = extract_params(params_sleep = params_sleep,
                           params_metrics = params_metrics,
-                          params_general = params_general, params_output = params_output, input = input) # load default parameters
+                          params_general = params_general, 
+                          params_output = params_output, input = input,
+                          params2check = c("sleep", "metrics",
+                                           "general", "output")) # load default parameters
   params_sleep = params$params_sleep
   params_metrics = params$params_metrics
   params_general = params$params_general
@@ -65,7 +68,6 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
     if (params_general[["overwrite"]] == TRUE) skip = 0
     if (skip == 0) {  
       # Load previously stored meta-data from part1.R
-      cat(paste(" ", i, sep = ""))
       SUM = IMP = M = c()
       load(paste(metadatadir, "/meta/basic/meta_", fnames[i], sep = ""))
       load(paste(metadatadir, "/meta/ms2.out/", fnames[i], sep = ""))
@@ -122,9 +124,14 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
     Ncores = cores[1]
     if (Ncores > 3) {
       if (length(params_general[["maxNcores"]]) == 0) params_general[["maxNcores"]] = Ncores
-      Ncores2use = min(c(Ncores - 1, params_general[["maxNcores"]]))
-      cl <- parallel::makeCluster(Ncores2use) #not to overload your computer
-      doParallel::registerDoParallel(cl)
+      Ncores2use = min(c(Ncores - 1, params_general[["maxNcores"]], (f1 - f0) + 1))
+      if (Ncores2use > 1) {
+        cl <- parallel::makeCluster(Ncores2use) # not to overload your computer
+        doParallel::registerDoParallel(cl)
+      } else {
+        # Don't process in parallel if only one core
+        params_general[["do.parallel"]] = FALSE
+      }
     } else {
       cat(paste0("\nparallel processing not possible because number of available cores (",Ncores,") < 4"))
       params_general[["do.parallel"]] = FALSE
@@ -140,7 +147,8 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
     } else {
       # pass on functions
       functions2passon = c("g.sib.det", "g.detecmidnight", "iso8601chartime2POSIX", 
-                           "g.sib.plot", "g.sib.sum", "HASPT", "HASIB", "CalcSleepRegularityIndex")
+                           "g.sib.plot", "g.sib.sum", "HASPT", "HASIB", "CalcSleepRegularityIndex",
+                           "extract_params", "load_params", "check_params")
       errhand = 'stop'
     }
     fe_dopar = foreach::`%dopar%`
@@ -167,6 +175,7 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
     }
   } else {
     for (i in f0:f1) {
+      cat(paste0(i, " "))
       main_part3(i, metadatadir, f0, f1, myfun, 
                  params_sleep, params_metrics, 
                  params_output,

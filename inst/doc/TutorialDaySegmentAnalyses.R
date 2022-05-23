@@ -6,7 +6,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  library("GGIR")
-#  g.shell.GGIR(datadir = "/your/data/directory",
+#  GGIR(datadir = "/your/data/directory",
 #               outputdir = "/your/output/directory",
 #               mode = 1:2, # <= run GGIR parts 1 and 2
 #               do.report = 2, # <= generate csv-report for GGIR part 2
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  library("GGIR")
-#  g.shell.GGIR(datadir = "/your/data/directory",
+#  GGIR(datadir = "/your/data/directory",
 #               outputdir = "/your/output/directory",
 #               mode = 1:2, # <= run GGIR parts 1 and 2
 #               do.report = 2, # <= generate csv-report for GGIR part 2

@@ -25,12 +25,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  library(GGIR)
-#  g.shell.GGIR(datadir="C:/mystudy/mydata",
+#  GGIR(datadir="C:/mystudy/mydata",
 #               outputdir="D:/myresults")
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  library(GGIR)
-#  g.shell.GGIR(
+#  GGIR(
 #               mode=c(1,2,3,4,5),
 #               datadir="C:/mystudy/mydata",
 #               outputdir="D:/myresults",
@@ -43,7 +43,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #               maxdur = 9,                 includedaycrit = 16,
 #               qwindow=c(0,24),
 #               mvpathreshold =c(100),
-#               bout.metric = 4,
+#               bout.metric = 6,
 #               excludefirstlast = FALSE,
 #               includenightcrit = 16,
 #               #=====================
@@ -69,7 +69,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  library(GGIR)
-#  g.shell.GGIR(datadir="C:/mystudy/mydata",
+#  GGIR(datadir="C:/mystudy/mydata",
 #               outputdir="D:/myresults", configfile = "D:/myconfigfiles/config.csv")
 
 ## ----eval=FALSE---------------------------------------------------------------
@@ -80,7 +80,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #      eval(parse(text = args[[i]]))
 #    }
 #  }
-#  g.shell.GGIR(f0=f0,f1=f1,...)
+#  GGIR(f0=f0,f1=f1,...)
 
 ## ---- out.width = "700px",echo=FALSE------------------------------------------
 knitr::include_graphics("reportexample.jpg")

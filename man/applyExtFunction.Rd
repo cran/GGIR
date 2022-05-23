@@ -9,7 +9,7 @@
   on accelerometer data while taking advantage of the existing comprehensive GGIR
   data management and analysis infrastructure.
   This function is not for direct interaction by user, please supply object 
-  \code{myfun} to \link{g.shell.GGIR} or \link{g.part1}. Object \code{myfun}
+  \code{myfun} to \link{GGIR} or \link{g.part1}. Object \code{myfun}
   is a list as detailed below.
 }
 \usage{
@@ -33,7 +33,7 @@
     Short epoch size (first value of windowsizes in \link{g.getmeta}).
   }
   \item{interpolationType}{
-    See \link{g.getmeta}
+    Integer to indicate type of interpolation to be used when resampling time series (mainly relevant for Axivity sensors), 1=linear, 2=nearest neighbour.
   }
 }
 \value{

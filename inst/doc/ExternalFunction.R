@@ -33,12 +33,12 @@ knitr::opts_chunk$set(
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  library(GGIR)
-#  g.shell.GGIR(datadir="~/myaccelerometerdata",
+#  GGIR(datadir="~/myaccelerometerdata",
 #               outputdir="~/myresults",
 #               mode=1:2,
 #               epochvalues2csv = TRUE,
 #               do.report=2,
-#               myfun=myfun) #<= this is where object myfun is provided to g.shell.GGIR
+#               myfun=myfun) #<= this is where object myfun is provided to GGIR
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  dominant_frequency = function(data=c(), parameters=c()) {
@@ -80,7 +80,7 @@ knitr::opts_chunk$set(
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  library(GGIR)
-#  g.shell.GGIR(datadir="~/myaccelerometerdata",
+#  GGIR(datadir="~/myaccelerometerdata",
 #               outputdir="~/myresults",
 #               mode=1:2,
 #               epochvalues2csv = TRUE,
