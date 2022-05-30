@@ -1,4 +1,4 @@
-1caa3ea6bb6a9f6d287a71ddd1984163 *DESCRIPTION
+478717a654ba708c55abe37904f5cfd1 *DESCRIPTION
 e6a600fd5e1d9cbde2d983680233ad02 *LICENSE
 03dd0cc6bb85d551d1d8fb56aed133f7 *LICENSE.note
 fbc58bf3553a26c7eafc1c7bb65e0a98 *NAMESPACE
@@ -21,7 +21,7 @@ b70b4f78a35c3771ad7510ac767f9f45 *R/datadir2fnames.R
 15c89e8ac9b0ef311f4155a2574ff1a9 *R/g.IVIS.R
 79f8c199a8e695c7dd2abbf5cd97bd5a *R/g.abr.day.names.R
 1022d03c8b218af4c6e55dcbb39023d8 *R/g.analyse.R
-b8e9e99f6d6baee1c948e9a932b80aee *R/g.analyse.avday.R
+768da8e6d97a13c529bc158bd5c8d27f *R/g.analyse.avday.R
 9cd113c2a7e4d9091688a8a8ff634bcb *R/g.analyse.perday.R
 626f44bd96954ccf9b9858c1e556342a *R/g.analyse.perfile.R
 e4587147453bf8a0de593a1815455b4c *R/g.applymetrics.R
@@ -46,13 +46,13 @@ e28cb678cce824107e2f6b043c771a51 *R/g.getmeta.R
 d9cc3f3c0aab6f20de685341cb41dfd8 *R/g.imputeTimegaps.R
 23565713cb6efa81310ad5f2a344e4ef *R/g.inspectfile.R
 ad94720d6513e0b354c1f55bf53c7ee0 *R/g.intensitygradient.R
-6055c39df4ae394894354a20c9155f36 *R/g.loadlog.R
-391935cbff702e43f47f91262fd74262 *R/g.part1.R
-61c1a74ec26f027c4d65deff5cd1e562 *R/g.part2.R
-86fa565f7a4f2c1b8befe22909ef81e3 *R/g.part3.R
+57381f11f1c56bcffc7a75ba83bf0836 *R/g.loadlog.R
+797eac92d96ae5859299c4e8173db289 *R/g.part1.R
+099c2afb66ae9b9f959d93e5b525f8cd *R/g.part2.R
+70e91c088cf466395dcb64c66be39ff2 *R/g.part3.R
 d58bc74568c7b38a3d9a4e0b1e04fa39 *R/g.part4.R
 1fc37914fa8ce7a04a44a831b0f37a54 *R/g.part4_extractid.R
-eb4d9e4da506e776ae95675b21e250eb *R/g.part5.R
+f8bc413ccbb40cbc272c2a473d026986 *R/g.part5.R
 e7c0a0d339e7e54a54a1ba29ef328044 *R/g.part5.addfirstwake.R
 e87d7b98e3a4458c040e99962906e1de *R/g.part5.addsib.R
 ad8de3e76a8b6f4bea5b85efdf930be4 *R/g.part5.classifyNaps.R
@@ -100,10 +100,10 @@ f8e5e7a89b8d60cb02b8a53207ffb975 *README.md
 70d52d29d1fa61fe80c9c498ebd7a6c7 *data/data.getmeta.RData
 0cb14c60e18f5bd4c15fb942c95aea2b *data/data.inspectfile.RData
 26a6b6fb77b4aa663f87b2b6b0eac7a3 *inst/CITATION
-d870437465e2e127e699ddc80312b5c2 *inst/NEWS.Rd
+ef77a15fc873aee6b342224452100540 *inst/NEWS.Rd
 b2ef08ae50dda4d8b19cb83cd0616d73 *inst/doc/ExternalFunction.R
 5b0e949d741764a46c51682e77829303 *inst/doc/ExternalFunction.Rmd
-fd82add1fb1075f90716466511f9e1f6 *inst/doc/ExternalFunction.pdf
+8c7e38aacdef78a4edd5b772f1198566 *inst/doc/ExternalFunction.pdf
 987fc01a535fa6238e168f689daf87bf *inst/doc/GGIR.R
 05bf32cb3c9a5fc6e4fadf074f6ba7b5 *inst/doc/GGIR.Rmd
 c306f4b759a1a3e73687db89da42c639 *inst/doc/GGIR.html
@@ -121,7 +121,7 @@ e29bc72556997d930507c0dba8135904 *inst/testfiles/ax3_testfile.cwa
 7042f294a3a4af3aada3d4a3ebc827d2 *inst/testfiles/ax3test.wav
 3898e642b0d46a94cc2b25739e0d55cf *inst/testfiles/genea_testfile.bin
 57e33d28c9b35d956a066f4f4595d19d *man/CalcSleepRegularityIndex.Rd
-291d59f13394dae45b76a565cf5c7873 *man/GGIR-package.Rd
+6c1699d6fb10dd8562694e2c5cca7b7c *man/GGIR-package.Rd
 24eed85a23e80a2b728d805fcf356ec6 *man/GGIR.Rd
 f396341d46551e9945d32801ab703ec8 *man/HASIB.Rd
 fa40660e5b34cbd44279712aee82b367 *man/HASPT.Rd
@@ -242,7 +242,7 @@ dbf469598414ddbc9114421550a1a76f *tests/testthat/test_g.intensitygradient.R
 0c0693fcf7d7eb162722a71b7bf0f7b2 *tests/testthat/test_gcwaread.R
 22da5b0f2246c370a1197ad24508227f *tests/testthat/test_getfolderstructure.R
 76f0365f5c70614cdc8dab8a64b10bbc *tests/testthat/test_ggetbout.R
-2bf9053dd350bf7329f7c2d2455111d7 *tests/testthat/test_gloadlog.R
+9c3a531f2b50d55d900fb798ff1421ef *tests/testthat/test_gloadlog.R
 a4421ba4d729b6a9c4236b999fda34aa *tests/testthat/test_greadaccfile.R
 655e4282f15637acd29fcc2c7415dfce *tests/testthat/test_gwavread.R
 71130f7e32a86ec39590fcdb8876458f *tests/testthat/test_identify_levels.R
