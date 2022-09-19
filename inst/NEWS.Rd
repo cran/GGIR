@@ -1,10 +1,85 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\section{Changes in version 2.8-0 (release date:19-09-2022)}{
+  \itemize{
+    \item Documentation: New package vignette added for cut-points.
+    \item Documentation: New package vignette added for arguments
+    \item Documentation: GGIR function manual and parameter/argument vignette 
+    auto-integrate default values to avoid inconsistencies.
+    \item Documentation: Main vignette sections on cut-points and input argument 
+    shortened with reference to the new vignettes.
+    \item Documentation: Paragraph added on processing time.
+    }
+}
+\section{Changes in version 2.7-7 (GitHub-only-release date:17-09-2022)}{
+  \itemize{
+    \item Part 1: Long timegaps in ActiGraph data or ad-hoc .csv data as a result of idle sleep mode are now dealt with at metric level rather than raw data level.
+    \item Part 1: Speed up to code by changing how GENEActiv data converted to matrix and by changing how rolling median is derived.
+    \item Part 1" Deprecate option to read raw data from in RData files, which was connected to the selectdaysfile functionality as deprecated in previous release.
+    \item Remove zenodo and .cff file to simplify package citation and avoid tracking by RSD (issue #636)
+    \item Part 1: Add extra arguments to modify zero-crossing count calculation.
+    \item Part 3: Adding ColeKripke sleep detection algorithm.
+    }
+}
+\section{Changes in version 2.7-6 (GitHub-only-release date:02-09-2022)}{
+  \itemize{
+    \item Part 1: Deprecated g.cwaread and internally replaced by GGIRread::readAxivity.
+    \item Part 1: Deprecated g.binread and internally replaced by GGIRread::readGenea.
+    \item Part 1: Deprecated resample and internally replaced by GGIRread::resample.
+    \item Part 1: Added temporary option to choose between using GENEAread or 
+      GGIRread::readGENEActiv for reading GENEActiv .bin files.
+    \item Part 1 + 2: Deprecated selectdaysfile functionality.
+    \item Deprecated function g.getidfromheaderobject, and functionality merged with g.extractheadervars
+    }
+}
+\section{Changes in version 2.7-5 (GitHub-only-release date:01-09-2022)}{
+\itemize{
+    \item Part 1: AX6 gyroscope data correctly ignored in g.getmeta.
+    }
+}
+\section{Changes in version 2.7-4 (GitHub-only-release date:17-08-2022)}{
+\itemize{
+    \item Part 1: Arguments configtz and desiredtz now also used for .gt3x data.
+    \item Part 1: Temporary copy of read.gt3x code replaced by direct dependency on read.gt3x
+    \item Vignette: Cut-point documentation paragraph improved.
+    \item Part 1: Mismatches in the reading of ActiGraph csv files handled (mainly because of header = TRUE resulted in some acceleration values disregarded as they were considered a header in each iteration).
+    \item Part 1: Fixed issue #573 (code redundancy to impute time gaps in read.myacc.csv and g.imputeTimegaps)
+    \item Part 1: g.imputeTimegaps extended so that now it can handle time gaps at the begining, at the end of the file, and
+    time gaps from one chunk to the next one.
+    \item Part 2: QC plot now with legend and minor updates to layout.
+    \item Part 4: Person level aggregation now takes place per filename instead of per ID, which should prevent that identical IDs in repeated recordings get aggregated into a single ling.
+    \item Part 4: ID matching between accelerometer file and sleep log improved by ignore spaces.
+    }
+}
+\section{Changes in version 2.7-3 (GitHub-only-release date:26-07-2022)}{
+\itemize{
+    \item Part1: Added option to expand the last day of the recording to
+      trigger analyses for that day, see argument expand_tail_max_hours in params_general.
+    \item Part 1: Add extraction of ID and serial number from Movisens data
+    \item Part 2: Corrected calendar date time stamps in daysummary report on last day of the recording.
+    \item Part 2: Further, improvement to activity diary functionality to warn user when date format is inconsistent.
+    \item Part 2: Missing values in activity diary are now skipped by which non-neighboring cells with valid data can
+    define segments.
+    \item Part 3: Improved handling of sleep that ends in the hour before noon on the last day of the recording.
+    \item Part 4: Fixing #592 concerning using a set time window as guider for the sleep analyses
+    \item Part 4: Fixed issue #592 which caused GGIR to incorrectly warn used about using the
+    set time window guider functionality correctly
+    }
+}
+\section{Changes in version 2.7-2 (GitHub-only-release date:22-06-2022)}{
+\itemize{
+    \item Part 4: Fixing timezone sensitivity for OSx in Pacific timezone for gloadlog function.
+    \item Inform user (onAttach) when local GGIR version is behind CRAN version.
+    \item Part 2: Enhancing activity diary functionality to warn user when date format is inconsistent and to treat cells with only a dot as missing values.
+    \item Part 1: Fixing issue #577 concerning use of temperature data in ad-hoc csv file format
+    \item Part 5: Fixing issue #582 affecting windows where a single fragment spans the entire window.
+  }
+}
 \section{Changes in version 2.7-1 (release date:29-05-2022)}{
 \itemize{
     \item Fixing bug #566 concerning decision to not parallel process being made too late
-    \item Part 4: Fixing timezone sensitivity for OSx in Pacific timezone for gloadlog function.
+    \item Part 4: Attempt to fix timezone sensitivity for OSx in Pacific timezone for gloadlog function.
   }
 }
 \section{Changes in version 2.7-0 (release date:23-05-2022)}{
@@ -61,6 +136,7 @@
 }
 \section{Changes in version 2.6-2 (GitHub-only-release date:06-03-2022)}{
 \itemize{
+
     \item Part 1: Can now handle .gt3x produced by CentrePoint but for now user needs to change upercase file extension to lowercase
     \item Part 1: Fixed issue #520 with handling Movisens data
     \item Part 1: Fixed issue #523 with calibration of ActiGraph csv files

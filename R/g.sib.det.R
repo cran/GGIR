@@ -1,6 +1,6 @@
 g.sib.det = function(M, IMP, I, twd = c(-12, 12),
                      acc.metric = "ENMO", desiredtz = "",
-                     myfun=c(), sensor.location = "wrist", params_sleep = c(), ...) {
+                     myfun=c(), sensor.location = "wrist", params_sleep = c(), zc.scale = 1, ...) {
   
   #get input variables
   input = list(...)
@@ -117,14 +117,19 @@ g.sib.det = function(M, IMP, I, twd = c(-12, 12),
     }
     ACC = as.numeric(as.matrix(IMP$metashort[,which(colnames(IMP$metashort) == acc.metric)]))
     night = rep(0, length(anglez))
-    if (params_sleep[["HASIB.algo"]] == "Sadeh1994" | params_sleep[["HASIB.algo"]] == "Galland2012") { # extract zeroCrossingCount
+    if (params_sleep[["HASIB.algo"]] == "Sadeh1994" | 
+        params_sleep[["HASIB.algo"]] == "Galland2012" |
+        params_sleep[["HASIB.algo"]] == "ColeKripke1992") { # extract zeroCrossingCount
       zeroCrossingCount =  IMP$metashort[,which(colnames(IMP$metashort) == paste0("ZC", params_sleep[["Sadeh_axis"]]))]
       zeroCrossingCount = fix_NA_invector(zeroCrossingCount)
+      zeroCrossingCount = zeroCrossingCount * zc.scale
       # always do zeroCrossingCount but optionally also add BrondCounts to output for comparison
       BrondCount_colname = paste0("BrondCount_", tolower(params_sleep[["Sadeh_axis"]]))
       if (BrondCount_colname %in% colnames(IMP$metashort)) {
         BrondCount =  IMP$metashort[, BrondCount_colname]
         BrondCount = fix_NA_invector(BrondCount)
+      } else {
+        BrondCount = c()
       }
     } else {
       zeroCrossingCount = c()
@@ -144,7 +149,7 @@ g.sib.det = function(M, IMP, I, twd = c(-12, 12),
       sleep = HASIB(HASIB.algo = params_sleep[["HASIB.algo"]], 
                     timethreshold = params_sleep[["timethreshold"]],
                     anglethreshold = params_sleep[["anglethreshold"]], 
-                    time = time, anglez = anglez, ws3=ws3,
+                    time = time, anglez = anglez, ws3 = ws3,
                     zeroCrossingCount = zeroCrossingCount,
                     BrondCount = BrondCount)
     } else { # getSleepFromExternalFunction == TRUE
@@ -241,21 +246,28 @@ g.sib.det = function(M, IMP, I, twd = c(-12, 12),
         if (length(spt_estimate$SPTE_end) != 0 & length(spt_estimate$SPTE_start) != 0) {
           if (spt_estimate$SPTE_end + qqq1 >= qqq2 - (1 * (3600 / ws3))) {
             # if estimated SPT ends within one hour of noon, re-run with larger window
-            # to be able to detect daysleepers
+            # to be able to detect sleep in daysleepers
             daysleep_offset = 6 # hours in which the window of data sent to SPTE is moved fwd from noon
             newqqq1 = qqq1 + (daysleep_offset * (3600 / ws3))
             newqqq2 = qqq2 + (daysleep_offset * (3600 / ws3))
             if (newqqq2 > length(anglez)) newqqq2 = length(anglez)
-            # only try to extract SPT again if it is possible to extrat a window of more than there is more than 23 hour
-            if (newqqq1 < length(anglez) & (newqqq2 - newqqq1) > (23*(3600/ws3)) ) {
-              spt_estimate = HASPT(anglez[newqqq1:newqqq2], ws3 = ws3,
+            # only try to extract SPT again if it is possible to extract a window of more than 23 hour
+            if (newqqq2 < length(anglez) & (newqqq2 - newqqq1) > (23*(3600/ws3)) ) {
+              spt_estimate_tmp = HASPT(anglez[newqqq1:newqqq2], ws3 = ws3,
                                    constrain2range = params_sleep[["constrain2range"]],
                                    perc = perc, spt_threshold = spt_threshold, sptblocksize = sptblocksize,
                                    spt_max_gap = spt_max_gap,
                                    HASPT.algo = params_sleep[["HASPT.algo"]], invalid = invalid,
                                    HASPT.ignore.invalid = params_sleep[["HASPT.ignore.invalid"]])
-              if (spt_estimate$SPTE_start + newqqq1 >= newqqq2) {
-                spt_estimate$SPTE_start = (newqqq2 - newqqq1) - 1
+              if (length(spt_estimate_tmp$SPTE_start) > 0) {
+                if (spt_estimate_tmp$SPTE_start + newqqq1 >= newqqq2) {
+                  spt_estimate_tmp$SPTE_start = (newqqq2 - newqqq1) - 1
+                  spt_estimate = spt_estimate_tmp
+                } else {
+                  daysleep_offset  = 0
+                }
+              } else {
+                daysleep_offset  = 0
               }
             } else {
               daysleep_offset  = 0
@@ -263,7 +275,7 @@ g.sib.det = function(M, IMP, I, twd = c(-12, 12),
           } 
           if (qqq1 == 1) {  # only use startTimeRecord if the start of the block send into SPTE was after noon
             startTimeRecord = unlist(iso8601chartime2POSIX(IMP$metashort$timestamp[1], tz = desiredtz))
-            startTimeRecord = sum(as.numeric(startTimeRecord[c("hour","min","sec")]) / c(1,60,3600))
+            startTimeRecord = sum(as.numeric(startTimeRecord[c("hour", "min", "sec")]) / c(1, 60, 3600))
             SPTE_end[j] = (spt_estimate$SPTE_end / (3600 / ws3)) + startTimeRecord + daysleep_offset
             SPTE_start[j] = (spt_estimate$SPTE_start / (3600 / ws3)) + startTimeRecord + daysleep_offset
           } else {

@@ -16,7 +16,6 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
   params_phyact = params$params_phyact
   params_output = params$params_output
   params_general = params$params_general
-  
   #-----------------------------
   if (is.numeric(params_247[["qwindow"]])) {
     params_247[["qwindow"]] = params_247[["qwindow"]][order(params_247[["qwindow"]])]
@@ -81,6 +80,7 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                         params_phyact = c(), params_output = c(), params_general = c(),
                         path, ms2.out, foldername, fullfilenames, folderstructure, referencefnames,
                         daySUMMARY, pdffilenumb, pdfpagecount, csvfolder, cnt78) {
+    tail_expansion_log =  NULL
     if (length(ffdone) > 0) {
       if (length(which(ffdone == as.character(unlist(strsplit(fnames[i], "eta_"))[2]))) > 0) {
         skip = 1 #skip this file because it was analysed before")
@@ -139,9 +139,10 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                        dayborder = params_general[["dayborder"]],
                        desiredtz = params_general[["desiredtz"]],
                        TimeSegments2Zero = TimeSegments2Zero)
+        
         if (params_cleaning[["do.imp"]] == FALSE) { #for those interested in sensisitivity analysis
           IMP$metashort = M$metashort
-          IMP$metalong = M$metalong
+          # IMP$metalong = M$metalong
         }
         SUM = g.analyse(I, C, M, IMP,
                         params_247 = params_247,
@@ -150,7 +151,6 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                         desiredtz = params_general[["desiredtz"]],
                         idloc = params_general[["idloc"]],
                         includedaycrit = params_cleaning[["includedaycrit"]],
-                        selectdaysfile = params_cleaning[["selectdaysfile"]],
                         myfun = myfun,
                         acc.metric = params_general[["acc.metric"]])
         name = as.character(unlist(strsplit(fnames[i], "eta_"))[2])
@@ -163,26 +163,7 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
           if (cnt78 == 1) {
             SUMMARY = SUM$summary
             daySUMMARY = SUM$daysummary
-            if (length(params_cleaning[["selectdaysfile"]]) > 0) {
-              winSUMMARY = SUM$windowsummary[,which(
-                is.na(colnames(SUM$windowsummary)) == FALSE)] # added for Millenium cohort
-            }
             cnt78 = 2
-          } else {
-            if (length(params_cleaning[["selectdaysfile"]]) > 0) {
-              # windowsummary
-              winSUMMARY2 = SUM$windowsummary[,which(is.na(colnames(SUM$windowsummary)) == FALSE)]
-              if (ncol(winSUMMARY) != ncol(winSUMMARY2)) {
-                winSUMMARY2 = cbind(winSUMMARY2,matrix(" ",1,(ncol(winSUMMARY) - ncol(winSUMMARY2))))
-                colnames(winSUMMARY2) = colnames(winSUMMARY)
-              }
-              if (length(which(colnames(winSUMMARY) != names(winSUMMARY2)) ) > 0) {
-                names(winSUMMARY2) =   colnames(winSUMMARY)
-              }
-              if (length(which(colnames(daySUMMARY) != names(SUM$daysummary)) ) > 0) {
-                names(SUM$windowsummary) =   colnames(winSUMMARY2)
-              }
-            }
           }
         }
         if (length(unlist(strsplit(name,"[.]RD"))) == 1) { # to avoid getting .RData.RData
@@ -192,7 +173,7 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
           SUM$daysummary$filename_dir = fullfilenames[i] #full filename structure
           SUM$daysummary$foldername = foldername[i] #store the lowest foldername
         }
-        save(SUM, IMP, file = paste0(metadatadir, ms2.out, "/", name)) #IMP is needed for g.plot in g.report.part2
+        save(SUM, IMP, tail_expansion_log, file = paste0(metadatadir, ms2.out, "/", name)) #IMP is needed for g.plot in g.report.part2
       }
       if (M$filecorrupt == FALSE & M$filetooshort == FALSE) rm(IMP)
       rm(M); rm(I)

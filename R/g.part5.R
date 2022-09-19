@@ -114,7 +114,7 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                         params_general = c(), ms5.out, ms5.outraw,
                         fnames.ms3, sleeplog, logs_diaries,
                         extractfilenames, referencefnames, folderstructure, fullfilenames, foldernam) {
-    
+    tail_expansion_log =  NULL
     fnames.ms1 = sort(dir(paste(metadatadir, "/meta/basic", sep = "")))
     fnames.ms2 = sort(dir(paste(metadatadir, "/meta/ms2.out", sep = "")))
     fnames.ms4 = sort(dir(paste(metadatadir, "/meta/ms4.out", sep = "")))
@@ -312,9 +312,9 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
               }
               Nts = nrow(ts)
             }
-            if ("angle" %in% colnames(ts)) {
-              ts = ts[, -which(colnames(ts) == "angle")]
-            }
+            # if ("angle" %in% colnames(ts)) {
+            #   ts = ts[, -which(colnames(ts) == "angle")]
+            # }
             #===============================================
             # Use sib.report to classify naps, non-wear and integrate these in time series
             # does not depend on bout detection criteria or window definitions.
@@ -595,6 +595,7 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                           dsummary[di,fi] = length(which(ts$sibdetection[sse] == 1 &
                                                            ts$diur[sse] == 1)) / length(which(ts$diur[sse] == 1))
                           ds_names[fi] = "sleep_efficiency";      fi = fi + 1
+                          
                           #===============================================
                           # NAPS (estimation)
                           if (params_output[["do.sibreport"]] == TRUE & "nap1_nonwear2" %in% colnames(ts) & length(params_sleep[["nap_model"]]) > 0) {
@@ -603,6 +604,13 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                             dsummary[di,fi] = round((sum(ts$nap1_nonwear2[sse[which(ts$nap1_nonwear2[sse] == 1 & ts$diur[sse] == 0)]]) * ws3new) / 60, digits = 2)
                             ds_names[fi] = "nap_totalduration";      fi = fi + 1
                           }
+                          if (length(tail_expansion_log) != 0) {
+                            # do not store sleep variables if data was expanded in GGIR part 1
+                            dsummary[di, fi] = (tail_expansion_log[["short"]] * ws3new) / 60
+                          } else {
+                            dsummary[di, fi] = 0
+                          }
+                          ds_names[fi] = "tail_expansion_minutes";      fi = fi + 1
                           #===============================================
                           # AVERAGE ACC PER WINDOW
                           for (levelsc in 0:(length(Lnames) - 1)) {
@@ -619,6 +627,10 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                           ds_names[fi] = "ACC_day_mg";      fi = fi + 1
                           dsummary[di, fi] = mean(ts$ACC[sse[ts$diur[sse] == 1]], na.rm = TRUE)
                           ds_names[fi] = "ACC_spt_mg";      fi = fi + 1
+                          dsummary[di, fi] = median(ts$ACC[sse[ts$diur[sse] == 1]], na.rm = TRUE)
+                          ds_names[fi] = "ACC_spt_mg_median";      fi = fi + 1
+                          dsummary[di, fi] = sd(ts$ACC[sse[ts$diur[sse] == 1]], na.rm = TRUE)
+                          ds_names[fi] = "ACC_spt_mg_stdev";      fi = fi + 1
                           dsummary[di, fi] = mean(ts$ACC[sse], na.rm = TRUE)
                           ds_names[fi] = "ACC_day_spt_mg";      fi = fi + 1
                           #===============================================
@@ -641,7 +653,7 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                             if (ignore == FALSE) {
                               # Calculate running window variables
                               ACCrunwin = matrix(0, nwindow_f, 1)
-                              TIMErunwin= matrix("", nwindow_f, 1)
+                              TIMErunwin = matrix("", nwindow_f, 1)
                               for (hri in 0:floor((((endd - wini) * (60/reso)) - 1))) {
                                 e1 = (hri * reso * (60/ws3new)) + 1
                                 e2 = (hri + (wini * (60/reso))) * reso * (60/ws3new)
@@ -658,7 +670,8 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                                 M5HOUR = TIMErunwin[which(ACCrunwin == max(ACCrunwin))[1]]
                                 M5VALUE = max(ACCrunwin)
                                 if (lightpeak_available == TRUE) {
-                                  startM5 = which(ts$time == M5HOUR)
+                                  if (length(unlist(strsplit(M5HOUR, " "))) == 1) M5HOUR = paste0(M5HOUR, " 00:00:00")
+                                  startM5 = which(as.character(ts$time) == M5HOUR)
                                   M5_mean_peakLUX = round(mean(ts$lightpeak[startM5[1]:(startM5[1] + (wini*60*(60/ws3new)))], na.rm = TRUE), digits = 1)
                                   M5_max_peakLUX = round(max(ts$lightpeak[startM5[1]:(startM5[1] + (wini*60*(60/ws3new)))], na.rm = TRUE), digits = 1)
                                 }
@@ -732,7 +745,7 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                           bc.mvpa = checkshape(bc.mvpa)
                           for (bci in 1:nrow(bc.mvpa)) {
                             RLE = rle(bc.mvpa[bci, sse])
-                            dsummary[di, fi + (bci-1)] = length(which(RLE$values == 1))
+                            dsummary[di, fi + (bci - 1)] = length(which(RLE$values == 1))
                             if (bci == 1) {
                               ds_names[fi + (bci - 1)] = paste0("Nbouts_day_MVPA_bts_", params_phyact[["boutdur.mvpa"]][bci])
                             } else {
@@ -893,6 +906,9 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
             }
           }
         }
+        if ("angle" %in% colnames(ts)) {
+          ts = ts[, -which(colnames(ts) == "angle")]
+        }
         #remove NA values
         for (kik in 1:ncol(dsummary)) {
           naval = which(is.na(dsummary[, kik]) == TRUE)
@@ -900,7 +916,7 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
         }
         output = data.frame(dsummary,stringsAsFactors = FALSE)
         names(output) = ds_names
-        if (params_cleaning[["excludefirstlast.part5"]] == TRUE) {
+         if (params_cleaning[["excludefirstlast.part5"]] == TRUE) {
           output$window_number = as.numeric(output$window_number)
           cells2exclude = c(which(output$window_number == min(output$window_number,na.rm = TRUE)),
                             which(output$window_number == max(output$window_number,na.rm = TRUE)))
@@ -942,12 +958,12 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
             # While we explore the fragmentation variables, we want to make sure that all variables are kept in the output
             FRAG_variables_indices = grep(pattern = "FRAG_",x = names(output))
             emptycols = emptycols[which(emptycols %in% FRAG_variables_indices == FALSE)]
-            if (length(emptycols) > 0) output = output[-emptycols]
+            if (length(emptycols) > 0) output = output[,-emptycols]
           }
-          
+       
           if (length(output) > 0) {
             if (nrow(output) > 0) {
-              save(output, file = paste(metadatadir,
+              save(output, tail_expansion_log, file = paste(metadatadir,
                                         ms5.out, "/", fnames.ms3[i], sep = ""))
             }
           }

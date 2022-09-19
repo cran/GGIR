@@ -1624,22 +1624,22 @@ structure:</p>
 <td>04-11-20</td>
 <td>7:45:00</td>
 <td>17:00:00</td>
-<td>17:30</td>
+<td>17:30:00</td>
 <td>05-11-20</td>
 <td></td>
 <td></td>
-<td>17:30</td>
+<td>17:30:00</td>
 </tr>
 <tr class="even">
 <td>4567</td>
 <td>24-11-20</td>
 <td>7:45:00</td>
 <td>17:00:00</td>
-<td>17:30</td>
+<td>17:30:00</td>
 <td>25-11-20</td>
 <td>7:45:00</td>
 <td>17:00:00</td>
-<td>17:30</td>
+<td>17:30:00</td>
 </tr>
 </tbody>
 </table>
@@ -1661,14 +1661,48 @@ correctly, specify argument <code>qwindow_dateformat</code>. The default
 format is <code>&quot;\%d-\%m-\%Y&quot;</code> as in 23-2-2021 to indicate the
 23rd of February 2021. If your date is formatted as 2-23-21 then
 specify<code>&quot;\%m-\%d-\%y&quot;</code>. The column name of the date column
-needs to include the character combination “date” or “Date” or
-“DATE”.</p>
+needs to include the character combination “date” or “Date” or “DATE”.
+Use the same date format consistently throughout your activity
+diary.</p>
 <p><strong>Start-times:</strong> The date column is followed by one or
 multiple columns with start times for the activity types in that day
 format in hours:minutes:seconds. Do not provide dates in these cells.
 The header of the column will be used as label for each activity type.
 Insert a new date column before continuing with activity types for next
 day. Leave missing values empty.</p>
+<p><strong>Missing values:</strong> If values are missing the preceding
+and succeeding time point will be used as the edges of the segment. In
+the example below this means that we will define a segment from
+<code>A-C</code> for ID <code>1234</code>, while for ID
+<code>6789</code> we only defined segments <code>A-B</code> and
+<code>B-C</code>, segment <code>A-C</code> is not derived here.</p>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>date</th>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1234</td>
+<td>04-11-20</td>
+<td>7:45:00</td>
+<td></td>
+<td>17:30:00</td>
+</tr>
+<tr class="even">
+<td>6789</td>
+<td>24-11-20</td>
+<td>7:45:00</td>
+<td>13:00:00</td>
+<td>17:30:00</td>
+</tr>
+</tbody>
+</table>
 <p><strong>Notes:</strong> - If an activity log was collected for some
 individuals then those will be processed with qwindow value c(0,24). -
 Dates with no activity log data can be skipped, no need to have a column

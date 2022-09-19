@@ -1,5 +1,5 @@
-g.part3 = function(metadatadir = c(), f0, f1, myfun = c(), 
-                   params_sleep = c(), params_metrics = c(), 
+g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
+                   params_sleep = c(), params_metrics = c(),
                    params_output = c(),
                    params_general = c(), ...) {
   #----------------------------------------------------------
@@ -7,7 +7,7 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
   input = list(...)
   params = extract_params(params_sleep = params_sleep,
                           params_metrics = params_metrics,
-                          params_general = params_general, 
+                          params_general = params_general,
                           params_output = params_output, input = input,
                           params2check = c("sleep", "metrics",
                                            "general", "output")) # load default parameters
@@ -15,7 +15,7 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
   params_metrics = params$params_metrics
   params_general = params$params_general
   params_output = params$params_output
-  
+
   #----------------------------------------------------------
   # create output directory if it does not exist
   if (!file.exists(paste(metadatadir, sep = ""))) {
@@ -44,10 +44,11 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
   #=========================================================
   # Declare core functionality, which at the end of this g.part3 is either
   # applied to the file in parallel with foreach or serially with a loop
-  main_part3 = function(i, metadatadir = c(), f0, f1, myfun = c(), 
-                        params_sleep = c(), params_metrics = c(), 
+  main_part3 = function(i, metadatadir = c(), f0, f1, myfun = c(),
+                        params_sleep = c(), params_metrics = c(),
                         params_output = c(),
                         params_general = c(), fnames, ffdone) {
+    tail_expansion_log =  NULL
     nightsperpage = 7
     FI = file.info(paste(metadatadir, "/meta/ms2.out/", fnames[i], sep = ""))
     if (is.na(FI$size) == TRUE) FI$size = 0
@@ -66,7 +67,7 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
       skip = 0
     }
     if (params_general[["overwrite"]] == TRUE) skip = 0
-    if (skip == 0) {  
+    if (skip == 0) {
       # Load previously stored meta-data from part1.R
       SUM = IMP = M = c()
       load(paste(metadatadir, "/meta/basic/meta_", fnames[i], sep = ""))
@@ -77,13 +78,13 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
                         desiredtz = params_general[["desiredtz"]],
                         myfun = myfun,
                         sensor.location = params_general[["sensor.location"]],
-                        params_sleep = params_sleep)
-        
+                        params_sleep = params_sleep, zc.scale = params_metrics[["zc.scale"]])
+
         # SleepRegulartiyIndex calculation
         if (!is.null(SLE$output)) {
           if (nrow(SLE$output) > 2*24*(3600/M$windowsizes[1])) { # only calculate SRI if there are at least two days of data
-            SleepRegularityIndex = CalcSleepRegularityIndex(data = SLE$output, 
-                                                            epochsize = M$windowsizes[1], 
+            SleepRegularityIndex = CalcSleepRegularityIndex(data = SLE$output,
+                                                            epochsize = M$windowsizes[1],
                                                             desiredtz = params_general[["desiredtz"]])
           } else {
             SleepRegularityIndex = NA
@@ -111,14 +112,15 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
                                   ignorenonwear = params_sleep[["ignorenonwear"]],
                                   desiredtz = params_general[["desiredtz"]])
           rec_starttime = IMP$metashort[1,1] # this may be used in g.loadlog to align sleeplog with recording
+          ms3out_filename = paste(metadatadir, "/meta/ms3.out/", fname, ".RData",sep = "")
           save(sib.cla.sum, L5list, SPTE_end, SPTE_start, tib.threshold, rec_starttime, ID,
-               longitudinal_axis, SleepRegularityIndex,
-               file = paste(metadatadir, "/meta/ms3.out/", fname, ".RData",sep = ""))
+               longitudinal_axis, SleepRegularityIndex, tail_expansion_log,
+               file = ms3out_filename)
         }
       }
     }
   }
-  
+
   if (params_general[["do.parallel"]] == TRUE) {
     cores = parallel::detectCores()
     Ncores = cores[1]
@@ -148,7 +150,7 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
       errhand = 'pass'
     } else {
       # pass on functions
-      functions2passon = c("g.sib.det", "g.detecmidnight", "iso8601chartime2POSIX", 
+      functions2passon = c("g.sib.det", "g.detecmidnight", "iso8601chartime2POSIX",
                            "g.sib.plot", "g.sib.sum", "HASPT", "HASIB", "CalcSleepRegularityIndex",
                            "extract_params", "load_params", "check_params")
       errhand = 'stop'
@@ -158,14 +160,14 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
     output_list = foreach::foreach(i = f0:f1, .packages = packages2passon,
                                    .export = functions2passon, .errorhandling = errhand) %myinfix% {
                                      tryCatchResult = tryCatch({
-                                       main_part3(i, metadatadir, f0, f1, myfun, 
-                                                  params_sleep, params_metrics, 
+                                       main_part3(i, metadatadir, f0, f1, myfun,
+                                                  params_sleep, params_metrics,
                                                   params_output,
                                                   params_general, fnames, ffdone)
                                      })
                                      return(tryCatchResult)
                                    }
-    
+
     on.exit(parallel::stopCluster(cl))
     for (oli in 1:length(output_list)) { # logged error and warning messages
       if (is.null(unlist(output_list[oli])) == FALSE) {
@@ -176,8 +178,8 @@ g.part3 = function(metadatadir = c(), f0, f1, myfun = c(),
   } else {
     for (i in f0:f1) {
       cat(paste0(i, " "))
-      main_part3(i, metadatadir, f0, f1, myfun, 
-                 params_sleep, params_metrics, 
+      main_part3(i, metadatadir, f0, f1, myfun,
+                 params_sleep, params_metrics,
                  params_output,
                  params_general, fnames, ffdone)
     }

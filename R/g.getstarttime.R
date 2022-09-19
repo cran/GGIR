@@ -1,4 +1,4 @@
-g.getstarttime = function(datafile, P, header, mon, dformat, desiredtz, selectdaysfile) { 
+g.getstarttime = function(datafile, P, header, mon, dformat, desiredtz, configtz = NULL) { 
   #get input variables (relevant when read.myacc.csv is used)
   #------------------------------------------------------------
   if (mon  == 1 & dformat == 1) {
@@ -28,18 +28,19 @@ g.getstarttime = function(datafile, P, header, mon, dformat, desiredtz, selectda
     if (length(starttime) == 0) starttime = P$timestamp # initially used, but apparently its is corrupted sometimes, so I am now using ICMTzTime
     if (length(P$timestamp) == 0) starttime = as.character(P$hvalues[which(P$hnames == "Start")])
   } else if (mon == 2 & dformat == 1) {
-    if (length(desiredtz) > 0) {
-      if (length(selectdaysfile) == 0) { # Tested way of getting starttime on GENEACtiv data
+    if ("page.timestamps" %in% names(P)) { # GENEAread
+      if (length(desiredtz) > 0) {
         starttime = POSIXtime2iso8601(P$page.timestamps[1], tz = desiredtz)
-      } else { # Modified way of getting starttime from Millenium cohort data
-        starttime = POSIXtime2iso8601(getFirstTimestamp(datafile, P$data.out[1,1]), tz = desiredtz)
-      }
-      if (length(unlist(strsplit(as.character(starttime),":"))) < 2) {
-        #needed for MaM study where first timestamp does not have clock time in it
-        starttime = POSIXtime2iso8601(P$page.timestamps[2], tz = desiredtz)
+        if (length(unlist(strsplit(as.character(starttime),":"))) < 2) {
+          #needed for MaM study where first timestamp does not have clock time in it
+          starttime = POSIXtime2iso8601(P$page.timestamps[2], tz = desiredtz)
+        }
+      } else {
+        starttime = P$page.timestamps[1]
       }
     } else {
-      starttime = P$page.timestamps[1]
+      starttime = as.POSIXlt(P$data.out$time[1], tz = desiredtz, origin = "1970-01-01")
+      starttime = POSIXtime2iso8601(starttime, tz = desiredtz)
     }
   } else if (dformat == 2 & mon == 2) {
     starttime = as.character(P[1,1])
@@ -98,7 +99,7 @@ g.getstarttime = function(datafile, P, header, mon, dformat, desiredtz, selectda
     starttime = paste0(startdate," ",starttime)
     getOption("digits.secs")
     options(digits.secs = 3)
-    if (mon == 3 | mon == 6) {
+    if ((mon == 3 & dformat != 6) | mon == 6) {
       options(warn = -1)
       topline = as.matrix(colnames(as.matrix(read.csv(datafile, nrow = 1, skip = 0))))
       topline = topline[1]  #To avoid dots
@@ -173,7 +174,12 @@ g.getstarttime = function(datafile, P, header, mon, dformat, desiredtz, selectda
   } else if (mon == 5) {
     starttime = unisensR::readUnisensStartTime(dirname(datafile))
   } else if (dformat == 6 & mon == 3) {
-    starttime = as.POSIXlt(as.character(P[1, 1]), tz = desiredtz)
+    if (is.null(configtz)) configtz = desiredtz
+    starttime = as.POSIXct(as.character(P[1, 1]), tz = configtz)
+    if (configtz != desiredtz) {
+      attr(starttime, "tzone") <- desiredtz
+    }
+    starttime = as.POSIXlt(starttime, tz = desiredtz)
   }
   return(starttime)
 }

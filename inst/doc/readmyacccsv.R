@@ -43,7 +43,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #               rmc.format.time = "%d/%m/%Y %H:%M:%OS",
 #               rmc.desiredtz = "Europe/London",
 #               rmc.sf = 100,
-#               rmc.noise = 0.013,
+#               rmc.noise = 0.013
 #  )
 
 ## ---- echo=FALSE, out.width = "60%", out.extra='style="border: 0; padding:20px"'----

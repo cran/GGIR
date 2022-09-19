@@ -30,7 +30,10 @@
                           rmc.check4timegaps = FALSE,
                           rmc.col.wear = c(),
                           rmc.doresample=FALSE,
-                          interpolationType=1)	
+                          interpolationType=1, 
+                          PreviousLastValue = c(0, 0, 1),
+                          PreviousLastTime = NULL,
+                          epochsize = NULL)	
 }
 \arguments{
   \item{rmc.file}{
@@ -145,7 +148,15 @@
   \item{interpolationType}{
     Integer to indicate type of interpolation to be used when resampling time series (mainly relevant for Axivity sensors), 1=linear, 2=nearest neighbour.
   }
-
+  \item{PreviousLastValue}{
+    Automatically identified last value in previous chunk of data read.
+  }
+    \item{PreviousLastTime}{
+    Automatically identified last timestamp in previous chunk of data read.
+  }
+  \item{epochsize}{
+    Numeric vector of length two, with short and long epoch sizes. Only used by GGIR internally.
+  }
 }
 \details{
   To use this function in the context of GGIR use all arguments from this function,

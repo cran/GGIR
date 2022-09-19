@@ -1,5 +1,7 @@
 g.applymetrics = function(data, sf, ws3, metrics2do,
-                          n = 4, lb = 0.2, hb = 15){
+                          n = 4, lb = 0.2, hb = 15,
+                          zc.lb = 0.25, zc.hb = 3, zc.sb = 0.01,
+                          zc.order = 2){
   epochsize = ws3 #epochsize in seconds
   # data is a 3 column matrix with the x, y, and z acceleration
   do.bfen = metrics2do$do.bfen
@@ -81,11 +83,41 @@ g.applymetrics = function(data, sf, ws3, metrics2do,
         data_processed[, i] = signal::filter(coef, data[,i])
       }
     } else if (filtertype == "rollmedian") {
+      # rollmed = function(x, sf) {
+      #   winsi = round(sf * 5)
+      #   if (round(winsi/2) == (winsi/2)) winsi = winsi + 1
+      #   xm = zoo::rollmedian(x, k = winsi, na.pad = TRUE)
+      #   xm[which(is.na(xm[1:1000]) == TRUE)] = xm[which(is.na(xm[1:1000]) == FALSE)[1]]
+      #   return(xm)
+      # }
       rollmed = function(x, sf) {
-        winsi = round(sf * 5)
+        stepsize = max(c(floor(sf / 10), 1))
+        newsf = ifelse(test = stepsize > 1, yes = 10, no = sf)
+        winsi = round(newsf * 5)
         if (round(winsi/2) == (winsi/2)) winsi = winsi + 1
-        xm = zoo::rollmedian(x, k = winsi, na.pad = TRUE)
-        xm[which(is.na(xm[1:1000]) == TRUE)] = xm[which(is.na(xm[1:1000]) == FALSE)[1]]
+        if ((winsi %% 2) == 0) winsi = winsi + 1
+        xm = zoo::rollmedian(x[seq(1, length(x), by = stepsize)],
+                             k = winsi, fill = c(0, 0, 0), na.pad = FALSE)
+        # replace zeros:
+        S2check = max(c(sf * 60, 1000))
+        # head
+        xm[which(xm[1:S2check] == 0)] = xm[which(xm[1:S2check] != 0)[1]]
+        # tail
+        LN = length(xm)
+        xm_tail = xm[(LN - S2check):LN]
+        lastvalue = xm_tail[which(xm_tail != 0)][1]
+        if (length(lastvalue) == 0) lastvalue = xm[which(xm != 0)][1]
+        xm_tail[which(xm_tail == 0)] = lastvalue
+        xm[(LN - S2check):LN] = xm_tail
+        # repeat values to get back to original sample rate
+        xm = rep(xm, each = stepsize)
+        LN = length(xm)
+        LX = length(x)
+        if (LN > LX) {
+          xm = x[1:LX]
+        } else if (LN < LX) {
+          xm = c(xm, rep(xm[LN], LX - LN))
+        }
         return(xm)
       }
       data_processed = data
@@ -142,7 +174,7 @@ g.applymetrics = function(data, sf, ws3, metrics2do,
     # Sadeh algorithm.
     # We use a second order filter because if it was an analog filter it was 
     # most likely not very steep filter.
-    data_processed = process_axes(data, filtertype = "pass", cut_point = c(0.25, 3), n = 2, sf)
+    data_processed = process_axes(data, filtertype = "pass", cut_point = c(zc.lb, zc.hb), n = zc.order, sf)
     zil = c()
     
     # 2) Sadeh reported to have used the y-axis but did not specify the orientation of
@@ -155,7 +187,7 @@ g.applymetrics = function(data, sf, ws3, metrics2do,
       # 3) apply stop-band to minic sensitivity of 1980s and 1990s accelerometer
       # technology. Using a 0.01g threshold based on book by Tyron 
       # "Activity Measurementy in Psychology And Medicine"
-      smallvalues = which(abs(data_processed[,zi]) < 0.01)
+      smallvalues = which(abs(data_processed[,zi]) < zc.sb)
       if (length(smallvalues) > 0) {
         data_processed[smallvalues, zi] = 0
       }
@@ -178,6 +210,7 @@ g.applymetrics = function(data, sf, ws3, metrics2do,
         allmetrics$ZCZ = sumPerEpoch(zerocross(data_processed[,zi], Ndat), sf, epochsize)
       }
     }
+
     # Note that this is per epoch, in GGIR part 3 we aggregate (sum) this per minute
     # to follow Sadeh. In Sadeh 1987 this resulted in values up to 280
     # 280 = 60 x 2 x frequency of movement which would mean near 2.33 Hertz average
@@ -221,7 +254,7 @@ g.applymetrics = function(data, sf, ws3, metrics2do,
     allmetrics$HFEN = averagePerEpoch(x = EuclideanNorm(data_processed), sf, epochsize)
   }
   #================================================
-  # Combined low-pass and high-pass filtering metric:
+  # Combined low-pass and high-pass filtering metric:)
   if (do.hfenplus == TRUE) { 
     # Note that we are using intentionally the lower boundary for the low pass filter
     data_processed = process_axes(data, filtertype = "low", cut_point = lb, n, sf)
@@ -285,7 +318,7 @@ g.applymetrics = function(data, sf, ws3, metrics2do,
     allmetrics$ENMOa = averagePerEpoch(x = ENMOa, sf, epochsize)
   }
   #================================================
-  # Brond Counts
+  # Brond Counts)
   if (do.brondcounts == TRUE) {
     if (ncol(data) > 3) data = data[,2:4]
     mycounts = activityCounts::counts(data = data, hertz = sf, 
@@ -302,4 +335,3 @@ g.applymetrics = function(data, sf, ws3, metrics2do,
   }
   return(allmetrics)
 } 
-

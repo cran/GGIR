@@ -49,7 +49,8 @@ check_params = function(params_sleep = c(), params_metrics = c(),
                        "do.lfx", "do.lfy", "do.lfz", "do.hfx", "do.hfy", "do.hfz",
                        "do.bfx", "do.bfy", "do.bfz", "do.brondcounts")
     check_class("Metrics", params = params_metrics, parnames = boolean_params, parclass = "boolean")
-    check_class("Metrics", params = params_metrics, parnames = c("hb", "lb", "n"), parclass = "numeric")
+    check_class("Metrics", params = params_metrics, parnames = c("hb", "lb", "n", "zc.lb", "zc.hb", 
+                                                                 "zc.sb", "zc.order", "zc.scale"), parclass = "numeric")
   }
   if (length(params_rawdata) > 0) {
     numeric_params = c("chunksize", "spherecrit", "minloadcrit", "minimumFileSizeMB", "dynrange",
@@ -63,7 +64,7 @@ check_params = function(params_sleep = c(), params_metrics = c(),
                          "rmc.unit.temp", "rmc.unit.time", "rmc.format.time", 
                          "rmc.origin", "rmc.desiredtz", "rmc.headername.sf", 
                          "rmc.headername.sn", "rmc.headername.recordingid", 
-                         "rmc.header.structure")
+                         "rmc.header.structure", "loadGENEActiv")
     if (is.logical(params_rawdata[["rmc.noise"]])) {
       # Older config files used this, so overwrite with NULL value
       params_rawdata[["rmc.noise"]] = c() 
@@ -98,7 +99,7 @@ check_params = function(params_sleep = c(), params_metrics = c(),
     numeric_params = c("includedaycrit", "ndayswindow", "strategy", "maxdur", "hrs.del.start",
                        "hrs.del.end", "includedaycrit.part5", "minimum_MM_length.part5", "includenightcrit", "max_calendar_days")
     boolean_params = c("excludefirstlast.part5", "do.imp", "excludefirstlast", "excludefirst.part4", "excludelast.part4")
-    character_params = c("selectdaysfile", "data_cleaning_file", "TimeSegments2ZeroFile")
+    character_params = c("data_cleaning_file", "TimeSegments2ZeroFile")
     check_class("cleaning", params = params_cleaning, parnames = numeric_params, parclass = "numeric")
     check_class("cleaning", params = params_cleaning, parnames = boolean_params, parclass = "boolean")
     check_class("cleaning", params = params_cleaning, parnames = character_params, parclass = "character")
@@ -114,7 +115,7 @@ check_params = function(params_sleep = c(), params_metrics = c(),
     check_class("output", params = params_output, parnames = character_params, parclass = "character")
   }
   if (length(params_general) > 0) {
-    numeric_params = c("maxNcores", "windowsizes", "idloc", "dayborder")
+    numeric_params = c("maxNcores", "windowsizes", "idloc", "dayborder", "expand_tail_max_hours")
     boolean_params = c("overwrite", "print.filename", "do.parallel", "part5_agg2_60seconds")
     character_params = c("acc.metric", "desiredtz", "configtz", "sensor.location")
     check_class("general", params = params_general, parnames = numeric_params, parclass = "numeric")
@@ -124,6 +125,12 @@ check_params = function(params_sleep = c(), params_metrics = c(),
   
   #-----------------------------------------------------------------------------------
   # Check value combinations and apply corrections if not logical
+  if (length(params_rawdata) > 0) {
+    if (params_rawdata[["loadGENEActiv"]] == "GENEAread") {
+      warning(paste0("\nYou asked GGIR to use package GENEAread instead of GGIRread for reading GENEActiv .bin files.",
+      " Note that this option will be deprecated in the next CRAN release."))
+    }
+  }
   if (length(params_metrics) > 0 & length(params_sleep) > 0) {
     if (length(params_sleep[["def.noc.sleep"]]) != 2) {
       if (params_sleep[["HASPT.algo"]] != "HorAngle") {
@@ -143,7 +150,7 @@ check_params = function(params_sleep = c(), params_metrics = c(),
         params_sleep[["HASPT.algo"]] = "HorAngle"; params_sleep[["def.noc.sleep"]] = 1
       }
     }
-    if (params_sleep[["HASIB.algo"]] %in% c("Sadeh1994", "Galland2012") == TRUE) {
+    if (params_sleep[["HASIB.algo"]] %in% c("Sadeh1994", "Galland2012", "ColeKripke1992") == TRUE) {
       if (params_sleep[["Sadeh_axis"]] %in% c("X","Y","Z") == FALSE) {
         warning("\nArgument Sadeh_axis does not have meaningful value, it needs to be X, Y or Z (capital)", call. = FALSE)
       }
@@ -156,7 +163,7 @@ check_params = function(params_sleep = c(), params_metrics = c(),
     if (length(params_sleep[["loglocation"]]) == 1) {
       if (params_sleep[["loglocation"]] == "") params_sleep[["loglocation"]] = c() #inserted because some users mistakingly use this
     }
-    if (length(params_sleep[["loglocation"]]) == 0 & length(params_sleep[["def.noc.sleep"]]) != 1) {
+    if (length(params_sleep[["loglocation"]]) > 0 & length(params_sleep[["def.noc.sleep"]]) != 1) {
       warning(paste0("\nloglocation was specified and def.noc.sleep does not have length of 1, this is not compatible. ",
                      " We assume you want to use the sleeplog and misunderstood",
                      " argument def.noc.sleep. Therefore, we will reset def.noc.sleep to its default value of 1"), call. = FALSE)

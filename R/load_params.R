@@ -41,7 +41,8 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
                           do.hfx = FALSE, do.hfy = FALSE, do.hfz = FALSE,
                           do.bfx = FALSE, do.bfy = FALSE, do.bfz = FALSE,
                           do.brondcounts = FALSE,
-                          hb = 15, lb = 0.2, n = 4)
+                          hb = 15, lb = 0.2, n = 4,
+                          zc.lb = 0.25, zc.hb = 3, zc.sb = 0.01, zc.order = 2, zc.scale = 1)
   }
   if ("rawdata" %in% group) {
     params_rawdata = list(
@@ -61,7 +62,7 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
       rmc.check4timegaps = FALSE,  rmc.noise = 13,
       rmc.col.wear = c(), rmc.doresample = FALSE,
       interpolationType = 1,
-      imputeTimegaps = TRUE)
+      imputeTimegaps = TRUE, loadGENEActiv = "GGIRread")
   }
   if ("247" %in% group) {
     params_247 = list(qwindow = c(0,24), qlevels = c(),
@@ -84,7 +85,7 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
   }
   if ("cleaning" %in% group) {
     params_cleaning = list(includedaycrit = 16, ndayswindow = 7,
-                           selectdaysfile = c(), strategy = 1, maxdur = 0,
+                           strategy = 1, maxdur = 0,
                            hrs.del.start = 0, hrs.del.end = 0,
                            includedaycrit.part5 = 2/3, excludefirstlast.part5 = FALSE,
                            TimeSegments2ZeroFile = c(), do.imp = TRUE,
@@ -110,7 +111,8 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
                           do.parallel = TRUE, windowsizes = c(5,900,3600),
                           desiredtz = "", configtz = c(), idloc = 1, dayborder = 0,
                           part5_agg2_60seconds = FALSE,
-                          sensor.location = "wrist")
+                          sensor.location = "wrist",
+                          expand_tail_max_hours = 0)
   }
   # }
   invisible(list(params_sleep = params_sleep,

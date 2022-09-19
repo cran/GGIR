@@ -10,7 +10,7 @@
 }
 \usage{
   g.getstarttime(datafile, P, header, mon, dformat, desiredtz,
-  selectdaysfile)
+  configtz = NULL)
 }
 \arguments{
   \item{datafile}{
@@ -31,8 +31,8 @@
   \item{desiredtz}{
     Same as in \link{g.dotorcomma}
   }
-  \item{selectdaysfile}{
-    See \link{g.part1}
+  \item{configtz}{
+    Same as in \link{g.dotorcomma}
   }
 }
 \value{

@@ -2,7 +2,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
                    studyname = c(), myfun = c(),
                    params_metrics = c(), params_rawdata = c(),
                    params_cleaning = c(), params_general = c(), ...) {
-  
+
   #----------------------------------------------------------
   # Extract and check parameters
   input = list(...)
@@ -10,7 +10,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
                           params_rawdata = params_rawdata,
                           params_cleaning = params_cleaning,
                           params_general = params_general,
-                          input = input, 
+                          input = input,
                           params2check = c("metrics", "rawdata",
                                            "cleaning", "general")) # load default parameters
   params_metrics = params$params_metrics
@@ -26,7 +26,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
       stop('\nVariable outputdir is not specified')
     }
   }
-  
+
   if (f1 == 0) cat("\nWarning: f1 = 0 is not a meaningful value")
   filelist = isfilelist(datadir)
   if (filelist == FALSE) {
@@ -48,20 +48,13 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
     fnamesfull = dir(datadir, recursive = TRUE, pattern = "acc.bin", full.names = TRUE)
     fnames = dir(datadir, recursive = FALSE)
   }
-  # check whether these are .RDA files
-  if (length(unlist(strsplit(fnames[1],"[.]RD"))) > 1) {
-    useRDA = TRUE
-  } else {
-    useRDA = FALSE
-  }
-  if (useRDA == FALSE) {
-    filesizes = file.info(fnamesfull)$size # in bytes
-    bigEnough = which(filesizes/1e6 > params_rawdata[["minimumFileSizeMB"]])
-    fnamesfull = fnamesfull[bigEnough]
-    fnames = fnames[bigEnough]
-  }
+  filesizes = file.info(fnamesfull)$size # in bytes
+  bigEnough = which(filesizes/1e6 > params_rawdata[["minimumFileSizeMB"]])
+  fnamesfull = fnamesfull[bigEnough]
+  fnames = fnames[bigEnough]
+  
   # create output directory if it does not exist
-  if (filelist == TRUE | useRDA == TRUE) {
+  if (filelist == TRUE) {
     if (length(studyname) == 0) {
       studyname = "mystudy"
       stop('\nError: studyname not specified in part1. Needed for analysing lists of files')
@@ -77,16 +70,13 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
     dir.create(file.path(outputdir, outputfolder))
     dir.create(file.path(outputdir, outputfolder, "meta"))
     dir.create(file.path(outputdir, paste0(outputfolder,"/meta"), "basic"))
-    if (length(params_cleaning[["selectdaysfile"]]) > 0) {
-      dir.create(file.path(outputdir, paste0(outputfolder,"/meta"), "raw"))
-    }
     dir.create(file.path(outputdir, outputfolder, "results"))
     dir.create(file.path(outputdir, paste0(outputfolder, "/results"), "QC"))
   }
   path3 = paste0(outputdir, outputfolder) #where is output stored?
   use.temp = TRUE
   daylimit = FALSE
-  
+
   # check access permissions
   Nfile_without_readpermission = length(which(file.access(paste0(fnamesfull), mode = 4) == -1)) #datadir,"/",
   if (Nfile_without_readpermission > 0) {
@@ -142,7 +132,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
   # check which files have already been processed, such that no double work is done
   # ffdone a matrix with all the binary filenames that have been processed
   ffdone = fdone = dir(paste0(outputdir, outputfolder, "/meta/basic"))
-  
+
   if (length(fdone) > 0) {
     for (ij in 1:length(fdone)) {
       tmp = unlist(strsplit(fdone[ij],".RData"))
@@ -161,6 +151,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
                         params_cleaning, params_general, datadir, fnames, fnamesfull,
                         outputdir, myfun, filelist, studyname, ffdone, tmp5, tmp6,
                         use.temp, daylimit, path3, outputfolder, is.mv) {
+    tail_expansion_log = NULL
     if (params_general[["print.filename"]] == TRUE) {
       cat(paste0("\nFile name: ",fnames[i]))
     }
@@ -200,22 +191,12 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
     } else {
       skip = 0
     }
-    if (length(unlist(strsplit(datafile,"[.]RD"))) > 1) {
-      useRDA = TRUE
-    } else {
-      useRDA = FALSE
-    }
     #=============================================================
     # Inspect file (and store output later on)
     options(warn = -1) #turn off warnings
-    if (useRDA == FALSE) {
-      I = g.inspectfile(datafile, desiredtz = params_general[["desiredtz"]],
+    I = g.inspectfile(datafile, desiredtz = params_general[["desiredtz"]],
                         params_rawdata = params_rawdata,
                         configtz = params_general[["configtz"]])
-    } else {
-      load(datafile) # to do: would be nice to only load the object I and not the entire datafile
-      I$filename = fnames[i]
-    }
     options(warn = 0) #turn on warnings
     if (params_general[["overwrite"]] == TRUE) skip = 0
     if (skip == 0) { #if skip = 1 then skip the analysis as you already processed this file
@@ -244,7 +225,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
       #data_quality_report.csv does not exist and there is also no ot
       if (assigned.backup.cal.coef == FALSE) params_rawdata[["backup.cal.coef"]] = c()
       #--------------------------------------
-      if (params_rawdata[["do.cal"]] == TRUE & useRDA == FALSE & length(params_rawdata[["backup.cal.coef"]]) == 0) {
+      if (params_rawdata[["do.cal"]] == TRUE & length(params_rawdata[["backup.cal.coef"]]) == 0) {
         # cat(paste0("\n",rep('-',options()$width),collapse=''))
         cat("\n")
         cat("\nInvestigate calibration of the sensors with function g.calibrate:\n")
@@ -291,7 +272,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
       # the end-user can generate this document based on calibration analysis done with the same accelerometer device.
       if (length(params_rawdata[["backup.cal.coef"]]) > 0 & check.backup.cal.coef == TRUE) {
         bcc.data = read.csv(params_rawdata[["backup.cal.coef"]])
-        cat("\nRetrieving previously derived calibration coefficients")
+        if (isTRUE(params_rawdata[["do.cal"]])) cat("\nRetrieving previously derived calibration coefficients")
         bcc.data$filename = as.character(bcc.data$filename)
         for (nri in 1:nrow(bcc.data)) {
           tmp = unlist(strsplit(as.character(bcc.data$filename[nri]),"meta_"))
@@ -319,7 +300,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
         } else {
           # cat("\nNo matching filename found in backup.cal.coef\n")
           # cat(paste0("\nCheck that filename ",fnames[i]," exists in the csv-file\n"))
-          if (params_rawdata[["do.cal"]] == TRUE & useRDA == FALSE) { # If no matching filename could be found, then try to derive the calibration coeficients in the normal way
+          if (params_rawdata[["do.cal"]] == TRUE) { # If no matching filename could be found, then try to derive the calibration coeficients in the normal way
             cat("\n")
             cat("\nInvestigate calibration of the sensors with function g.calibrate:\n")
             C = g.calibrate(datafile,
@@ -340,8 +321,63 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
                     meantempcal = C$meantempcal,
                     outputdir = outputdir,
                     outputfolder = outputfolder,
-                    selectdaysfile = params_cleaning[["selectdaysfile"]],
                     myfun = myfun)
+
+      if (params_general[["expand_tail_max_hours"]] > 0) {
+        # Identify gap between last timestamp and following midnight
+        ws3 = M$windowsizes[1]
+        ws2 = M$windowsizes[2]
+        # Check whether gap is less then criteria
+        last_ts = c(Sys.time(), Sys.time())
+        secs_to_midnight = c(0, 0)
+        last_ts[1] = iso8601chartime2POSIX(tail(M$metalong$timestamp, n = 1), tz = params_general[["desiredtz"]])
+        last_ts[2] = iso8601chartime2POSIX(tail(M$metashort$timestamp, n = 1), tz = params_general[["desiredtz"]])
+        refhour = (24 + 8 + params_general[["dayborder"]])
+        for (wsi in 1:2) {
+          secs_to_midnight[wsi] = (refhour * 3600) -
+            (as.numeric(format(last_ts[wsi], "%H")) * 3600 +
+               as.numeric(format(last_ts[wsi], "%M")) * 60  +
+               as.numeric(format(last_ts[wsi], "%S")))
+        }
+        if (secs_to_midnight[1] <= refhour * 3600) {
+          # If yes, expand data
+          N_long_epochs_expand = ceiling(secs_to_midnight[1] / ws2) + 1
+          N_short_epochs_expand = ceiling(secs_to_midnight[2] / ws3) + 1
+          if (N_short_epochs_expand / (ws2 / ws3) < N_long_epochs_expand) {
+            N_short_epochs_expand = N_long_epochs_expand * (ws2 / ws3)
+          }
+          # N_short_epochs_expand = ((N_long_epochs_expand) * (ws2/ws3))
+          # Expand metashort
+          NR = nrow(M$metashort)
+          metashort_expand = M$metashort[NR,]
+          metashort_expand[, grep(pattern = "timestamp|angle", x = names(metashort_expand), invert = TRUE, value = FALSE)] = 0
+          if ("EN" %in% names(metashort_expand)) {
+            metashort_expand$EN = 1
+          }
+          expand_indices = (NR + 1):(NR + N_short_epochs_expand)
+          expand_tsPOSIX = seq(last_ts[2] + ws3, last_ts[2] + (N_short_epochs_expand * ws3), by = ws3)
+          M$metashort[expand_indices,] = metashort_expand
+          M$metashort$timestamp[expand_indices] = POSIXtime2iso8601(expand_tsPOSIX, tz = params_general[["desiredtz"]])
+          anglecol = grep(pattern = "angle", x = names(metashort_expand), value = FALSE)
+          if (length(anglecol) > 0) {
+            M$metashort[expand_indices,anglecol] = round(sin((1:length(expand_indices)) / (900/ws3))) * 15
+          }
+          tail_expansion_log = list(short = length(expand_indices))
+          # Expand metalong
+          NR = nrow(M$metalong)
+          metalong_expand = M$metalong[NR,]
+          metalong_expand[, grep(pattern = "timestamp", x = names(metalong_expand), invert = TRUE, value = FALSE)] = 0
+          metalong_expand$en = tail(M$metalong$en, n = 1)
+          expand_indices = (NR + 1):(NR + N_long_epochs_expand)
+          expand_tsPOSIX = seq(last_ts[1] + ws2, last_ts[1] + (N_long_epochs_expand * ws2), by = ws2)
+          M$metalong[expand_indices,] = metalong_expand
+          M$metalong$timestamp[expand_indices] = POSIXtime2iso8601(expand_tsPOSIX, tz = params_general[["desiredtz"]])
+          # Keep log of data expansion
+          tail_expansion_log[["long"]] = length(expand_indices)
+        } else {
+          tail_expansion_log = NULL
+        }
+      }
       #------------------------------------------------
       cat("\nSave .RData-file with: calibration report, file inspection report and all signal features...\n")
       # remove directory in filename if present
@@ -355,7 +391,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
       if (length(unlist(strsplit(fnames[1], "[.]RD"))) == 1) { # to avoid getting .RData.RData
         filename = paste0(filename,".RData")
       }
-      save(M, I, C, filename_dir, filefoldername,
+      save(M, I, C, filename_dir, filefoldername, tail_expansion_log,
            file = paste0(path3, "/meta/basic/meta_", filename))
       # as metadatdir is not known derive it:
       metadatadir = c()
@@ -370,16 +406,8 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
           dir2fn = datadir2fnames(datadir, filelist)
           fnames = dir2fn$fnames
         }
-        # check whether these are RDA
-        if (length(unlist(strsplit(fnames[1],"[.]RD"))) > 1) {
-          useRDA = TRUE
-        } else {
-          useRDA = FALSE
-        }
-      } else {
-        useRDA = FALSE
       }
-      if (filelist == TRUE | useRDA == TRUE) {
+      if (filelist == TRUE) {
         metadatadir = paste0(outputdir,"/output_",studyname)
       } else {
         outputfoldername = unlist(strsplit(datadir, "/"))[length(unlist(strsplit(datadir, "/")))]
@@ -388,14 +416,14 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
       rm(M); rm(I); rm(C)
     }
   } # end of main_part1
-  
+
   #--------------------------------------------------------------------------------
   # Run the code either parallel or in serial (file index starting with f0 and ending with f1)
   if (params_general[["do.parallel"]] == TRUE) {
     cores = parallel::detectCores()
     Ncores = cores[1]
     if (Ncores > 3) {
-      
+
       if (length(params_general[["maxNcores"]]) == 0) params_general[["maxNcores"]] = Ncores
       Ncores2use = min(c(Ncores - 1, params_general[["maxNcores"]], (f1 - f0) + 1))
       if (Ncores2use > 1) {
@@ -422,12 +450,11 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
       # pass on functions
       # packages2passon = 'Rcpp'
       functions2passon = c("g.inspectfile", "g.calibrate","g.getmeta", "g.dotorcomma", "g.applymetrics",
-                           "g.binread", "g.cwaread", "g.readaccfile", "g.wavread", "g.downsample", "updateBlocksize",
-                           "g.getidfromheaderobject", "g.getstarttime", "POSIXtime2iso8601", "chartime2iso8601",
+                           "g.readaccfile", "g.wavread", "g.downsample", "updateBlocksize",
+                           "g.getstarttime", "POSIXtime2iso8601", "chartime2iso8601",
                            "iso8601chartime2POSIX", "datadir2fnames", "read.myacc.csv",
                            "get_nw_clip_block_params", "get_starttime_weekday_meantemp_truncdata", "ismovisens",
-                           "g.extractheadervars", "g.imputeTimegaps", "resample", "parseGT3Xggir",
-                           "read.gt3x_ggir")
+                           "g.extractheadervars", "g.imputeTimegaps", "parseGT3Xggir")
       errhand = 'stop'
       # Note: This will not work for cwa files, because those also need Rcpp functions.
       # So, it is probably best to turn off parallel when debugging cwa data.
@@ -449,7 +476,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
     } else if (params_rawdata[["chunksize"]] > 0.6 & Nmetrics2calc >= 6) { # if user wants to extract more than 5 metrics
       params_rawdata[["chunksize"]] = 0.4 # put limit to chunksize, because when processing in parallel memory is more limited
     }
-    
+
     cat(paste0('\n Busy processing ... see ', outputdir, outputfolder,'/meta/basic', ' for progress\n'))
     `%myinfix%` = foreach::`%dopar%`
     output_list = foreach::foreach(i = f0:f1, .packages = packages2passon,
@@ -459,7 +486,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
                                                   params_cleaning, params_general, datadir, fnames, fnamesfull,
                                                   outputdir, myfun, filelist, studyname, ffdone, tmp5, tmp6,
                                                   use.temp, daylimit, path3, outputfolder, is.mv)
-                                     }) 
+                                     })
                                      return(tryCatchResult)
                                    }
     on.exit(parallel::stopCluster(cl))
@@ -476,7 +503,7 @@ g.part1 = function(datadir = c(), outputdir = c(), f0 = 1, f1 = c(),
                  params_cleaning, params_general, datadir, fnames, fnamesfull,
                  outputdir, myfun, filelist, studyname, ffdone, tmp5, tmp6,
                  use.temp, daylimit, path3, outputfolder, is.mv)
-      
+
     }
   }
 }

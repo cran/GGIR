@@ -51,10 +51,14 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), loglocation = c(), f
       f1 = length(fnames.ms4)
     cat(" loading all the milestone data from part 4 this can take a few minutes\n")
     myfun = function(x) {
+      tail_expansion_log = NULL
       load(file = x)
       cut = which(nightsummary[, 1] == "")
       if (length(cut) > 0 & length(cut) < nrow(nightsummary)) {
         nightsummary = nightsummary[-cut, ]
+      }
+      if (length(tail_expansion_log) != 0) {
+        nightsummary = nightsummary[-which(nightsummary$night == max(nightsummary$night)),] # remove last row because it may not be trustworthy
       }
       out = as.matrix(nightsummary)
     }
@@ -122,11 +126,11 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), loglocation = c(), f
       NumberNotNA = length(which(is.na(nightsummary2[, 3:25]) == FALSE))
       if (NumberNotNA == 0) {
         skip = TRUE
-        warning("\nCannot create report part 4 report, because no sleep estimates present in milestone data.")
+        warning("\nCannot create report part 4 report, because no sleep estimates present in milestone data.", call. = FALSE)
       }
     } else {
       skip = TRUE
-      warning("\nCannot create report part 4 report, because no milestone data found for part4.")
+      warning("\nCannot create report part 4 report, because no milestone data found for part4.", call. = FALSE)
     }
     if (skip == FALSE) {
       # skip if no data was loaded or if it all rows were NA values
@@ -143,7 +147,7 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), loglocation = c(), f
       } else {
         nightsummary_clean = tidyup_df(nightsummary)
         write.csv(nightsummary_clean, file = paste(resultfolder, "/results/QC/part4_nightsummary_sleep_full.csv",
-                                             sep = ""), row.names = FALSE)
+                                                   sep = ""), row.names = FALSE)
         nightsummary_bu = nightsummary
       }
       ####
@@ -192,29 +196,31 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), loglocation = c(), f
         } else {
           personSummary = matrix(0, NIDS, ((NDEF * 3 * 22) + 13 + (6 * 3)))
         }
-        uid = unique(nightsummary$ID)
+        # unique filenames, previously we used unique IDs, but that would not allow
+        # for repeated measurements of the same ID to be summarised separately
+        uniquefn = unique(nightsummary$filename) 
         if (nrow(nightsummary) > 0) {
-          for (i in 1:length(uid)) {
+          for (i in 1:length(uniquefn)) {
             personSummarynames = c()  #moved here on 3/12/2014
             # fully cleaned from nights that need to be deleted
-            nightsummary.tmp = nightsummary[which(nightsummary$ID == uid[i]), ]  #back up
+            this_file = which(nightsummary$filename == uniquefn[i])
+            nightsummary.tmp = nightsummary[this_file, ]  #back up
             udef = as.character(unique(nightsummary.tmp$sleepparam))
             if (length(which(as.character(udef) == "0") > 0))
               udef = udef[-c(which(as.character(udef) == "0"))]
             udefn = udef
             #-------------------------------------------
             # general info about file
-            personSummary[i, 1] = uid[i]  #id
+            personSummary[i, 1] = nightsummary.tmp$ID[1]  #id
             personSummarynames = c(personSummarynames, "ID")
-            personSummary[i, 2] = as.character(nightsummary$filename[which(nightsummary$ID == uid[i])][1])  #filename
+            personSummary[i, 2] = uniquefn[i] #as.character(nightsummary$filename[which(nightsummary$ID == uid[i])][1])  #filename
             if (length(unlist(strsplit(as.character(personSummary[i, 2]), ".RDa"))) > 1)
               personSummary[i, 2] = unlist(strsplit(personSummary[i, 2], ".RDa"))[1]
             personSummarynames = c(personSummarynames, "filename")
             cntt = 2
-            personSummary[i, cntt + 1] = as.character(nightsummary$calendar_date[which(nightsummary$ID ==
-                                                                                         uid[i])][1])  #date
+            personSummary[i, cntt + 1] = as.character(nightsummary$calendar_date[this_file[1]])  #date
             personSummarynames = c(personSummarynames, "calendar_date")
-            personSummary[i, cntt + 2] = nightsummary$weekday[which(nightsummary$ID == uid[i])][1]  #date
+            personSummary[i, cntt + 2] = nightsummary$weekday[this_file[1]]  #date
             personSummarynames = c(personSummarynames, "weekday")
             # sleep log used
             personSummary[i, cntt + 3] = as.character(nightsummary.tmp$sleeplog_used[1])
@@ -312,20 +318,20 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), loglocation = c(), f
             }
             nightsummary$cleaningcode = as.numeric(nightsummary$cleaningcode)
             nightsummary$ID = as.character(nightsummary$ID)
-            uid = as.character(uid)
+            # uid = as.character(uid)
             #-------------------------------------------
             # accelerometer summary
             #----------------------------------------------
             if (only.use.sleeplog == FALSE) {
               # when sleep log is not available
               if (dotwice == 2) {
-                CRIT = which(nightsummary$ID == uid[i] & (nightsummary$cleaningcode == 0 | nightsummary$cleaningcode ==
+                CRIT = which(nightsummary$filename == uniquefn[i] & (nightsummary$cleaningcode == 0 | nightsummary$cleaningcode ==
                                                             1))
               } else {
-                CRIT = which(nightsummary$ID == uid[i])
+                CRIT = which(nightsummary$filename == uniquefn[i])
               }
             } else {
-              CRIT = which(nightsummary$ID == uid[i] & nightsummary$cleaningcode == 0)  #when sleep log is available
+              CRIT = which(nightsummary$filename == uniquefn[i] & nightsummary$cleaningcode == 0)  #when sleep log is available
             }
             personSummarynames_backup = c()
             if (length(CRIT) > 0) {
@@ -496,14 +502,14 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), loglocation = c(), f
           personSummary_clean = tidyup_df(personSummary)
           if (dotwice == 1) {
             write.csv(nightsummary_clean, file = paste(resultfolder, "/results/QC/part4_nightsummary_sleep_full.csv",
-                                                 sep = ""), row.names = FALSE)
+                                                       sep = ""), row.names = FALSE)
             write.csv(personSummary_clean, file = paste(resultfolder, "/results/QC/part4_summary_sleep_full.csv",
-                                                  sep = ""), row.names = FALSE)
+                                                        sep = ""), row.names = FALSE)
           } else {
             write.csv(nightsummary_clean, file = paste(resultfolder, "/results/part4_nightsummary_sleep_cleaned.csv",
-                                                 sep = ""), row.names = FALSE)
+                                                       sep = ""), row.names = FALSE)
             write.csv(personSummary_clean, file = paste(resultfolder, "/results/part4_summary_sleep_cleaned.csv",
-                                                  sep = ""), row.names = FALSE)
+                                                        sep = ""), row.names = FALSE)
           }
         }
       }

@@ -1,13 +1,13 @@
 g.analyse =  function(I, C, M, IMP, params_247 = c(), params_phyact = c(),
                       quantiletype = 7, includedaycrit = 16, 
-                      idloc = 1, snloc = 1, selectdaysfile = c(), 
-                      dayborder = 0,  desiredtz = "", myfun = c(), acc.metric = c(), ...) {
+                      idloc = 1, snloc = 1, dayborder = 0,  desiredtz = "", 
+                      myfun = c(), acc.metric = c(), ...) {
   
   #get input variables
   input = list(...)
   expectedArgs = c("I", "C", "M", "IMP", "params_247", "params_phyact", 
                    "quantiletype", "includedaycrit", 
-                   "idloc", "snloc", "selectdaysfile", "dayborder", 
+                   "idloc", "snloc", "dayborder", 
                    "desiredtz", "myfun")
   if (any(names(input) %in% expectedArgs == FALSE) |
       any(!unlist(lapply(expectedArgs, FUN = exists)))) {
@@ -107,7 +107,9 @@ g.analyse =  function(I, C, M, IMP, params_247 = c(), params_phyact = c(),
   qwindow_actlog = FALSE
   if (is.data.frame(params_247[["qwindow"]]) == TRUE) {
     qwindow_actlog = TRUE
-    params_247[["qwindow"]] = params_247[["qwindow"]][which(params_247[["qwindow"]]$ID == ID),]
+    IDacc = gsub(pattern = " ", replacement = "", x = as.character(ID))
+    IDlog = gsub(pattern = " ", replacement = "", x = as.character(params_247[["qwindow"]]$ID))
+    params_247[["qwindow"]] = params_247[["qwindow"]][which(IDlog == IDacc),]
   }
   # # Time window for L5 & M5 analysis (commented out because this is now defined further down)
   # t0_LFMF = L5M5window[1] #start in 24 hour clock hours
@@ -250,7 +252,7 @@ g.analyse =  function(I, C, M, IMP, params_247 = c(), params_phyact = c(),
   #--------------------------------------------------------------
   # Analysis per day
   if (doperday == TRUE) {
-    output_perday = g.analyse.perday(selectdaysfile = selectdaysfile, ndays = ndays,
+    output_perday = g.analyse.perday(ndays = ndays,
                                      firstmidnighti = firstmidnighti, time = time,
                                      nfeatures = nfeatures, midnightsi = midnightsi,
                                      metashort = metashort, averageday = averageday,
@@ -337,11 +339,6 @@ g.analyse =  function(I, C, M, IMP, params_247 = c(), params_phyact = c(),
   } else {
     cosinor_ts = c()
   }
-  if (length(selectdaysfile) > 0) {
-    windowsummary = data.frame(windowsummary,stringsAsFactors = FALSE) # addition for Millenium cohort
-    names(windowsummary) = ws_names
-    invisible(list(summary = filesummary, daysummary = daysummary, windowsummary = windowsummary, cosinor_ts = cosinor_ts))
-  } else {
-    invisible(list(summary = filesummary, daysummary = daysummary, cosinor_ts = cosinor_ts))
-  }
+  invisible(list(summary = filesummary, daysummary = daysummary, cosinor_ts = cosinor_ts))
+ 
 }
