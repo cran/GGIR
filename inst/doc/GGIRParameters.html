@@ -2982,6 +2982,16 @@ the counts proposed by Jan Brønd and implemented in R by Ruben Brondeel.
 The <em>brondcounts</em> are intended to be an imitation of the counts
 produced by one of the closed source ActiLife software by ActiGraph.</p>
 </div>
+<div id="do.neishabouricounts" class="section level3 unnumbered">
+<h3 class="unnumbered">do.neishabouricounts</h3>
+<p>Boolean (default = FALSE). If TRUE, calculates the metric via R
+package actilifecounts, which is an implementation of the algorithm used
+in the closed-source software ActiLife by ActiGraph (methods published
+in doi: 10.1038/s41598-022-16003-x). We use the name of the first author
+(instead of ActiLifeCounts) of the paper and call them NeishabouriCount
+under the uncertainty that ActiLife will implement this same algorithm
+over time.</p>
+</div>
 <div id="hb" class="section level3 unnumbered">
 <h3 class="unnumbered">hb</h3>
 <p>Numeric (default = 15). Higher boundary of the frequency filter (in
@@ -3022,6 +3032,13 @@ filter.</p>
 <h3 class="unnumbered">zc.scale</h3>
 <p>default = 1) Used for zero-crossing counts only. Scaling factor to be
 applied after counts are calculated (GGIR part 3).</p>
+</div>
+<div id="actilife_lfe" class="section level3 unnumbered">
+<h3 class="unnumbered">actilife_LFE</h3>
+<p>Boolean (default = FALSE). If TRUE, calculates the NeishabouriCount
+metric with the low-frequency extension filter as proposed in the closed
+source ActiLife software by ActiGraph. Only applicable to the metric
+NeishabouriCount.</p>
 </div>
 </div>
 <div id="cleaning-parameters" class="section level2" number="2.5">
@@ -3603,46 +3620,9 @@ report generated with visualreport = TRUE.</p>
 </div>
 <div id="dofirstpage" class="section level3 unnumbered">
 <h3 class="unnumbered">dofirstpage</h3>
-<p>large number of extra columns in the output report. should be stored.
-This is turned off by default as it generates a In g.part5: To indicate
-whether week and weekend-days aggregates Boolean (default = FALSE).
-_weekend_aggregate.part5 in the visual report generated with
-visualreport = TRUE. Centre the day as displayed around noon
-(viewingwindow = 1) or around midnight (viewingwindow = 2) Numeric
-(default = 1). If TRUE, then generate visual report based on combined
-output from g.part2 and g.part4. Boolean (default = TRUE). included in
-the visualisation. between sleep log and accelerometer estimate for the
-night to be criterror specifies the number of minimum number of hours
-difference In g.part4: Only used if do.visual = TRUE and outliers.only =
-TRUE. Numeric (default = 3). larger than the variable of argument
-criterror will be included. If TRUE, then only nights with a difference
-in onset or waking time all available nights are included in the visual
-representation of the data and sleeplog. In g.part4: Only used if
-do.visual = TRUE. If FALSE, Boolean (default = FALSE). .only not come
-with obvious mistakes. detections. This can be used to visually verify
-that the sleeplog entries do representation of the overlap between the
-sleeplog entries and the accelerometer In g.part4: If TRUE, the function
-will generate a pdf with a visual Boolean (default = TRUE). .visual In
-g.part4: To indicate whether to generate report for the sustained
-inactivity bouts (SIB). Boolean (default = FALSE). .sibreport Here,
-non-wear time is imputed where possible. In g.part2: If TRUE then epoch
-values are exported to a csv file. Boolean (default = FALSE). 2csv Only
-used if save_ms5rawlevels = TRUE. In g.part5: To indicate whether to
-remove invalid days from the time series output files. Boolean (default
-= TRUE). _ms5raw_without_invalid Only used if save_ms5rawlevels = TRUE.
-In g.part5: To specify how data should be stored: either ‘csv’ or
-‘RData’. Character (default = ‘csv’). _ms5raw_format as csv or RData
-files (as defined by save_ms5raw_format). In g.part5: Whether to save
-the time series classification (levels) Boolean (default = FALSE).
-_ms5rawlevels or both c(‘MM’,‘WW’). Value can be ‘MM’ (midnight to
-midnight), ‘WW’ (waking time to waking time), In g.part5: Timewindow
-over which summary statistics are derived. Character (default = c(‘MM’,
-‘WW’)). In g.part3: Whether to generate a pdf for g.part3. Boolean
-(default = TRUE). .part3.pdf In g.part2: Whether to generate a pdf for
-g.part2. Boolean (default = TRUE). .part2.pdf Store folder structure of
-the accelerometer data. Boolean (default = FALSE). process. A list of
-parameters used to specify whether and how GGIR stores its output at
-various stages of the</p>
+<p>Boolean (default = TRUE). To indicate whether a first page with
+histograms summarizing the whole measurement should be added in the file
+summary reports generated with visualreport = TRUE.</p>
 </div>
 <div id="visualreport" class="section level3 unnumbered">
 <h3 class="unnumbered">visualreport</h3>

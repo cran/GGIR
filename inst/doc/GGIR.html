@@ -3633,16 +3633,22 @@ parameters as discussed below.</p>
 <p><strong>Input argument to aid in the optimisation:</strong></p>
 <p>To aid research in exploring count type algorithms, we also
 implemented the <code>brondcounts</code> as proposed by Brønd and
-Brondeel and available via R package activityCounts. To extract this
-metric in addition to the zero crossing count, specify
-<code>do.brondcounts = TRUE</code> which is used in GGIR part 1 and uses
-R package activityCounts in the background. As a result, sleep estimates
-for Sadeh, Cole-Kripke or Galland will be derived based on both the zero
-crossing algorithm and the <code>brondcounts</code> algorithms. Further,
-we have added parameters to help modify the configuration of the
-zero-crossing count calculation, see arguments: <code>zc.lb</code>,
-<code>zc.hb</code>, <code>zc.sb</code>, <code>zc/order</code>, and
-<code>zc.scale</code>.</p>
+Brondeel and available via R package activityCounts, as well as the
+<code>neishabouricounts</code> that follows the algorithm implemented in
+the close-source software ActiLife by ActiGraph and is available in the
+R package actilifecounts. To extract these metrics in addition to the
+zero crossing count, specify <code>do.brondcounts = TRUE</code> and/or
+<code>do.neishabouricounts = TRUE</code> which is used in GGIR part 1
+and uses R packages activityCounts and actilifecounts in the background.
+As a result, sleep estimates for Sadeh, Cole-Kripke or Galland will be
+derived based on the zero crossing algorithm and additionally on the
+<code>brondcounts</code> or/and <code>actilifecounts</code> algorithms
+if requested by the user. Further, we have added parameters to help
+modify the configuration of the zero-crossing count calculation, see
+arguments: <code>zc.lb</code>, <code>zc.hb</code>, <code>zc.sb</code>,
+<code>zc/order</code>, and <code>zc.scale</code>. As well as one
+parameter to modify the neishabouricounts calculation, see argument:
+<code>actilife_LFE</code>.</p>
 </div>
 </div>
 <div id="guiders" class="section level3" number="5.6.2">
