@@ -1,8 +1,8 @@
 Package: GGIR
 Type: Package
 Title: Raw Accelerometer Data Analysis
-Version: 2.8-1
-Date: 2022-10-01
+Version: 2.8-2
+Date: 2022-10-06
 Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                   email="v.vanhees@accelting.com"),
                   person("Jairo H","Migueles",role="aut"),
@@ -29,12 +29,11 @@ BugReports: https://github.com/wadpac/GGIR/issues
 License: LGPL (>= 2.0, < 3) | file LICENSE
 Suggests: testthat, covr, knitr, rmarkdown, actilifecounts
 Imports: data.table, foreach, doParallel, signal, zoo, GENEAread,
-        tuneR, unisensR, ineq, read.gt3x, activityCounts, ActCR,
-        methods, GGIRread
+        tuneR, unisensR, ineq, read.gt3x, ActCR, methods, GGIRread
 Depends: stats, utils, R (>= 3.5.0)
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2022-10-01 09:10:08 UTC; vincent
+Packaged: 2022-10-06 12:01:01 UTC; vincent
 Author: Vincent T van Hees [aut, cre],
   Jairo H Migueles [aut],
   Severine Sabia [ctb],
@@ -51,4 +50,4 @@ Author: Vincent T van Hees [aut, cre],
   Accelting [cph, fnd],
   French National Research Agency [cph, fnd]
 Repository: CRAN
-Date/Publication: 2022-10-01 09:40:02 UTC
+Date/Publication: 2022-10-06 12:50:02 UTC

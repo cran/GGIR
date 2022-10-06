@@ -3622,22 +3622,28 @@ publications.</p>
 <p><strong>How you can help to optimise the implementation:</strong></p>
 <p>Given the uncertainties surrounding the older sleep algorithm we
 encourage GGIR users to evaluate and help optimise the algorithms. Here,
-we have the following suggestions: - For ActiGraph users, when comparing
-GGIR Cole-Kripke estimates with ActiLife Cole Kripke estimate be aware
-that ActiLife may have adopted a different Cole-Kripke algorithm as the
-original publication presented four algorithms. Further, ActiLife may
-have used different educated guesses about how Motionlogger counts are
-calculated. - Compare GGIR sleep estimate with Polysomnography or
-Motionlogger output and try to optimise the zero crossing count
-parameters as discussed below.</p>
+we have the following suggestions:</p>
+<ul>
+<li>For ActiGraph users, when comparing GGIR Cole-Kripke estimates with
+ActiLife Cole Kripke estimate be aware that ActiLife may have adopted a
+different Cole-Kripke algorithm as the original publication presented
+four algorithms. Further, ActiLife may have used different educated
+guesses about how Motionlogger counts are calculated.</li>
+<li>Compare GGIR sleep estimate with Polysomnography or Motionlogger
+output and try to optimise the zero crossing count parameters as
+discussed below.</li>
+</ul>
 <p><strong>Input argument to aid in the optimisation:</strong></p>
 <p>To aid research in exploring count type algorithms, we also
 implemented the <code>brondcounts</code> as proposed by Brønd and
 Brondeel and available via R package activityCounts, as well as the
 <code>neishabouricounts</code> that follows the algorithm implemented in
 the close-source software ActiLife by ActiGraph and is available in the
-R package actilifecounts. To extract these metrics in addition to the
-zero crossing count, specify <code>do.brondcounts = TRUE</code> and/or
+R package actilifecounts. DISCLAIMER: the brondcounts option has been
+deprecated as of October2022 due to issues with the activityCounts
+package it relies on. We will reactivate brondcounts once the issues are
+resolved. To extract these metrics in addition to the zero crossing
+count, specify <code>do.brondcounts = TRUE</code> and/or
 <code>do.neishabouricounts = TRUE</code> which is used in GGIR part 1
 and uses R packages activityCounts and actilifecounts in the background.
 As a result, sleep estimates for Sadeh, Cole-Kripke or Galland will be
