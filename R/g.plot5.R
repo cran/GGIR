@@ -1,47 +1,49 @@
-g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f1=c(),overwrite=FALSE,
-                   metric="ENMO",desiredtz = "Europe/London",threshold.lig=30,threshold.mod=100,threshold.vig=400) {
-  if (file.exists(paste(metadatadir,"/results/file summary reports",sep=""))) {
-    fnames.fsr = sort(dir(paste(metadatadir,"/results/file summary reports",sep="")))
+g.plot5 = function(metadatadir = c(), dofirstpage = FALSE, viewingwindow = 1, f0 = c(), f1 = c(), overwrite = FALSE,
+                   metric = "ENMO", desiredtz = "Europe/London", threshold.lig = 30, threshold.mod = 100, threshold.vig = 400) {
+  if (file.exists(paste(metadatadir,"/results/file summary reports", sep = ""))) {
+    fnames.fsr = sort(dir(paste(metadatadir,"/results/file summary reports", sep = "")))
     ffdone = fnames.fsr #ffdone is now a list of files that have already been processed by g.part5
   } else {
-    dir.create(file.path(paste(metadatadir,"/results",sep=""),"file summary reports"))
+    dir.create(file.path(paste(metadatadir,"/results", sep = ""),"file summary reports"))
     ffdone = c()
   }
-  N_milestone_data_p3 = length(dir(paste(metadatadir,"/meta/ms3.out",sep="")))
+  N_milestone_data_p3 = length(dir(paste(metadatadir,"/meta/ms3.out", sep = "")))
   if (f1 > N_milestone_data_p3) f1 = N_milestone_data_p3 # this is intentionally ms3 and not ms4, do not change!
   if (f1 == 0) f1 = N_milestone_data_p3
   # directories
-  meta = paste(metadatadir,"/meta/basic",sep="")
-  metasleep = paste(metadatadir,"/meta/ms3.out",sep="")
-  ms4 = paste(metadatadir,"/meta/ms4.out",sep="")
-  results = paste(metadatadir,"/results",sep="")
+  tail_expansion_log = NULL
+  meta = paste(metadatadir,"/meta/basic", sep = "")
+  metasleep = paste(metadatadir,"/meta/ms3.out", sep = "")
+  ms4 = paste(metadatadir,"/meta/ms4.out", sep = "")
+  results = paste(metadatadir,"/results", sep = "")
   # get list of filenames
   fname_m = dir(meta)
   fname_ms = dir(metasleep)
   fname_ms4 = dir(ms4)
   cave = function(x) as.character(unlist(strsplit(x,".RDa")))[1]
   x = as.matrix(as.character(fname_m))
-  temp1 = apply(x,MARGIN=c(1),FUN=cave)
+  temp1 = apply(x, MARGIN = c(1), FUN = cave)
   cave2 = function(x) as.character(unlist(strsplit(x,"eta_")))[2]
   x = as.matrix(as.character(temp1))
-  fnamesmeta = apply(x,MARGIN=c(1),FUN=cave2)
+  fnamesmeta = apply(x, MARGIN = c(1), FUN = cave2) # part 2 milestone data files
   x = as.matrix(as.character(fname_ms))
-  fnamesmetasleep = apply(x,MARGIN=c(1),FUN=cave)
+  fnamesmetasleep = apply(x, MARGIN = c(1), FUN = cave) # part 3 milestone data files
   # create list of day names
   wdaynames = c("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
   # load summary spreadsheets for this study
-  if (file.exists(paste(results,"/part2_daysummary.csv",sep=""))) {
+  if (file.exists(paste(results,"/part2_daysummary.csv", sep = ""))) {
   } else {
     stop("Warning: File daysummary.csv not generated yet")
   }
-  daysummary = read.csv(paste(results,"/part2_daysummary.csv",sep=""))
-  summary = read.csv(paste(results,"/part2_summary.csv",sep=""))
+  daysummary = read.csv(paste(results,"/part2_daysummary.csv", sep = ""))
+  summary = read.csv(paste(results,"/part2_summary.csv", sep = ""))
   checkfiles = dir(results)
   M = c()
   # loop through files
+  
   for (i in f0:f1) {  #1:length(fnamesmeta)
     if (length(ffdone) > 0) {
-      if (length(which(ffdone == paste("Report_",fnamesmeta[i],".pdf",sep=""))) > 0) {
+      if (length(which(ffdone == paste("Report_",fnamesmetasleep[i],".pdf", sep = ""))) > 0) {
         skip = 1 #skip this file because it was analysed before")
       } else {
         skip = 0 #do not skip this file
@@ -50,28 +52,29 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
       skip = 0
     }
     if (overwrite == TRUE) skip = 0
-    if (skip ==0) {
-      sel = which(fnamesmetasleep == fnamesmeta[i])
+    if (skip == 0) {
+      sel = which(fnamesmeta == fnamesmetasleep[i])
       if (length(sel) > 0) {
+        
         ms4_file_index = which(fname_ms4 == fname_ms[i])
-        if (length(ms4_file_index) == 1){
+        if (length(ms4_file_index) == 1) {
           nightsummary = c()
-          ms4_filepath = paste(ms4,"/",fname_ms4[ms4_file_index],sep="")
+          ms4_filepath = paste(ms4, "/", fname_ms4[ms4_file_index], sep = "")
           load(ms4_filepath) #to load summary sleep
           summarysleep_tmp = nightsummary
         } else {
-          warning(paste0("\nVisual report not generated for ",fnamesmeta[i]," because part 4 output was not available."))
+          warning(paste0("\nVisual report not generated for ",fnamesmeta[sel]," because part 4 output was not available."))
           next()
         }
-        pdf(paste(metadatadir,"/results/file summary reports/Report_",fnamesmeta[i],".pdf",sep=""),
-            paper="a4",width = 0, height = 0)
-        print(paste("File ",fnamesmeta[i],sep=""))
+        pdf(paste(metadatadir,"/results/file summary reports/Report_",fnamesmeta[sel],".pdf", sep = ""),
+            paper = "a4", width = 0, height = 0)
+        # print(paste("File ",fnamesmeta[sel], sep = ""))
         sib.cla.sum = c()
-        load(paste(metasleep,"/",fname_ms[sel],sep=""))
-        load(paste(meta,"/",fname_m[i],sep=""))
+        load(paste(metasleep,"/",fname_ms[i], sep = ""))
+        load(paste(meta,"/",fname_m[sel], sep = ""))
         ws3 = M$windowsizes[1]
         ws2 = M$windowsizes[2]
-        daysummary_tmp = daysummary[which(daysummary$filename == fnamesmeta[i]),]
+        daysummary_tmp = daysummary[which(daysummary$filename == fnamesmeta[sel]),]
         # note that the reports are generated from the raw sleep classification (part4) and no attempt is made to clean it up,
         # by deleting nights for which no diary was available or not enough accelerometer data was available
         if (length(unique(summarysleep_tmp$acc_def)) > 1) {
@@ -92,6 +95,14 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
           daysummary_tmp = daysummary_tmp[-d2exclude,] #ignore days with non-wear
           d2exclude = d2excludeb
         }
+        
+        if (length(tail_expansion_log) != 0) { # then keep timing of sleeponset to plot
+          lastnight = max(summarysleep_tmp$night)
+          if (lastnight %in% n2exclude) {
+            n2excludeb = n2exclude = n2exclude[-which(n2exclude == lastnight)]
+          }
+        }
+        
         if (length(n2exclude) > 0) {
           n2excludeb = summarysleep_tmp$night[n2exclude]
           summarysleep_tmp = summarysleep_tmp[-n2exclude,]
@@ -108,6 +119,7 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
         MainMetric_1 = paste0("mean_",metric,"_mg_24hr")
         MainMetric_2 = paste0("mean_",metric,"_mg_0-24hr")
         MainMetric_3 = paste0("mean_",metric,"_mg_0.24hr")
+        MainMetric = NULL
         if (length(which(colnames(daysummary_tmp) == MainMetric_1)) == 1) {
           MainMetric = MainMetric_1
         } else if (length(which(colnames(daysummary_tmp) == MainMetric_2)) == 1) {
@@ -115,8 +127,15 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
         } else if (length(which(colnames(daysummary_tmp) == MainMetric_3)) == 1) {
           MainMetric = MainMetric_3
         }
-        if (dofirstpage == TRUE & length(which(is.na(daysummary_tmp[,MainMetric]) == FALSE)) > 1
-            & length(which(is.na(daysummary_tmp[,c45]) == FALSE)) > 1
+        if (is.null(MainMetric) == TRUE) {
+          dofirstpage = FALSE
+        } else {
+          if (length(which(is.na(daysummary_tmp[,MainMetric]) == FALSE)) <= 1) {
+            dofirstpage = FALSE
+          }
+        }
+        
+        if (dofirstpage == TRUE & length(which(is.na(daysummary_tmp[,c45]) == FALSE)) > 1
             & nrow(summarysleep_tmp) > 0) {
           # abbreviate names of days
           days1 = daysummary_tmp$weekday
@@ -145,11 +164,11 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
           CLS_A[which(days_PA == "SUN" | days_PA == "SAT")] = CLS[2]
           CLS_B[which(days_SLEEP == "SUN" | days_SLEEP == "SAT")] = CLS[2]
           # headers
-          vars = c(paste("Time spent in moderate or vigorous activity (average is ",round(mean(f01,na.rm=TRUE))," minutes per day)",sep=""),
-                   paste("Total physical activity (average per day is ",round(mean(f02,na.rm=TRUE))," mg)",sep=""),
-                   paste("Sleep period time (average is ",round(mean(f05_2,na.rm=TRUE),digits=1)," hours per night)",sep=""),
-                   paste("Sleep efficiency (average is ",round(mean(f06,na.rm=TRUE)),"% per night)",sep=""),
-                   paste("Duration monitor worn (hours per day)",sep="")) #(mean = ",round(mean(f07))," hours)
+          vars = c(paste("Time spent in moderate or vigorous activity (average is ",round(mean(f01,na.rm=TRUE))," minutes per day)", sep = ""),
+                   paste("Total physical activity (average per day is ",round(mean(f02,na.rm=TRUE))," mg)", sep = ""),
+                   paste("Sleep period time (average is ",round(mean(f05_2,na.rm=TRUE),digits=1)," hours per night)", sep = ""),
+                   paste("Sleep efficiency (average is ",round(mean(f06,na.rm=TRUE)),"% per night)", sep = ""),
+                   paste("Duration monitor worn (hours per day)", sep = "")) #(mean = ",round(mean(f07))," hours)
           # plot data
           CEXN = 0.9
           par(mfrow=c(5,1),omi=c(0,0,0.2,0),mar=c(3,2,2,2)+0.1)
@@ -201,11 +220,13 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
           text(y = as.matrix(round(f06)) + topp, x = B5, labels = as.character(as.matrix(round(f06))), xpd = TRUE,cex = 1)
           text(x = 1, y = (max(YXLIM) - 10), labels = vars[4], pos = 4, font = 2, cex = 1.2)
           #-----------------------------------------------------------------------------------
-          mtext(paste("Activity and sleep report: ",fnamesmeta[i], sep = ""), side = 3, line = 0, outer = TRUE,font=2,cex=0.7)
+          mtext(paste("Activity and sleep report: ",fnamesmeta[sel], sep = ""), side = 3, line = 0, outer = TRUE,font=2,cex=0.7)
         }
         LWDX = 2.5 #linewidth for coloured lines
         LWDA = 0.2
         BLX = 0.6
+        
+        
         #=================================================
         # Next pages with day specific graphs
         #get variables - activity:
@@ -229,7 +250,7 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
         rm(time_unclassed)
         # take instances where nonwear was detected (on ws2 time vector) and map results onto a ws3 length vector for plotting purposes
         if (sum(which(nonwearscore > 1))) {
-          nonwear_elements = which(nonwearscore > 1)
+          nonwear_elements = which(nonwearscore > 1 | nonwearscore == -1) # it now includes the expanded time
           for (j in 1:length(nonwear_elements)) {
             # could add try/catch in here in case 'which' fails..
             match_loc = which(nw_time[nonwear_elements[j]]==time)
@@ -238,6 +259,7 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
           }
         }
         INACT = LIGPA = MODPA = VIGPA = rep(NA,length(ACC))  # PA vectors for plotting
+        
         # Find bouts of light-PA (LPA):
         boutdur2 = 10 * (60/ws3)    # 10min bout duration
         boutcriter = 0.8            # 80% bout criteria
@@ -366,8 +388,15 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
               t1 = t1 + (60*60/ws3)
             }
             # Initialize daily 'what we think you did' vectors:
+            if (length(tail_expansion_log) != 0) {
+              from = length(ACC) - tail_expansion_log$short + 1
+              to = length(ACC)
+              ACC[from:to] = NA; angle[from:to] = NA
+            }
             acc = abs(ACC[t0:t1])
             ang = angle[t0:t1]
+            # if only expanded data in this day, then no plot
+            if (all(is.na(acc)) & all(is.na(ang))) next
             non_wear <- NONWEAR[t0:t1]
             annot_mat = matrix(NA,nrow=length(acc),ncol=6)
             annot_mat[,1] <- detection[t0:t1]          # night sleep
@@ -484,13 +513,13 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
               annot_mat = rbind(extension_mat,annot_mat)
               # adjust any sleeponset / wake annotations if they exist:
               if (sleeponset_loc[1] != 0) {
-                for (i in 1:length(sleeponset_loc)) {
-                  sleeponset_loc[i] = sleeponset_loc[i] + length(extension)
+                for (i2 in 1:length(sleeponset_loc)) {
+                  sleeponset_loc[i2] = sleeponset_loc[i2] + length(extension)
                 }
               }
               if (wake_loc[1] != 0) {
-                for (i in 1:length(wake_loc)) {
-                  wake_loc[i] = wake_loc[i] + length(extension)
+                for (i3 in 1:length(wake_loc)) {
+                  wake_loc[i3] = wake_loc[i3] + length(extension)
                 }
               }
             } else if (((t1-t0)+1) != npointsperday & t1 == length(time)) {
@@ -554,13 +583,13 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
               # loop through each annotation and update data frames accordingly
               if (first_day_adjust != 0) {
                 prev_loc = first_day_adjust  # start at adjusted start point on day one
-                if (first_day_adjust > sleep_wake_mat[1,1]) print('ERROR: sleep/wake annotation is before the recording begins')
+                if (first_day_adjust > sleep_wake_mat[1,1]) warning('ERROR: sleep/wake annotation is before the recording begins')
               } else {
                 prev_loc = 1  # otherwise, start from first sample
               }
-              for (i in 1:length(sleep_wake_mat[,1])) {
-                annot_type = sleep_wake_mat[i,2] # get if it is wake (1) or sleep (0)
-                curr_loc = sleep_wake_mat[i,1]
+              for (i4 in 1:length(sleep_wake_mat[, 1])) {
+                annot_type = sleep_wake_mat[i4, 2] # get if it is wake (1) or sleep (0)
+                curr_loc = sleep_wake_mat[i4, 1]
                 if (annot_type == 0) {
                   # sleeponset annotation, previous data is wake  # turn off sleep_mat (NA)
                   sleep_mat[prev_loc:curr_loc,] <- 0
@@ -608,16 +637,16 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
               # add sleeponset time annotation to plot:
               arrow_line_length = length(x) * 0.01736 # make arrow line length adaptable to differnt short epochs
               if (sleeponset_loc[1] != 0){
-                for (i in sleeponset_loc) { # allow for multiple sleeponset_loc
+                for (i5 in sleeponset_loc) { # allow for multiple sleeponset_loc
                   set_pos = 4 # position of text in relation to arrow
-                  ar_start_idx <- i
-                  ar_end_idx <- i + arrow_line_length # make arrow go to the right of the annotation line
+                  ar_start_idx <- i5
+                  ar_end_idx <- i5 + arrow_line_length # make arrow go to the right of the annotation line
                   if (i > (0.8 * length(x))) {  # check to see if text should be placed on the left side of the line
                     set_pos = 2
-                    ar_end_idx <- i - arrow_line_length
+                    ar_end_idx <- i5 - arrow_line_length
                   }
                   # draw sleeponset annotation:
-                  segments(i,-230,i,210,col='black',lwd=1.5)
+                  segments(i5,-230,i5,210,col='black',lwd=1.5)
                   arrows(ar_start_idx,205,ar_end_idx,205,length=0.05,angle = 20,code=1,lwd=0.5)
                   segments(ar_start_idx,205,ar_end_idx,205,col="black",lwd=0.5)
                   text(ar_end_idx,205,labels="Sleep-onset",pos=set_pos,font=1.8,cex=0.8,col="darkgrey")
@@ -625,16 +654,16 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
               }
               # add wake time annotation to plot:
               if (wake_loc[1] != 0) {
-                for (i in wake_loc) {
+                for (i6 in wake_loc) {
                   set_pos <- 4
-                  ar_start_idx <- i
-                  ar_end_idx <- i + arrow_line_length
-                  if (i > (0.8 * length(x))) {  # check to see if text should be placed on the left side of the line
+                  ar_start_idx <- i6
+                  ar_end_idx <- i6 + arrow_line_length
+                  if (i6 > (0.8 * length(x))) {  # check to see if text should be placed on the left side of the line
                     set_pos = 2
-                    ar_end_idx <- i - arrow_line_length
+                    ar_end_idx <- i6 - arrow_line_length
                   }
                   # draw wake annotation:
-                  segments(i,-230,i,210,col='black',lwd=1.5)
+                  segments(i6,-230,i6,210,col='black',lwd=1.5)
                   arrows(ar_start_idx,160,ar_end_idx,160,length=0.05,angle = 20,code=1,lwd=0.5)
                   segments(ar_start_idx,160,ar_end_idx,160,col="black",lwd=0.5)
                   text(ar_end_idx,160,labels="Wake",pos=set_pos,font=1.8,cex=0.8,col="darkgrey")
@@ -689,7 +718,7 @@ g.plot5 = function(metadatadir=c(),dofirstpage=FALSE, viewingwindow = 1,f0=c(),f
                      lty=c(1,1),col=c(night_sleep_col,night_wake_col,inactive_col,light_pa_col,mod_pa_col,vig_pa_col,nonwear_col),
                      lwd=c(LWDX,LWDX,LWDX),bg="white",cex=0.6,ncol=7,box.lwd=BLX)
               if (daycount==1 | ((daycount-1)/NGPP) == (round((daycount-1)/NGPP))) {
-                mtext(paste("Filename: ",fnamesmeta[i],sep=""),side = 3,line=0,outer=TRUE,font=2,cex=0.6)
+                mtext(paste("Filename: ",fnamesmeta[sel], sep = ""),side = 3,line=0,outer=TRUE,font=2,cex=0.6)
               }
             }
             daycount = daycount + 1
