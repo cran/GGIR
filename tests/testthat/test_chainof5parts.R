@@ -15,6 +15,14 @@ test_that("chainof5parts", {
   if (file.exists(dn))  unlink(dn, recursive = TRUE)
   minimumFileSizeMB = 0
   #--------------------------------------------
+  # isfilelist
+  expect_true(isfilelist("file1.bin"))
+  expect_true(isfilelist("file1.csv"))
+  expect_true(isfilelist("file1.wav"))
+  expect_true(isfilelist("file1.cwa"))
+  expect_true(isfilelist("file1.gt3x"))
+  expect_true(isfilelist(c("file1.bin", "file2.bin")))
+  #--------------------------------------------
   # part 1
   g.part1(datadir = fn, outputdir = getwd(), f0 = 1, f1 = 1,
           overwrite = TRUE, desiredtz = desiredtz,
@@ -36,7 +44,7 @@ test_that("chainof5parts", {
   #-------------------------
   # part 2 with strategy = 3
   g.part2(datadir = fn, metadatadir = metadatadir, f0 = 1, f1 = 1,
-          idloc = 2, desiredtz = desiredtz,
+          idloc = 2, desiredtz = desiredtz, ndayswindow = 1,
           strategy = 3, overwrite = TRUE, hrs.del.start = 0, hrs.del.end = 0,
           maxdur = Ndays, includedaycrit = 0, do.parallel = do.parallel, myfun = c())
   dirname = "output_test/meta/ms2.out/"
@@ -44,7 +52,21 @@ test_that("chainof5parts", {
   load(rn[1])
   expect_equal(nrow(IMP$metashort), 11280)
   expect_equal(round(mean(IMP$metashort$ENMO), digits = 5), 0.00802, tolerance = 3)
-  expect_equal(round(as.numeric(SUM$summary$meas_dur_def_proto_day), digits = 3), 0.417)
+  expect_equal(round(as.numeric(SUM$summary$meas_dur_def_proto_day), digits = 3), 1)
+  expect_equal(SUM$summary$`N valid WEdays`, "1")
+  expect_equal(SUM$summary$`N valid WKdays`, "2")
+  
+  # part 2 with strategy = 5
+  g.part2(datadir = fn, metadatadir = metadatadir, f0 = 1, f1 = 1,
+          idloc = 2, desiredtz = desiredtz, ndayswindow = 1,
+          strategy = 5, overwrite = TRUE, hrs.del.start = 0, hrs.del.end = 0,
+          maxdur = Ndays, includedaycrit = 0, do.parallel = do.parallel, myfun = c())
+  dirname = "output_test/meta/ms2.out/"
+  rn = dir(dirname,full.names = TRUE)
+  load(rn[1])
+  expect_equal(nrow(IMP$metashort), 11280)
+  expect_equal(round(mean(IMP$metashort$ENMO), digits = 5), 0.03398, tolerance = 3)
+  expect_equal(round(as.numeric(SUM$summary$meas_dur_def_proto_day), digits = 3), 1)
   expect_equal(SUM$summary$`N valid WEdays`, "1")
   expect_equal(SUM$summary$`N valid WKdays`, "2")
   
@@ -103,7 +125,7 @@ test_that("chainof5parts", {
   # part 4
   g.part4(datadir = fn, metadatadir = metadatadir, f0 = 1, f1 = 1,
           idloc = 2, loglocation = sleeplog_fn, do.visual = TRUE, outliers.only = FALSE,
-          excludefirstlast = FALSE, criterror = 1, includenightcrit = 0, nnights = 7,
+          excludefirstlast = FALSE, criterror = 1, includenightcrit = 0, #nnights = 7,
           colid = 1, coln1 = 2, relyonguider = FALSE, desiredtz = desiredtz,
           storefolderstructure = FALSE, overwrite = TRUE)
   dirname = "output_test/meta/ms4.out/"
@@ -111,7 +133,7 @@ test_that("chainof5parts", {
   load(rn[1])
   vis_sleep_file = "output_test/results/visualisation_sleep.pdf"
   g.report.part4(datadir = fn, metadatadir = metadatadir, loglocation = sleeplog_fn,
-                 f0 = 1, f1 = 1)
+                 f0 = 1, f1 = 1, verbose = FALSE)
   expect_true(dir.exists(dirname))
   expect_true(file.exists(vis_sleep_file))
   expect_that(round(nightsummary$number_sib_wakinghours[1], digits = 4), equals(6))
@@ -125,10 +147,11 @@ test_that("chainof5parts", {
           loglocation = sleeplog_fn,
           overwrite = TRUE, excludefirstlast = FALSE, do.parallel = do.parallel,
           frag.metrics = "all", save_ms5rawlevels = TRUE,
-          part5_agg2_60seconds = TRUE, do.sibreport = TRUE, nap_model = "hip3yr")
+          part5_agg2_60seconds = TRUE, do.sibreport = TRUE, nap_model = "hip3yr",
+          iglevels = 1)
   sibreport_dirname = "output_test/meta/ms5.outraw/sib.reports"
   expect_true(dir.exists(sibreport_dirname))
-  expect_true(file.exists(paste0(sibreport_dirname, "/sib_report_123A_testaccfile.csv.RData_T5A5.csv")))
+  expect_true(file.exists(paste0(sibreport_dirname, "/sib_report_123A_testaccfile_T5A5.csv")))
   
   dirname = "output_test/meta/ms5.out/"
   rn = dir(dirname,full.names = TRUE)
@@ -139,7 +162,7 @@ test_that("chainof5parts", {
   expect_true(dir.exists(dirname))
   expect_true(file.exists(rn[1]))
   expect_that(nrow(output),equals(3)) # changed because part5 now gives also first and last day
-  expect_that(ncol(output),equals(153))
+  expect_that(ncol(output),equals(160)) # changed because intensity gradient now included in the test
   expect_that(round(as.numeric(output$wakeup[2]), digits = 4), equals(36))
   dirname_raw = "output_test/meta/ms5.outraw/40_100_400"
   rn2 = dir(dirname_raw,full.names = TRUE, recursive = T)
@@ -152,11 +175,13 @@ test_that("chainof5parts", {
   suppressWarnings(GGIR(mode = c(2,3,4,5), datadir = fn, outputdir = getwd(),
                         studyname = "test", f0 = 1, f1 = 1,
                         do.report = c(2,4,5), overwrite = FALSE, visualreport = FALSE, viewingwindow = 1,
-                        do.parallel = do.parallel, minimumFileSizeMB = minimumFileSizeMB))
+                        do.parallel = do.parallel, minimumFileSizeMB = minimumFileSizeMB,
+                        verbose = FALSE, storefolderstructure = TRUE))
   suppressWarnings(GGIR(mode = c(), datadir = fn, outputdir = getwd(), studyname = "test",
                         f0 = 1, f1 = 1,
                         do.report = c(), overwrite = FALSE, visualreport = TRUE, viewingwindow = 1,
-                        do.parallel = do.parallel, minimumFileSizeMB = minimumFileSizeMB, verbose = FALSE))
+                        do.parallel = do.parallel, minimumFileSizeMB = minimumFileSizeMB, 
+                        verbose = FALSE))
   expect_true(file.exists("output_test/results/part2_daysummary.csv"))
   expect_true(file.exists("output_test/results/part2_summary.csv"))
   expect_true(file.exists("output_test/results/part4_nightsummary_sleep_cleaned.csv"))
@@ -319,8 +344,7 @@ test_that("chainof5parts", {
   
   
   if (file.exists(selectdaysfile)) file.remove(selectdaysfile)
-  if (file.exists(dn))  unlink(dn, recursive = TRUE)
-  if (file.exists(fn)) file.remove(fn)
-  if (file.exists(selectdaysfile)) file.remove(selectdaysfile)
+  if (dir.exists(dn))  unlink(dn, recursive = TRUE)
+  if (file.exists(fn)) unlink(fn)
   if (file.exists(sleeplog_fn)) file.remove(sleeplog_fn)
 })

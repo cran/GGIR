@@ -1,11 +1,10 @@
 export(g.analyse, g.calibrate,
        g.getmeta, g.impute,
-       g.inspectfile, g.binread,
+       g.inspectfile,
        g.plot, g.part1,
        g.part2, g.part3,
        g.part4, g.part5,
        GGIR, g.shell.GGIR, g.getbout,
-       g.wavread, g.cwaread,
        g.abr.day.names,
        g.applymetrics, g.create.sp.mat, g.detecmidnight,
        g.dotorcomma, g.downsample, g.extractheadervars,
@@ -14,7 +13,7 @@ export(g.analyse, g.calibrate,
        g.plot5, g.readaccfile,
        g.report.part2, g.report.part4,
        g.report.part5, g.sib.det,
-       g.sib.plot, g.wavread,
+       g.sib.plot, 
        g.weardec, isfilelist,
        iso8601chartime2POSIX, is_this_a_dst_night,
        POSIXtime2iso8601, is.ISO8601,
@@ -36,8 +35,11 @@ export(g.analyse, g.calibrate,
        check_params, extract_params,
        g.imputeTimegaps, g.part5.classifyNaps,
        tidyup_df, cosinorAnalyses,
+       detect_nonwear_clipping,
        ShellDoc2Vignette, parametersVignette,
-       correctOlderMilestoneData)
+       correctOlderMilestoneData,
+       convertEpochData, appendRecords, extractID,
+       g.part5_analyseSegment, g.part5_initialise_ts)
 importFrom("grDevices", "colors", "dev.off", "pdf","rainbow","rgb")
 importFrom("graphics", "abline", "axis", "par", "plot", "plot.new",
            "rect","axis.POSIXct", "barplot", "box", "legend",
@@ -52,4 +54,4 @@ importFrom("stats", "aggregate.data.frame", "weighted.mean",
             "residuals", "fitted")
 import(data.table)
 importFrom("methods", "is")
-importFrom("utils", "available.packages", "packageVersion", "help")
+importFrom("utils", "available.packages", "packageVersion", "help", "read.table")

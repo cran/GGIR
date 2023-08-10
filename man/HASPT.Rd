@@ -10,7 +10,7 @@
 \usage{
 HASPT(angle, perc = 10, spt_threshold = 15, sptblocksize = 30, 
       spt_max_gap = 60, ws3 = 5, constrain2range = FALSE,
-      HASPT.algo="HDCZA", invalid, HASPT.ignore.invalid=FALSE)
+      HASPT.algo="HDCZA", invalid, HASPT.ignore.invalid=FALSE, activity)
 }
 \arguments{
   \item{angle}{
@@ -51,10 +51,16 @@ HASPT(angle, perc = 10, spt_threshold = 15, sptblocksize = 30,
   \item{HASPT.ignore.invalid}{
     Boolean to indicate whether invalid time segments should be ignored
   }
+   \item{activity}{
+    Magnitude of acceleration, only used when HASPT.algo is set to NotWorn.
+    Acceleration metric used is specified by argument \code{acc.metric} 
+    elsewhere in GGIR.
+  }
 }
 \value{
   List with start and end times of the SPT window and the threshold as used.
 }
+\keyword{internal}
 \author{
   Vincent T van Hees <v.vanhees@accelting.com>
 }

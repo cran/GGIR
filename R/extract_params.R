@@ -22,10 +22,6 @@ extract_params = function(params_sleep = c(), params_metrics = c(),
     params = load_params(group = "rawdata")
     params_rawdata = params$params_rawdata
   }
-  if (length(params_rawdata) == 0) {
-    params = load_params(group = "rawdata")
-    params_rawdata = params$params_rawdata
-  }
   if (length(params_247) == 0) {
     params = load_params(group = "247")
     params_247 = params$params_247
@@ -49,7 +45,7 @@ extract_params = function(params_sleep = c(), params_metrics = c(),
   #==================================================================================
   # Overwrite them by arguments provided via configuration file
   if (length(configfile_csv) > 0) {
-    config = read.csv(file = configfile_csv, stringsAsFactors = FALSE)
+    config = data.table::fread(file = configfile_csv, stringsAsFactors = FALSE, data.table = FALSE)
     argNames = names(input)
     if (nrow(config) > 1) {
       for (ci in 1:nrow(config)) {
@@ -137,10 +133,13 @@ extract_params = function(params_sleep = c(), params_metrics = c(),
                           params_247[[varName]] = newValue
                         } else {
                           if (varName %in% names(params_cleaning)) {
-                            params_247[[varName]] = newValue
+                            params_cleaning[[varName]] = newValue
                           } else {
-                            warning("\nNot able to use argument/parameter ", varName,
-                                    " from configuration file and ignored.")
+                            warning(paste0("\nIgnoring argument/parameter ", varName,
+                                           " as stored in the configuration file",
+                                           " as no (longer) used by GGIR. To avoid this",
+                                           " warning remove the corresponding rows",
+                                           " from the config.csv file."), call. = FALSE)
                           }
                         }
                       }
@@ -198,7 +197,6 @@ extract_params = function(params_sleep = c(), params_metrics = c(),
   #==================================================================================
   # Check that all parameter values have expect data class
   # and perform some checks on reasonable parameter combinations
-  
   # prevent checking of parameters that are not used in GGIR part
   if (!"sleep" %in% params2check) params_sleep = c()
   if (!"metrics" %in% params2check) params_metrics = c()

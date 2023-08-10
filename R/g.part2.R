@@ -83,7 +83,8 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                         params_phyact = c(), params_output = c(), params_general = c(),
                         path, ms2.out, foldername, fullfilenames, folderstructure, referencefnames,
                         daySUMMARY, pdffilenumb, pdfpagecount, csvfolder, cnt78, verbose) {
-    tail_expansion_log =  NULL
+    
+    Nappended = I_list = tail_expansion_log =  NULL
     if (length(ffdone) > 0) {
       if (length(which(ffdone == as.character(unlist(strsplit(fnames[i], "eta_"))[2]))) > 0) {
         skip = 1 #skip this file because it was analysed before")
@@ -99,6 +100,7 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
       filename_dir = c()
       filefoldername = c()
       file2read = paste0(path,fnames[i])
+      
       load(file2read) #reading RData-file
       # convert to character/numeric if stored as factor in metashort and metalong
       M$metashort = correctOlderMilestoneData(M$metashort)
@@ -109,7 +111,7 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
         TimeSegments2Zero = c() # set defaul
         # Check whether csv file exists with start-end end times of timewindows to be ignored (where 0 movement will be assumed)
         if (length(params_cleaning[["TimeSegments2ZeroFile"]]) > 0) {
-          TimeSegments2ZeroAll = read.csv(params_cleaning[["TimeSegments2ZeroFile"]])
+          TimeSegments2ZeroAll = data.table::fread(params_cleaning[["TimeSegments2ZeroFile"]], data.table = FALSE)
           # Check whether this individual is part of the file
           filei = which(TimeSegments2ZeroAll$filename == as.character(unlist(strsplit(fnames[i], "eta_"))[2]))
           if (length(filei) > 0) {
@@ -131,7 +133,6 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
             }
           }
         }
-        #------------
         if (length(myfun) > 0) {
           if (myfun$outputtype == "character") {
             # At the moment we do not have a strategy in place on how to impute categorical variables
@@ -144,7 +145,8 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                        params_cleaning = params_cleaning,
                        dayborder = params_general[["dayborder"]],
                        desiredtz = params_general[["desiredtz"]],
-                       TimeSegments2Zero = TimeSegments2Zero)
+                       TimeSegments2Zero = TimeSegments2Zero,
+                       acc.metric = params_general[["acc.metric"]])
         
         if (params_cleaning[["do.imp"]] == FALSE) { #for those interested in sensisitivity analysis
           IMP$metashort = M$metashort
@@ -164,12 +166,9 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
         SUM = g.analyse(I, C, M, IMP,
                         params_247 = params_247,
                         params_phyact = params_phyact,
-                        dayborder = params_general[["dayborder"]],
-                        desiredtz = params_general[["desiredtz"]],
-                        idloc = params_general[["idloc"]],
-                        includedaycrit = params_cleaning[["includedaycrit"]],
-                        myfun = myfun,
-                        acc.metric = params_general[["acc.metric"]])
+                        params_general = params_general,
+                        params_cleaning = params_cleaning,
+                        myfun = myfun)
         RDname = as.character(unlist(strsplit(fnames[i], "eta_"))[2])
         # reset M and IMP so that they include the expanded time (needed for sleep detection in parts 3 and 4)
         if (length(tail_expansion_log) != 0) {
@@ -178,7 +177,8 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
         }
         if (params_output[["epochvalues2csv"]] == TRUE) {
           if (length(IMP$metashort) > 0) {
-            write.csv(IMP$metashort, paste0(metadatadir, "/", csvfolder, "/", RDname, ".csv"), row.names = FALSE)
+            data.table::fwrite(IMP$metashort, paste0(metadatadir, "/", csvfolder, "/", RDname, ".csv"),
+                               row.names = FALSE, sep = params_output[["sep_reports"]])
           }
         }
         if (M$filecorrupt == FALSE & M$filetooshort == FALSE) {
@@ -198,6 +198,34 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
           SUM$daysummary$foldername = foldername[i] #lowest foldername
           SUM$summary$filename_dir = fullfilenames[i]
           SUM$summary$foldername = foldername[i]
+        }
+        if (!is.null(params_general[["maxRecordingInterval"]])) {
+          getValue = function(x, name) {
+            if (name %in% names(x)) {
+              out = x[name]
+            } else {
+              out = NULL
+            }
+            return(out)
+          }
+          if (!is.null(I_list)) {
+            # This recording is the result of appending 2 or more recordings
+            NappendedRecordings = Nappended
+            sf_appendedRecordings = paste0(unlist(lapply(X = I_list, FUN = getValue, name = "sf")), collapse = " ")
+            names_appendedRecordings = paste0(unlist(lapply(X = I_list, FUN = getValue, name = "filename")), collapse = " ")
+            # Note if overlap is positive it is overlap, if it is negative there was a gap
+            overlap_appendedRecordings = paste0(unlist(lapply(X = I_list[[1]], FUN = getValue, name = "interval")), collapse = " ")
+          } else {
+            # This recording is has not been appended
+            NappendedRecordings = 0
+            sf_appendedRecordings = getValue(I, "sf")
+            names_appendedRecordings = getValue(I, "filename")
+            overlap_appendedRecordings = ""
+          }
+          SUM$summary$NappendedRecordings = NappendedRecordings
+          SUM$summary$sf_appendedRecordings  = sf_appendedRecordings
+          SUM$summary$names_appendedRecordings = names_appendedRecordings
+          SUM$summary$overlap_hrs_appendedRecordings = overlap_appendedRecordings
         }
         save(SUM, IMP, tail_expansion_log, file = paste0(metadatadir, ms2.out, "/", RDname)) #IMP is needed for g.plot in g.report.part2
       }
@@ -241,7 +269,7 @@ g.part2 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                            "g.extractheadervars", "g.analyse.avday", "g.getM5L5", "g.IVIS",
                            "g.analyse.perday", "g.getbout", "g.analyse.perfile", "g.intensitygradient",
                            "iso8601chartime2POSIX", "extract_params", "load_params", "check_params",
-                           "correctOlderMilestoneData", "cosinorAnalyses")
+                           "correctOlderMilestoneData", "cosinorAnalyses", "extractID")
       errhand = 'stop'
     }
     i = 0 # declare i because foreach uses it, without declaring it

@@ -23,7 +23,7 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
                         nnights = c(),
                         relyonguider = FALSE,
                         def.noc.sleep = 1,
-                        sleeplogsep = ",", sleepwindowType = "SPT",
+                        sleeplogsep = NULL, sleepwindowType = "SPT",
                         possible_nap_window = c(9, 18),
                         possible_nap_dur = c(15, 240),
                         nap_model = c())
@@ -58,13 +58,13 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
       rmc.unit.time = "POSIX", rmc.format.time = "%Y-%m-%d %H:%M:%OS",
       rmc.bitrate = c(),  rmc.dynamic_range = c(),
       rmc.unsignedbit = TRUE, rmc.origin = "1970-01-01",
-      rmc.desiredtz = "", rmc.configtz = c(),  rmc.sf = c(),
+      rmc.desiredtz = NULL, rmc.configtz = NULL,  rmc.sf = c(),
       rmc.headername.sf = c(), rmc.headername.sn = c(),
       rmc.headername.recordingid = c(), rmc.header.structure = c(),
       rmc.check4timegaps = FALSE,  rmc.noise = 13,
       rmc.col.wear = c(), rmc.doresample = FALSE,
       interpolationType = 1,
-      imputeTimegaps = TRUE)
+      imputeTimegaps = TRUE, frequency_tol = 0.1)
   }
   if ("247" %in% group) {
     params_247 = list(qwindow = c(0,24), qlevels = c(),
@@ -96,7 +96,9 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
                            includenightcrit = 16, #<= to cleaning
                            excludefirst.part4 = FALSE, # => to cleaning
                            excludelast.part4 = FALSE, max_calendar_days = 0,
-                           nonWearEdgeCorrection = TRUE)
+                           nonWearEdgeCorrection = TRUE, nonwear_approach = "2013",
+                           segmentWEARcrit.part5 = 0.5,
+                           segmentDAYSPTcrit.part5 = c(0,0))
   }
   if ("output" %in% group) {
     params_output = list(epochvalues2csv = FALSE, save_ms5rawlevels = FALSE,
@@ -105,7 +107,8 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
                          viewingwindow = 1, dofirstpage = TRUE, visualreport = TRUE,
                          week_weekend_aggregate.part5 = FALSE, do.part3.pdf = TRUE,
                          outliers.only = FALSE, criterror = 3, do.visual = TRUE,
-                         do.sibreport = FALSE, do.part2.pdf = TRUE)
+                         do.sibreport = FALSE, do.part2.pdf = TRUE,
+                         sep_reports = ",", sep_config = ",", visualreport_without_invalid = TRUE)
 
   }
   if ("general" %in% group) {
@@ -115,7 +118,9 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
                           desiredtz = "", configtz = c(), idloc = 1, dayborder = 0,
                           part5_agg2_60seconds = FALSE,
                           sensor.location = "wrist",
-                          expand_tail_max_hours = NULL, recordingEndSleepHour = NULL)
+                          expand_tail_max_hours = NULL, recordingEndSleepHour = NULL,
+                          dataFormat = "raw", maxRecordingInterval = NULL,
+                          extEpochData_timeformat = "%d-%m-%Y %H:%M:%S")
   }
   # }
   invisible(list(params_sleep = params_sleep,

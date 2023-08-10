@@ -1,14 +1,16 @@
 g.part5.savetimeseries = function(ts, LEVELS, desiredtz, rawlevels_fname,
-                                  save_ms5raw_format="csv", save_ms5raw_without_invalid=TRUE,
-                                  DaCleanFile = c(),
-                                  includedaycrit.part5= 2/3, ID = c()) {
+                                  save_ms5raw_format = "csv",
+                                  save_ms5raw_without_invalid = TRUE,
+                                  DaCleanFile = NULL,
+                                  includedaycrit.part5 = 2/3, ID = NULL,
+                                  sep_reports = ",") {
   ms5rawlevels = data.frame(date_time = ts$time, class_id = LEVELS,
                             # class_name = rep("",Nts),
                             stringsAsFactors = FALSE)
 
   if (length(grep(pattern = " ", x = ts$time[1])) == 0) {
-    ts$timestamp = as.POSIXlt(ts$time, tz = desiredtz, format = "%Y-%m-%dT%H:%M:%S%z")
-    ms5rawlevels$date_time = as.POSIXlt(ms5rawlevels$date_time, 
+    ts$timestamp = as.POSIXct(ts$time, tz = desiredtz, format = "%Y-%m-%dT%H:%M:%S%z")
+    ms5rawlevels$date_time = as.POSIXct(ms5rawlevels$date_time, 
                                         tz = desiredtz, format = "%Y-%m-%dT%H:%M:%S%z")
   } else {
     ts$timestamp = ts$time
@@ -71,11 +73,11 @@ g.part5.savetimeseries = function(ts, LEVELS, desiredtz, rawlevels_fname,
     # re-oder columns
     if (save_ms5raw_format == "csv") {
       # save to csv file
-      write.csv(mdat,rawlevels_fname, row.names = F)
+      data.table::fwrite(mdat, rawlevels_fname, row.names = F, sep = sep_reports)
     } else if (save_ms5raw_format == "RData") {
       # only doing this for RData output, because it would affect file size too much in csv,
       # remember that this function can create many files: sample sizes times all combinations of thresholds.
-      mdat$timestamp = as.POSIXlt(mdat$timenum, origin = "1970-01-01",tz = desiredtz) 
+      mdat$timestamp = as.POSIXct(mdat$timenum, origin = "1970-01-01",tz = desiredtz) 
       save(mdat, file = rawlevels_fname)
     }
     #===============================
