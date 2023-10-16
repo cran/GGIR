@@ -1,4 +1,4 @@
-## ---- echo=FALSE, out.width = "60%", out.extra='style="border: 0; padding:20px"'----
+## ----echo=FALSE, out.width = "60%", out.extra='style="border: 0; padding:20px"'----
 knitr::include_graphics("GGIR-MASTERLOGO-RGB.png")
 
 ## ----setup, include=FALSE-----------------------------------------------------
@@ -80,15 +80,15 @@ knitr::opts_chunk$set(echo = TRUE)
 #  }
 #  GGIR(f0=f0,f1=f1,...)
 
-## ---- out.width = "700px",echo=FALSE------------------------------------------
+## ----out.width = "700px",echo=FALSE-------------------------------------------
 knitr::include_graphics("reportexample.jpg")
 
-## ---- out.width = "700px",echo=FALSE------------------------------------------
+## ----out.width = "700px",echo=FALSE-------------------------------------------
 knitr::include_graphics("example_dovisual.jpg")
 
-## ---- out.width = "400px",echo=FALSE------------------------------------------
+## ----out.width = "400px",echo=FALSE-------------------------------------------
 knitr::include_graphics("nonwearimage.jpg")
 
-## ---- echo=FALSE, out.width = "60%", out.extra='style="border: 0; padding:20px"'----
+## ----echo=FALSE, out.width = "60%", out.extra='style="border: 0; padding:20px"'----
 knitr::include_graphics("GGIR-MASTERLOGO-RGB.png")
 

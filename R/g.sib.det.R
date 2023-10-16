@@ -4,16 +4,14 @@ g.sib.det = function(M, IMP, I, twd = c(-12, 12),
   
   #get input variables
   input = list(...)
-  expectedArgs = c("params_sleep", "M", "IMP",
-                   "I", "twd", "acc.metric", "desiredtz",
-                   "myfun", "sensor.location")
-  if (any(names(input) %in% expectedArgs == FALSE) |
-      any(!unlist(lapply(expectedArgs, FUN = exists)))) {
-    # Extract and check parameters if user provides more arguments than just the parameter arguments
+  if (length(input) > 0 || length(params_sleep) == 0) {
+    # Extract and check parameters if user provides more arguments than just the parameter arguments,
+    # or if params_[...] aren't specified (so need to be filled with defaults).
     # So, inside GGIR this will not be used, but it is used when g.sleep is used on its own
     # as if it was still the old g.sleep function
     params = extract_params(params_sleep = params_sleep,
-                            input = input) # load default parameters
+                            input = input,
+                            params2check = "sleep") # load default parameters
     params_sleep = params$params_sleep
   }
   #==============================================================
@@ -196,17 +194,24 @@ g.sib.det = function(M, IMP, I, twd = c(-12, 12),
         firstmidnighti = midnightsi[1]
       }
       # if recording started before 4am, then also derive first awakening
-      first4am = grep("04:00:00", time)[1]
-      if (first4am < firstmidnighti) { # this means recording started after midnight and before 4am
-        midn_start = 0
+      first4am = grep("04:00:00", time[1:pmin(nD, (n_ws3_perday + 1))])[1]
+      # only do this if there is a 4am in the recording
+      if (!is.na(first4am)) {
+        if (first4am < firstmidnighti) { # this means recording started after midnight and before 4am
+          midn_start = 0
+        } else {
+          midn_start = 1
+        }
       } else {
-        midn_start = 1
+        # since there's no 4am in the recording, then even if there is a midnight, skip this midnight. 
+        # (basically treat this midnight like any other midnight without a preceding 4am)
+        midn_start = countmidn
       }
       sptei = 0
       for (j in midn_start:(countmidn)) { #Looping over the midnight
         if (j == 0) {
           qqq1 = 1 # preceding noon (not available in recording)
-          qqq2 = grep("12:00:00", time)[1] # first noon in recording
+          qqq2 = midnightsi[1] + (twd[1] * (3600 / ws3))# first noon in recording
         } else {
           qqq1 = midnightsi[j] + (twd[1] * (3600 / ws3)) #preceding noon
           qqq2 = midnightsi[j] + (twd[2] * (3600 / ws3)) #next noon
@@ -222,13 +227,12 @@ g.sib.det = function(M, IMP, I, twd = c(-12, 12),
         windowRL = round((3600/ws3)*5)
         if ((windowRL / 2) == round(windowRL / 2)) windowRL = windowRL + 1
         if (length(tmpACC) < windowRL) {  0 # added 4/4/2-17
-          cat("Warning: time window shorter than 5 hours which makes it impossible to identify L5")
           L5 = 0
         } else {
           ZRM = zoo::rollmean(x = c(tmpACC), k = windowRL, fill = "extend", align = "center") #
           L5 = which(ZRM == min(ZRM))[1]
           if (sd(ZRM) == 0) {
-            L5 = c()
+            L5 = 0
           } else {
             L5 = (L5  / (3600 / ws3)) + 12
           }

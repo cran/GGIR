@@ -10,7 +10,7 @@ g.part5_analyseSegment = function(indexlog, timeList, levelList,
                                   add_one_day_to_next_date,
                                   lightpeak_available,
                                   tail_expansion_log,
-                                  foldernamei) {
+                                  foldernamei, sibreport = NULL) {
   # unpack list objects:
   # indexlog
   fileIndex = indexlog$fileIndex
@@ -48,8 +48,8 @@ g.part5_analyseSegment = function(indexlog, timeList, levelList,
   # The following is to avoid issue with merging sleep variables from part 4
   # This code extract them the time series (ts) object create in g.part5
   # Note that this means that for MM windows there can be multiple or no wake or onsets
-  date = as.Date(ts$time[segStart + 1])
-  if (add_one_day_to_next_date == TRUE & timewindowi == "WW") { # see below for explanation
+  date = as.Date(ts$time[segStart + 1], tz = params_general[["desiredtz"]])
+  if (add_one_day_to_next_date == TRUE & timewindowi %in% c("WW", "OO")) { # see below for explanation
     date = date + 1
     add_one_day_to_next_date = FALSE
   }
@@ -69,7 +69,13 @@ g.part5_analyseSegment = function(indexlog, timeList, levelList,
   skiponset = onsetwaketiming$skiponset; skipwake = onsetwaketiming$skipwake
   if (wake < 24 & timewindowi == "WW") {
     # waking up before midnight means that next WW window
-    # will start a day before the day we refer to when discussing it's SPT
+    # will start a day before the date we refer to when discussing it's SPT
+    # So, for next window we have to do date = date + 1
+    add_one_day_to_next_date = TRUE
+  }
+  if (onset > 24 & timewindowi == "OO") {
+    # onset after midnight means that next OO window
+    # will start a date after the date we refer to when discussing it;s SPT
     # So, for next window we have to do date = date + 1
     add_one_day_to_next_date = TRUE
   }
@@ -405,25 +411,31 @@ g.part5_analyseSegment = function(indexlog, timeList, levelList,
       fi = fi + 3
     }
     #===============================================
-    # FRAGMENTATION for daytime hours only
+    # FRAGMENTATION
     if (length(params_phyact[["frag.metrics"]]) > 0) {
-      frag.out = g.fragmentation(frag.metrics = params_phyact[["frag.metrics"]],
-                                 LEVELS = LEVELS[sse[ts$diur[sse] == 0]],
-                                 Lnames = Lnames, xmin = 60/ws3new)
-      # fragmentation values come with a lot of decimal places
-      dsummary[si, fi:(fi + (length(frag.out) - 1))] = round(as.numeric(frag.out), digits = 5)
-      ds_names[fi:(fi + (length(frag.out) - 1))] = paste0("FRAG_", names(frag.out), "_day")
-      fi = fi + length(frag.out)
+      for (fragmode in c("day", "spt")) {
+        frag.out = g.fragmentation(frag.metrics = params_phyact[["frag.metrics"]],
+                                   LEVELS = LEVELS[sse[ts$diur[sse] == ifelse(fragmode == "day", 0, 1)]],
+                                   Lnames = Lnames, xmin = 60/ws3new, mode = fragmode)
+        # fragmentation values can come with a lot of decimal places
+        dsummary[si, fi:(fi + (length(frag.out) - 1))] = round(as.numeric(frag.out), digits = 6)
+        ds_names[fi:(fi + (length(frag.out) - 1))] = paste0("FRAG_", names(frag.out), "_", fragmode)
+        fi = fi + length(frag.out)
+      }
     }
     #===============================================
     # LIGHT, IF AVAILABLE
     if ("lightpeak" %in% colnames(ts) & length(params_247[["LUX_day_segments"]]) > 0) {
       # mean LUX
-      dsummary[si,fi] =  round(max(ts$lightpeak[sse[ts$diur[sse] == 0]], na.rm = TRUE), digits = 1)
-      dsummary[si,fi + 1] = round(mean(ts$lightpeak[sse[ts$diur[sse] == 0]], na.rm = TRUE), digits = 1)
-      dsummary[si,fi + 2] = round(mean(ts$lightpeak[sse[ts$diur[sse] == 1]], na.rm = TRUE), digits = 1)
-      dsummary[si,fi + 3] = round(mean(ts$lightpeak[sse[ts$diur[sse] == 0 & ts$ACC[sse] > TRMi]], na.rm = TRUE),
-                                  digits = 1)
+      if (length(which(ts$diur[sse] == 0)) > 0 & length(which(ts$diur[sse] == 1)) > 0) {
+        dsummary[si,fi] =  round(max(ts$lightpeak[sse[ts$diur[sse] == 0]], na.rm = TRUE), digits = 1)
+        dsummary[si,fi + 1] = round(mean(ts$lightpeak[sse[ts$diur[sse] == 0]], na.rm = TRUE), digits = 1)
+        dsummary[si,fi + 2] = round(mean(ts$lightpeak[sse[ts$diur[sse] == 1]], na.rm = TRUE), digits = 1)
+        dsummary[si,fi + 3] = round(mean(ts$lightpeak[sse[ts$diur[sse] == 0 & ts$ACC[sse] > TRMi]], na.rm = TRUE),
+                                    digits = 1)
+      } else {
+        dsummary[si,fi:(fi + 3)] = NA
+      }
       ds_names[fi:(fi + 3)] = c("LUX_max_day", "LUX_mean_day", "LUX_mean_spt", "LUX_mean_day_mvpa"); fi = fi + 4
       # time in LUX ranges
       Nluxt = length(params_247[["LUXthresholds"]])
@@ -438,7 +450,7 @@ g.part5_analyseSegment = function(indexlog, timeList, levelList,
         }
       }
       fi = fi + Nluxt
-      if (timewindowi == "WW") {
+      if (timewindowi %in% c("WW", "OO")) {
         # LUX per segment of the day
         luxperseg = g.part5.lux_persegment(ts, sse,
                                            LUX_day_segments = params_247[["LUX_day_segments"]],
@@ -448,6 +460,20 @@ g.part5_analyseSegment = function(indexlog, timeList, levelList,
         ds_names[fi:(fi + (length(luxperseg$values) - 1))] = luxperseg$names
         fi = fi + length(luxperseg$values)
       }
+    }
+    #=======================================================
+    # nap/sib/nonwear overlap analysis
+    #=======================================================
+    if (params_output[["do.sibreport"]]  == TRUE & !is.null(sibreport))  {
+      restAnalyses = g.part5.analyseRest(sibreport = sibreport, dsummary = dsummary,
+                                         ds_names = ds_names, fi = fi, di = si,
+                                         time = ts$time[sse[ts$diur[sse] == 0]],
+                                         tz = params_general[["desiredtz"]],
+                                         possible_nap_dur = params_sleep[["possible_nap_dur"]])
+      fi = restAnalyses$fi
+      si = restAnalyses$di
+      dsummary = restAnalyses$dsummary
+      ds_names = restAnalyses$ds_names
     }
     #===============================================
     # FOLDER STRUCTURE
@@ -471,7 +497,6 @@ g.part5_analyseSegment = function(indexlog, timeList, levelList,
                   columnIndex = fi)
   timeList = list(ts = ts,
                   epochSize = ws3new)
-  
   invisible(list(
     indexlog = indexlog,
     ds_names = ds_names,

@@ -105,7 +105,7 @@ Also of interest may be the brief [free R introduction tutorial](https://www.acc
 **Change log**
 
 Our log of main changes to GGIR over time can be found
-[here](https://cran.r-project.org/package=GGIR/news.html).
+[here](https://cran.r-project.org/package=GGIR/news/news.html).
 
 # Setting up your work environment
 
@@ -312,7 +312,7 @@ for that.
     -   If `strategy` is set to value 1, then check out arguments
         `hrs.del.start` and `hrs.del.end`.
     -   If `strategy` is set to value 3 or 5, then check out arguments
-        `ndayswindow`.
+        `ndayswindow`, `hrs.del.start` and `hrs.del.end`.
 -   `maxdur` - maximum number of days you expect in a data file based on
     the study protocol.
 -   `desiredtz` - time zone of the experiment.
@@ -438,7 +438,8 @@ comes with the following changes:
 -   You can add columns relating to self-reported napping time and nonwear time. These
     are not used for the sleep analysis in g.part3 and g.part4, but used
     in g.part5 to facilitate napping analysis, see argument
-    `do.sibreport`. Multiple naps and multiple nonwear periods can be
+    `do.sibreport` and the paragraph on naps. Multiple naps and multiple 
+    nonwear periods can be
     entered per day.
 -   Leave cells for missing values blank.
 -   Column names are critical for the advanced sleeplog format: Date
@@ -481,8 +482,8 @@ For an explanation on how time use analysis is performed see section
         Here, the full 25 minutes would count towards the duration of
         the MVPA bout.
 -   `timewindow` to specify whether days should be defined from midnight
-    to midnight `"MM"`, from waking-up to waking-up `"WW"`, or both
-    `c("MM","WW")`.
+    to midnight `"MM"`, from waking-up to waking-up `"WW"`, from sleep onset
+    to sleep onset `"OO"`, or any combination of them.
 -   Configure durations of bouts: `boutdur.mvpa`, `boutdur.in`, and
     `boutdur.lig`. Note that this can be a vector of multiple values
     indicating the minimum and maximum duration of subsequent bout
@@ -733,9 +734,9 @@ Part 2 generates the following output:
 | `_M VPA_E5S_B1M80_T100`        | MVPA calculated based on 5 second epoch setting bout duration 1 Minute and inclusion criterion of more than 80 percent. This is only done for metric ENMO at the moment, and only if mvpa threshold is not left blank     |
 | `_ENMO_mg`         | ENMO or other metric was first calculated per day and then average according to AD, WD, WWE, WWD           |
 | data exclusion strategy        | A log of the decision made when calling g.impute: value=1 mean ignore specific hours; value=2 mean ignore all data before the first midnight and after the last midnight |
-| n hours ignored at start of meas (if strategy=1)        | number of hours ignored at the start of the measurement (if strategy = 1) A log of decision made in part2.R       |
-| n hours ignored at end of meas (if strategy=1)          | number of hours ignored at the end of the measurement (if strategy = 1). A log of decision made in part2.R         |
-| n hours ignored at end of meas (if strategy=1)          | number of days of measurement after which all data is ignored (if strategy = 1) A log of decision made in part2.R    |
+| n hours ignored at start of meas (if strategy=1, 3 or 5)        | number of hours ignored at the start of the measurement (if strategy = 1) or at the start of the `ndayswindow` (if strategy = 3 or 5) A log of decision made in part2.R       |
+| n hours ignored at end of meas (if strategy=1, 3 or 5)          | number of hours ignored at the end of the measurement (if strategy = 1) or at the end of the `ndayswindow` (if strategy = 3 or 5). A log of decision made in part2.R         |
+| n hours ignored at end of meas (if strategy = 1, 3 or 5)          | number of days of measurement after which all data is ignored (if strategy = 1, 3 or 5) A log of decision made in part2.R    |
 | epoch size to which acceleration was averaged (seconds) | A log of decision made in part1.R     |
 | pdffilenumb        | Indicator of in which pdf-file the plot was stored  |
 | pdfpagecount       | Indicator of in which pdf-page the plot was stored|
@@ -766,6 +767,44 @@ in summary.csv
 | ig\_intercept_ENMO_0-24hr | Intercept from intensity gradient analysis proposed by [Rowlands et al. 2018](https://journals.lww.com/acsm-msse/Fulltext/2018/06000/Beyond_Cut_%20Points__Accelerometer_Metrics_that.25.aspx) based on metric ENMO for the time segment 0 to 24 hours |
 | ig\_rsquared_ENMO_0-24hr  | r squared from intensity gradient analysis proposed by [Rowlands et al. 2018](https://journals.lww.com/acsm-msse/Fulltext/2018/06000/Beyond_Cut_%20Points__Accelerometer_Metrics_that.25.aspx) based on metric ENMO for the time segment 0 to 24 hours |
 
+### Data_quality_report
+
+The data_quality_report.csv is stored in subfolder folder results/QC.
+
+| (Part of) variable name  | Description                                  |
+|--------------------------|----------------------------------------------|
+| filename                 | file name                                    |
+| file.corrupt	           | Is file corrupt? TRUE or FALSE (mainly tested for GENEActiv bin files) |
+| file.too.short	         | File too short for processing? ([definition](#Minimum_recording_duration)) TRUE or FALSE |
+| use.temperature	| Temperature used for auto-calibration? TRUE or FALSE |
+| scale.x	| Auto-calibration scaling coefficient for x-axis (same for y and z axis, not shown here) |
+| offset.x	| Auto-calibration offset coefficient for x-axis (same for y and z axis, not shown here) |
+| temperature.offset.x | Auto-calibration temperature offset coefficient for x-axis (same for y and z axis, not shown here) |
+| cal.error.start	| Calibration error prior to auto-calibration |
+| cal.error.end		| Calibration error after auto-calibration |
+| n.10sec.windows	| Number of 10 second epochs used as sphere data in auto-calibration |
+| n.hours.considered | Number of hours of data considered for auto-calibration |
+| QCmessage	| Character QC message at the end of the auto-calibration |
+| mean.temp	|  Mean temperature in sphere data |
+| device.serial.number	| Device serial number |
+| NFilePagesSkipped	| (Only for Axivity .cwa format) Number of data blocks skipped |
+| filehealth_totimp_min | (Only for Axivity .cwa format) Total number of minutes of data imputed |
+| filehealth_checksumfail_min	| (Only for Axivity .cwa format) Total number of minutes of data where the checksum failed |
+| filehealth_niblockid_min |  (Only for Axivity .cwa format) Total number of minutes of data with non-incremental block ids |
+| filehealth_fbias0510_min | (Only for Axivity .cwa format) Total number of minutes with a sampling frequency bias between 5 and 10% |
+| filehealth_fbias1020_min | (Only for Axivity .cwa format) Total number of minutes with a sampling frequency bias between 10 and 20% |
+| filehealth_fbias2030_min |  (Only for Axivity .cwa format) Total number of minutes with a sampling frequency bias between 20 and 30% |
+| filehealth_fbias30_min | (Only for Axivity .cwa format) Total number of minutes with a sampling frequency bias higher than 30% |
+| filehealth_totimp_N | (Only for Axivity .cwa format) Total number of data blocks that were imputed |
+| filehealth_checksumfail_N	| (Only for Axivity .cwa format)  Total number of blocks where the checksum failed  |
+| filehealth_niblockid_N | (Only for Axivity .cwa format) Total number of data blocks with non-incremental block ids  |
+| filehealth_fbias0510_N | (Only for Axivity .cwa format) Total number of data blocks with a sampling frequency bias between 5 and 10% |
+| filehealth_fbias1020_N | (Only for Axivity .cwa format) Total number of data blocks with a sampling frequency bias between 10 and 20%|
+| filehealth_fbias2030_N | (Only for Axivity .cwa format) Total number of data blocks with a sampling frequency bias between 20 and 30% |
+| filehealth_fbias30_N | (Only for Axivity .cwa format) Total number of data blocks with a sampling frequency bias higher than 30% |
+
+
+
 ## Output part 4 {.tabset}
 
 Part 4 generates the following output:
@@ -774,6 +813,12 @@ Part 4 generates the following output:
 
 -   part4_nightsummary_sleep_cleaned.csv
 -   QC/part4_nightsummary_sleep_full.csv
+
+The latter with '_full' in the name is intended to aid
+clarifying why some nights (if any) are excluded from the cleaned summary report.
+Although, nights where the accelerometer was not worn at all are excluded from this. So,
+if you have a 30 day recording where the accelerometer was not worn from day 7 onward then
+you will not find the last 22 nights in either csv-report.
 
 The csv. files contain the variables as shown below.
 
@@ -817,7 +862,6 @@ The csv. files contain the variables as shown below.
 | nonwear_perc_spt           | Non-wear percentage during the spt hours of this day. This is a copy of the nonwear_perc_spt calculated in [part 5](#output5), only included in part 4 reports if part 5 has been run with timewindow = WW      |
 
 
-
 #### Non-default variables in part 4 csv report
 
 These additional are only stored if you used a sleeplog that captures
@@ -830,7 +874,7 @@ data. If either of these applies set argument `sleepwindowType` to
 | guider_guider_inbedStart  | Time of getting in bed   |
 | guider_guider_inbedEnd    | Time of getting out of bed|
 | guider_inbedDuration      | Time in Bed: guider_inbedEnd - guider_inbedStart  |
-| sleepefficiency           | Sleep efficiency, calculated as: SleepDurationInSpt / guider_inbedDuration |
+| sleepefficiency           | Sleep efficiency, calculated as: SleepDurationInSpt / guider_inbedDuration or SleepDurationInSpt / (Spt + latency) as defined with  `relyonguider_SleepEfficiency`|
 | sleeplatency  | Sleep latency, calculated as: sleeponset - guider_inbedStart   |
 
 ### Person level summaries
@@ -852,7 +896,7 @@ may not be obvious:
 | `_WE`| Weekend days    |
 | `_WD`| Week days       |
 | sleeplog_used     | Whether a sleeplog was available (TRUE) or not (FALSE)|
-| sleep_efficiency  | Accelerometer detrive sleep efficiency within the sleep period time calculated as the ratio between acc_SleepDurationInSpt and acc_SptDuration (denominator). Only available at person level, because at night level the user can calculate this from existing variables. |
+| sleep_efficiency  | Accelerometer derived sleep efficiency within the sleep period time calculated as the ratio between acc_SleepDurationInSpt and guider_SptDuration (denominator) or acc_SleepDurationInSpt and acc_SptDuration + latency (denominator), as defined with relyonguider_SleepEfficiency. Only available at person level, because at night level the user can calculate this from existing variables. |
 | n_nights_acc      | Number of nights of accelerometer data   |
 | n_nights_sleeplog | Number of nights of sleeplog data.       |
 | n\_WE_nights_complete        | Number of weekend nights complete which means both accelerometer and estimate from guider. |
@@ -971,10 +1015,20 @@ vigorous activity:
 | `Gini_dur`  | Gini index|
 | `CoV_dur`   | Coefficient of Variation           |
 | alpha       | Power law exponent    |
-| `x0.5`      | Derived from power law exponent alpha, see [Chastin et al. 201 0](https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub)        |
-| `W0.5`      | Derived from power law exponent alpha, see [Chastin et al. 201 0](https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub)        |
+| `x0.5`      | Derived from power law exponent alpha, see [Chastin et al. 201 0](https://doi.org/10.1016/j.gaitpost.2009.09.002)        |
+| `W0.5`      | Derived from power law exponent alpha, see [Chastin et al. 201 0](https://doi.org/10.1016/j.gaitpost.2009.09.002)        |
 | nap_count   | Total number of naps, only calculated when argument do.sibreport = TRUE, currently optimised for 3.5-year olds. See function documentation for function `g.part5.classifyNaps` in the [GGIR function documentation (pdf)](https:/CRAN.R-project.org/package=GGIR/GGIR.pdf). |
 | nap_totalduration       | Total nap duration, only calculated when argument do.sibreport = TRUE, currently optimised for 3.5-year old. See function documentation for function `g.part5.classifyNaps` in the [GGIR function documentation (pdf)](https:/CRAN.R-project.org/package=GGIR/GGIR.pdf).    |
+| sibreport_n_items	| Only created if `do.sibreport = TRUE`. Number of items in the sibreport |
+| sibreport_n_items_day |	Only created if `do.sibreport = TRUE`. Number of items in the sibreport for this specific day |
+| nbouts_day_X | Only created if `do.sibreport = TRUE`. Number of bouts in a day of X where X can be sib (sustained inactivity bout), srnap (self-reported nap) or srnonw (self-reported nonwear) |
+| noverl_X | Only created if `do.sibreport = TRUE`. Number of overlapping bouts in a day of X where X can be sib_srnap, sib_srnonw, srnap_sib, or srnonw_sib |
+| frag_mean_dur_X_day | Only created if `do.sibreport = TRUE`. Mean duration of X per day, where X can be sib, srnap or srnonw |
+| dur_day_X_min | Only created if `do.sibreport = TRUE`. Total duration in minutes of X per day, where X can be sib, srnap or srnonw |
+| mdur_X_overl_Y | Only created if `do.sibreport = TRUE`. Mean duration of the overlap between X and Y, which are combinations of sib, srnap or srnonw |
+| tdur_X_overl_Y | Only created if `do.sibreport = TRUE`. Total duration in minutes of the overlap between X and Y, which are combinations of sib, srnap or srnonw |
+| perc_X_overl_Y | Only created if `do.sibreport = TRUE`. Percentage of overlap between X and Y, which are combinations of sib, srnap or srnonw |
+
 
 **Special note if you are working on compositional data analysis:**
 
@@ -1601,7 +1655,7 @@ correspond to the date of analysis.
 | SleepPeriodTime      | Is 1 if SPT is detected, 0 if not. Note that this refers to the combined usage of guider and detected sustained inactivity bouts (rest periods).|
 | invalidepoch         | Is 1 if epoch was detect as invalid (e.g. non-wear), 0 if not.       |
 | guider   | Is 1 if guider method detect epoch as SPT (e.g. sleeplog, HDCZA), 0 if not. You will not find here which guider is used, for this see other GGIR output.    |
-| window   | Numeric indicator of the analysis window in the recording. If timewindow = "MM" then these correspond to calendar days, if timewindow = "WW" then these correspond to which wakingup-wakingup window in the recording. So, in a recording of one week you may find window numbers 1, 2, 3, 4, 5 and 6.|
+| window   | Numeric indicator of the analysis window in the recording. If timewindow = "MM" then these correspond to calendar days, if timewindow = "WW" then these correspond to which wakingup-wakingup window in the recording, if timewindow = "OO" then these correspond to which sleeponset-sleeponset window in the recording. So, in a recording of one week you may find window numbers 1, 2, 3, 4, 5 and 6.|
 | class_id | The behavioural class codes are documented in the exported csv file meta/ms5outraw/behaviouralcodes.csv. Class codes above class 8 will be analysis specific, because it depends on the number time variants of the bouts used. For example, if you look at MVPA lasting 1-10, 10-20, 30-40 then all of them will have their own class_id. |
 | invalid_fullwindow   | Fraction of the window (see above) that represents invalid data. I added this to make it easier to filter the timeseries based on whether days are valid or not.         |
 | invalid_sleepperiod  | Fraction of SPT within the current window that represents invalid data.          |
@@ -1651,12 +1705,12 @@ header.
 ### Fragmentation metrics
 
 When setting input argument as `frag.metrics="all"` GGIR part 5 will
-perform daytime behavioural fragmentation analysis. Do this in
-combination with argument `part5_agg2_60seconds=TRUE` as that will
+perform behavioural fragmentation analysis for daytime and (separately) for spt.
+Do this in combination with argument `part5_agg2_60seconds=TRUE` as that will
 aggregate the time series to 1 minute resolution as is common in
 behavioural fragmentation literature.
 
-In GGIR, a fragment is a defined as a sequence of epochs that belong to
+In GGIR, a fragment for daytime is a defined as a sequence of epochs that belong to
 one of the four categories:
 
 1.  Inactivity
@@ -1666,8 +1720,18 @@ one of the four categories:
 
 Each of these categories represents the combination of bouted and
 unbouted time in the respective categories. Inactivity and physical
-activity add up to a full day, as well as inactivity, LIPA and MVPA. The
+activity add up to a full day (outside SPT), as well as inactivity, LIPA and MVPA. The
 fragmentation metrics are applied in function `g.fragmentation`.
+
+A fragment of SPT is defined as a sequence of epochs that belong to
+one of the four categories:
+1. Estimated sleep
+2. Estimated wakefulness
+3. Inactivity
+4. Physical activity (can be either LIPA or MVPA)
+
+Note that from the metrics below only fragmentation metrics TP and NFrag are 
+calculated for the SPT fragments.
 
 **Literature about these metrics:**
 
@@ -1685,7 +1749,7 @@ fragmentation metrics are applied in function `g.fragmentation`.
     package, and with it's argument `corr` set to TRUE.
 -   Power law exponent metrics: Alpha, x0.5, and W0.5 are calculated
     according to [Chastin et al.
-    2010](https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub).
+    2010](https://doi.org/10.1016/j.gaitpost.2009.09.002).
 -   Number of fragment per minutes (`NFragPM`) is calculated identical
     to metric `fragmentation` in [Chastin et al.
     2012](https://academic.oup.com/ageing/article/41/1/111/46538), but
@@ -1729,7 +1793,8 @@ similar to the definition of a fragment, but for blocks we distinguish
 every behavioural class, which includes the subcategories such as bouted
 and unbouted behaviour. This means that variables `Nblock_day_total_IN`
 and `Nblock_day_total_LIG` are identical to `Nfrag_IN_day` and
-`Nfrag_LIPA_day`, respectively.
+`Nfrag_LIPA_day`, respectively. In contrast, for fragments we may group LIPA and MVPA
+together when refering to the fragmentation of PA.
 
 **Differences with R package ActFrag:**
 
@@ -1741,7 +1806,7 @@ in [Junrui Di et al.
 However, we made a couple of a different decisions that may affect
 comparability:
 
--   GGIR derives fragmentation metrics for day. This allows us to avoid
+-   GGIR derives fragmentation metrics per day. This allows us to avoid
     the issue of gaps between days that need to be dealt with. Further, it allows us to
     test for behavioural differences between days of the week. It is
     well known that human behaviour can be driven by weekly rhythms,
@@ -1749,9 +1814,11 @@ comparability:
     the week allows us to study and account for such possible variation.
     As with all other GGIR variables we also report recording level
     aggregates of the daily estimates.
+-   Transition probability is according
+    to [Lim et al. 2011](https://doi.org/10.5665/sleep.1400)
 -   Power law alpha exponent metrics were calculated according to
     [Chastin et al.
-    2010](https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub)
+    2010](https://doi.org/10.1016/j.gaitpost.2009.09.002)
     using the theoretical minimum fragment duration instead of the
     observed minimum fragment duration.
 
@@ -1813,7 +1880,7 @@ also the intensity gradient. If argument `winhr` is a vector then
 descriptive values for LX and MX are derived per value in `winhr`.
 Within GGIR part 2 MXLX is calculated per calendar day and, if argument
 `qwindow` is specified, per segment of the day. Within GGIR part 5 MXLX
-is calculated per window, and if used in combination with the GENEActiv
+is calculated per window, and if used in combination with the GENEActiv or Axivity
 accelerometer brand LUX estimates per LX and MX are included.
 
 The MX metric describe here should not be confused by the MX metrics as proposed
@@ -1981,6 +2048,56 @@ the radar plots of these MX metrics as first described by
 can access [this](https://github.com/Maylor8/RadarPlotGenerator) github repository
 which provides the R code and detailed instructions on how to make the radar 
 plots using your own data.
+
+
+## Minimum recording duration {#Minimum_recording_duration}
+
+GGIR has been designed to process multi-day recordings. The minimum recording duration
+considered by GGIR depends on the type of analysis:
+
+**Running part 1 and 2**
+
+- File size; At least 2MB, where 2MB can be adjusted with argument minimumFileSizeMB. 
+This should not be changed unless you have good reason to believe that a smaller 
+file size is also acceptable.
+
+- Recording duration: At least two long epoch windows 
+(default 60 minutes) in g.readaccfile. The size of this epoch can be altered with
+the second and third value of vector argument `windowsizes`, where the third should not
+be smaller than the second. For example, in short lasting lab-experiments you may
+find it easier to set this to `windowsizes = c(5, 600, 600)` as non-wear detection is
+usually not necessary in lab studies.
+
+**Running part 3 and 4**
+
+- At least one night of data is expected, where a night is expected to have at least the timestamp 
+for midnight. If midnight is not found the sleep detection is skipped.
+
+**Running part 5**
+
+- Ideally two valid consecutive nights and the waking hours in between.
+
+
+## LUX sensor data processing
+
+Although GGIR focuses on accelerometer data a few brands come with LUX data.
+
+In part 1 GGIR calculates the peak lux per long epoch at a default resolution of 15 minutes,
+which can be modified with argument windowsizes. Peak light offers a more reliable 
+estimate of light exposure per time window compared with taking the average. Further,
+LUX is used in the auto-calibration.
+
+In GGIR part 2 we visualise the LUX values in the qc plot. In part 3 and 4 LUX is 
+not used for sleep classification because relation between light exposure and sleep is weak.
+
+In part 5 we calculate the mean and maximum of the peak LUX per epoch across all
+waking hours of the day. Here, the mean (peak per epoch) LUX would then indicate
+average light exposure per time segment, while max peak would indicate the maximum
+light exposure per day. Further, we calculate the max and mean peak LUX per most 
+active consecutive X hour of the day. This is intended to offer an alternative to LUX
+exposure during waking hours which relies on correct sleep classification. LUX
+exposure during M10 may be seen as an alternative if you are unsure whether you 
+can trust the sleep classification in your data set.
 
 # Other Resources
 

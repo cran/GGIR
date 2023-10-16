@@ -26,7 +26,8 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
                         sleeplogsep = NULL, sleepwindowType = "SPT",
                         possible_nap_window = c(9, 18),
                         possible_nap_dur = c(15, 240),
-                        nap_model = c())
+                        nap_model = c(), sleepefficiency.metric = 1,
+                        possible_nap_edge_acc = Inf)
   }
   if ("metrics" %in% group) {
     params_metrics = list(do.anglex = FALSE, do.angley = FALSE, do.anglez = TRUE,
@@ -64,7 +65,7 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
       rmc.check4timegaps = FALSE,  rmc.noise = 13,
       rmc.col.wear = c(), rmc.doresample = FALSE,
       interpolationType = 1,
-      imputeTimegaps = TRUE, frequency_tol = 0.1)
+      imputeTimegaps = TRUE, frequency_tol = 0.1, rmc.scalefactor.acc = 1)
   }
   if ("247" %in% group) {
     params_247 = list(qwindow = c(0,24), qlevels = c(),
@@ -96,9 +97,9 @@ load_params = function(group = c("sleep", "metrics", "rawdata",
                            includenightcrit = 16, #<= to cleaning
                            excludefirst.part4 = FALSE, # => to cleaning
                            excludelast.part4 = FALSE, max_calendar_days = 0,
-                           nonWearEdgeCorrection = TRUE, nonwear_approach = "2013",
+                           nonWearEdgeCorrection = TRUE, nonwear_approach = "2023",
                            segmentWEARcrit.part5 = 0.5,
-                           segmentDAYSPTcrit.part5 = c(0,0))
+                           segmentDAYSPTcrit.part5 = c(0.9, 0))
   }
   if ("output" %in% group) {
     params_output = list(epochvalues2csv = FALSE, save_ms5rawlevels = FALSE,

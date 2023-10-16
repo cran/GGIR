@@ -30,7 +30,7 @@ check_params = function(params_sleep = c(), params_metrics = c(),
   #-----------------------------------------------------------------------------------------
   if (length(params_sleep) > 0) { # Check class of sleep parameters
     numeric_params = c("anglethreshold", "timethreshold", "longitudinal_axis", "possible_nap_window", "possible_nap_dur",
-                       "colid", "coln1", "def.noc.sleep", "nnights")
+                       "colid", "coln1", "def.noc.sleep", "nnights", "sleepefficiency.metric", "possible_nap_edge_acc")
     boolean_params = c("ignorenonwear", "constrain2range", "HASPT.ignore.invalid",
                        "relyonguider", "sleeplogidnum")
     character_params = c("HASPT.algo", "HASIB.algo", "Sadeh_axis", "nap_model",
@@ -57,7 +57,7 @@ check_params = function(params_sleep = c(), params_metrics = c(),
                        "rmc.col.acc", "interpolationType",
                        "rmc.firstrow.acc", "rmc.firstrow.header", "rmc.header.length",
                        "rmc.col.temp", "rmc.col.time", "rmc.bitrate", "rmc.dynamic_range",
-                       "rmc.sf", "rmc.col.wear", "rmc.noise", "frequency_tol")
+                       "rmc.sf", "rmc.col.wear", "rmc.noise", "frequency_tol", "rmc.scalefactor.acc")
     boolean_params = c("printsummary", "do.cal", "rmc.unsignedbit", "rmc.check4timegaps", "rmc.doresample",
                        "imputeTimegaps")
     character_params = c("backup.cal.coef", "rmc.dec", "rmc.unit.acc",
@@ -211,11 +211,11 @@ check_params = function(params_sleep = c(), params_metrics = c(),
   }
   
   if (length(params_cleaning) > 0) {
-    if (params_cleaning[["strategy"]] != 1 & params_cleaning[["hrs.del.start"]] != 0) {
+    if (params_cleaning[["strategy"]] %in% c(2, 4) & params_cleaning[["hrs.del.start"]] != 0) {
       warning(paste0("\nSetting argument hrs.del.start in combination with strategy = ",
                      params_cleaning[["strategy"]]," is not meaningful, because this is only used when straytegy = 1"), call. = FALSE)
     }
-    if (params_cleaning[["strategy"]] != 1 & params_cleaning[["hrs.del.end"]] != 0) {
+    if (params_cleaning[["strategy"]] %in% c(2, 4) & params_cleaning[["hrs.del.end"]] != 0) {
       warning(paste0("\nSetting argument hrs.del.end in combination with strategy = ",
                      params_cleaning[["strategy"]]," is not meaningful, because this is only used when straytegy = 1"), call. = FALSE)
     }
@@ -397,8 +397,21 @@ check_params = function(params_sleep = c(), params_metrics = c(),
                   "fraction of the day between zero and one, please change."), 
            call. = FALSE)
     }
+    if (length(params_cleaning[["segmentDAYSPTcrit.part5"]]) != 2) {
+      stop("\nArgument segmentDAYSPTcrit.part5 is expected to be a numeric vector of length 2", call. = FALSE)
+    }
+    if (sum(params_cleaning[["segmentDAYSPTcrit.part5"]]) < 0.5 |
+        0 %in% params_cleaning[["segmentDAYSPTcrit.part5"]] == FALSE) {
+      
+      stop(paste0("\nIf you used argument segmentDAYSPTcrit.part5 then make sure",
+                  " it includes one zero",
+                  " and one value of at least 0.5, see documentation for",
+                  " argument segmentDAYSPTcrit.part5. If you do not use",
+                  " argument segmentDAYSPTcrit.part5",
+                  " then delete it from your config.csv file (in your output folder)",
+                  " or delete the config.csv file itself."), call. = FALSE)
+    }
   }
-  
   
   invisible(list(params_sleep = params_sleep,
                  params_metrics = params_metrics,

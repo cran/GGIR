@@ -6,42 +6,79 @@ GGIR = function(mode = 1:5, datadir = c(), outputdir = c(),
   #get input variables
   input = list(...)
   # Check for duplicated arguments
-  if (length(input) > 0) {
-    if (length(input) > 1) {
-      argNames = names(input)
-      dupArgNames = duplicated(argNames)
-      if (any(dupArgNames)) { # Warn user about those duplicated arguments
-        for (dupi in unique(argNames[dupArgNames])) {
-          dupArgValues = input[which(argNames %in% dupi)]
-          if (all(dupArgValues == dupArgValues[[1]])) { # duplicated arguments, but no confusion about what value should be
-            warning(paste0("\nArgument ", dupi, " has been provided more than once. Try to avoid this."))
-          } else {# duplicated arguments, and confusion about what value should be,
-            warning(paste0("\nArgument ", dupi, " has been provided more than once and with inconsistent values. Please fix."))
-          }
+  if (length(input) > 1) {
+    argNames = names(input)
+    dupArgNames = duplicated(argNames)
+    if (any(dupArgNames)) { # Warn user about those duplicated arguments
+      for (dupi in unique(argNames[dupArgNames])) {
+        dupArgValues = input[which(argNames %in% dupi)]
+        if (all(dupArgValues == dupArgValues[[1]])) { # duplicated arguments, but no confusion about what value should be
+          warning(paste0("\nArgument ", dupi, " has been provided more than once. Try to avoid this."))
+        } else {# duplicated arguments, and confusion about what value should be,
+          warning(paste0("\nArgument ", dupi, " has been provided more than once and with inconsistent values. Please fix."))
         }
       }
     }
   }
+
+  if (length(datadir) == 0) {
+    stop('\nVariable datadir is not specified')
+  }
+
+  if (length(outputdir) == 0) {
+    stop('\nVariable outputdir is not specified')
+  }
+
   # Convert paths from Windows specific slashed to generic slashes
   outputdir = gsub(pattern = "\\\\", replacement = "/", x = outputdir)
   datadir = gsub(pattern = "\\\\", replacement = "/", x = datadir)
+
   #===========================
   # Establish default start / end file index to process
   filelist = isfilelist(datadir)
-  if (dir.exists(outputdir) == FALSE) stop("\nDirectory specified by argument outputdir, does not exist")
-  derivef0f1 = FALSE
-  if (length(f0) == 0 | length(f1) == 0) {
-    derivef0f1 = TRUE
-  } else {
-    if (f0 == 0 | f1 == 0) derivef0f1 = TRUE
+
+  if (filelist == FALSE) {
+    if (dir.exists(datadir) == FALSE && 1 %in% mode) {
+      # Note: The check whether datadir exists is only relevant when running part 1
+      # For other scenarios it can be convenient to keep specifying datadir
+      # even if the actual path is no longer available, because GGIR uses the most
+      # distal folder name to identify the output directory. For example,
+      # if part 2-5 are processed on a different system then part 1.
+      
+      stop("\nDirectory specified by argument datadir does not exist")
+    }
+    if (datadir == outputdir || grepl(paste(datadir, '/', sep =''), outputdir)) {
+      stop(paste0('\nError: The file path specified by argument outputdir should ',
+                  'NOT equal or be a subdirectory of the path specified by argument datadir'))
+    }
   }
-  if (derivef0f1 == TRUE) { # What file to start with?
+  if (dir.exists(outputdir) == FALSE) {
+    stop("\nDirectory specified by argument outputdir does not exist")
+  }
+  if (file.access(outputdir, mode = 2) == 0) {
+    if (verbose == TRUE) cat("\nChecking that user has write access permission for directory specified by argument outputdir: Yes\n")
+  } else {
+    stop("\nUser does not seem to have write access permissions for the directory specified by argument outputdir.\n")
+  }
+  if (filelist == TRUE) {
+    if (length(studyname) == 0) {
+      stop('\nError: studyname must be specified if datadir is a list of files')
+    }
+  }
+  if (is.null(f0) || f0 < 1) { # What file to start with?
     f0 = 1
-    if (filelist == FALSE) {  # What file to end with?
+  }
+  if ((is.null(f1) || f1 < 1) && 1 %in% mode) {  # What file to end with?
+    # Do not modify f1 here when not attempting to process GGIR part 1
+    # we only expect datadir to exist when running part 1
+    if (filelist == FALSE) {
       f1 <- length(dir(datadir, recursive = TRUE, ignore.case = TRUE, pattern = "[.](csv|bin|Rda|wa|cw|gt3)")) # modified by JH
     } else {
       f1 = length(datadir) #modified
     }
+  }
+  if (is.null(f1)) {
+    f1 = 0
   }
   # Establish which parts need to be processed:
   dopart1 = dopart2 = dopart3 = dopart4 = dopart5 = FALSE
@@ -56,13 +93,6 @@ GGIR = function(mode = 1:5, datadir = c(), outputdir = c(),
     if (length(which(mode == 5)) > 0) dopart5 = TRUE
   }
 
-  # test whether RData input was used and if so, use original outputfolder
-  if (length(datadir) > 0) {
-    # list of all csv and bin files
-    dir2fn = datadir2fnames(datadir, filelist)
-    fnames = dir2fn$fnames
-    fnamesfull = dir2fn$fnamesfull
-  }
   if (filelist == TRUE) {
     metadatadir = paste0(outputdir, "/output_", studyname)
   } else {
@@ -122,8 +152,6 @@ GGIR = function(mode = 1:5, datadir = c(), outputdir = c(),
   }
 
   if (length(myfun) != 0) { # Run check on myfun object, if provided
-    warning("\nAre you using GGIR as online service to others? If yes, then make sure you prohibit the",
-            " user from specifying argument myfun as this poses a security risk.", call. = FALSE)
     check_myfun(myfun, params_general[["windowsizes"]])
   }
 
@@ -151,36 +179,37 @@ GGIR = function(mode = 1:5, datadir = c(), outputdir = c(),
       stop("If you want to derive circadian rhythm indicators, please install package: ActCR.", call. = FALSE)
     }
   }
-
-  checkFormat = TRUE
-  if (all(dir.exists(datadir)) == TRUE) {
-    rawaccfiles = dir(datadir, full.names = TRUE)[f0:f1]
-  } else if (all(file.exists(datadir))) {
-    rawaccfiles = datadir[f0:f1]
-  } else {
-    checkFormat = FALSE
-  }
-
-  if (checkFormat == TRUE) {
-    is_GGIRread_installed = is.element('GGIRread', installed.packages()[,1])
-    is_read.gt3x_installed = is.element('read.gt3x', installed.packages()[,1])
-    # skip this check if GGIRread and read.gt3x are both available
-    if (is_GGIRread_installed == FALSE | is_read.gt3x_installed == FALSE) {
-      getExt = function(x) {
-        tmp = unlist(strsplit(x, "[.]"))
-        return(tmp[length(tmp)])
-      }
-      rawaccfiles_formats = unique(unlist(lapply(rawaccfiles, FUN = getExt)))
-      # axivity (cwa, wav), geneactive (bin), genea (bin):
-      if (any(grepl("cwa|wav|bin", rawaccfiles_formats))) {
-        if (is_GGIRread_installed == FALSE) {
-          stop("If you are working with axivity, geneactiv, or genea files, please install package: GGIRread.", call. = FALSE)
+  if (1 %in% mode) {
+    checkFormat = TRUE
+    if (all(dir.exists(datadir)) == TRUE) {
+      rawaccfiles = dir(datadir, full.names = TRUE)[f0:f1]
+    } else if (all(file.exists(datadir))) {
+      rawaccfiles = datadir[f0:f1]
+    } else {
+      checkFormat = FALSE
+    }
+    
+    if (checkFormat == TRUE) {
+      is_GGIRread_installed = is.element('GGIRread', installed.packages()[,1])
+      is_read.gt3x_installed = is.element('read.gt3x', installed.packages()[,1])
+      # skip this check if GGIRread and read.gt3x are both available
+      if (is_GGIRread_installed == FALSE | is_read.gt3x_installed == FALSE) {
+        getExt = function(x) {
+          tmp = unlist(strsplit(x, "[.]"))
+          return(tmp[length(tmp)])
         }
-      }
-      # actigraph (gt3x)
-      if (any(grepl("gt3x", rawaccfiles_formats))) {
-        if (is_read.gt3x_installed == FALSE) {
-          stop(paste0("If you are working with actigraph files, please install package: read.gt3x.", call. = FALSE))
+        rawaccfiles_formats = unique(unlist(lapply(rawaccfiles, FUN = getExt)))
+        # axivity (cwa, wav), geneactive (bin), genea (bin):
+        if (any(grepl("cwa|wav|bin", rawaccfiles_formats))) {
+          if (is_GGIRread_installed == FALSE) {
+            stop("If you are working with axivity, geneactiv, or genea files, please install package: GGIRread.", call. = FALSE)
+          }
+        }
+        # actigraph (gt3x)
+        if (any(grepl("gt3x", rawaccfiles_formats))) {
+          if (is_read.gt3x_installed == FALSE) {
+            stop(paste0("If you are working with actigraph files, please install package: read.gt3x.", call. = FALSE))
+          }
         }
       }
     }
@@ -233,7 +262,7 @@ GGIR = function(mode = 1:5, datadir = c(), outputdir = c(),
       }
     }
     if (params_general[["dataFormat"]] == "raw") {
-      g.part1(datadir = datadir, outputdir = outputdir, f0 = f0, f1 = f1,
+      g.part1(datadir = datadir, metadatadir = metadatadir, f0 = f0, f1 = f1,
               studyname = studyname, myfun = myfun,
               params_rawdata = params_rawdata, params_metrics = params_metrics,
               params_cleaning = params_cleaning, params_general = params_general,
@@ -247,8 +276,7 @@ GGIR = function(mode = 1:5, datadir = c(), outputdir = c(),
                      " input arguments related to raw data handling are ignored."),
               call. = FALSE)
       convertEpochData(datadir = datadir,
-                       studyname = studyname,
-                       outputdir = outputdir,
+                       metadatadir = metadatadir,
                        params_general = params_general,
                        verbose = verbose)
     }
@@ -304,12 +332,11 @@ GGIR = function(mode = 1:5, datadir = c(), outputdir = c(),
   #--------------------------------------------------
   # Store configuration parameters in config file
   LS = ls()
-  LS = LS[which(LS %in% c("input", "txt", "derivef0f1", "dopart1", "dopart2", "dopart3", "LS",
-                          "dopart4", "dopart5", "fnames", "metadatadir", "ci", "config",
+  LS = LS[which(LS %in% c("input", "txt", "dopart1", "dopart2", "dopart3", "LS",
+                          "dopart4", "dopart5", "metadatadir", "ci", "config",
                           "configfile", "filelist", "outputfoldername", "numi", "logi",
                           "conv2logical", "conv2num", "SI", "params", "argNames", "dupArgNames",
-                          "print_console_header", "configfile_csv", "myfun",
-                          "ex", "dir2fn", "fnamesfull",
+                          "print_console_header", "configfile_csv", "myfun", "ex",
                           "GGIRversion",  "dupArgValues", "verbose", "is_GGIRread_installed", 
                           "is_read.gt3x_installed", "is_ActCR_installed", 
                           "is_actilifecounts_installed", "rawaccfiles", 
@@ -322,16 +349,11 @@ GGIR = function(mode = 1:5, datadir = c(), outputdir = c(),
     data.table::fwrite(config.matrix, file = paste0(metadatadir, "/config.csv"),
                        row.names = FALSE, sep = params_output[["sep_config"]])
   } else {
-    if (dir.exists(datadir) == FALSE) {
-      warning("\nCould not write config file because studyname or datadir are not correctly specified.")
-    }
+      warning("\nCould not write config file.")
   }
   #==========================
   # Report generation:
   # -----
-  # Commented out 2023-03-14 - Not needed since now there are checks for meta data
-  # before generating reports for parts 2, 4, 5 and visualreport
-  #
   # check a few basic assumptions before continuing
   if (length(which(do.report == 2)) > 0) {
     if (verbose == TRUE) print_console_header("Report part 2")
@@ -341,7 +363,9 @@ GGIR = function(mode = 1:5, datadir = c(), outputdir = c(),
       # if (N.files.ms2.out < f1) f1 = N.files.ms2.out
       if (length(f0) == 0) f0 = 1
       if (f1 == 0) f1 = N.files.ms2.out
-      if (length(params_247[["qwindow"]]) > 2 | is.character(params_247[["qwindow"]])) {
+      if (length(params_247[["qwindow"]]) > 2 |
+          is.character(params_247[["qwindow"]]) |
+        (length(params_247[["qwindow"]]) == 2 & !all(c(0, 24) %in% params_247[["qwindow"]]))) {
         store.long = TRUE
       } else {
         store.long = FALSE

@@ -1,52 +1,15 @@
 g.getstarttime = function(datafile, P, header, mon, dformat, desiredtz, configtz = NULL) {
   #get input variables (relevant when read.myacc.csv is used)
   #------------------------------------------------------------
-  if (mon  == 1 & dformat == 1) {
-    starttime = P$timestamps2[1]
-  } else if (mon  == 4 & dformat == 4) {
+  if (mon == MONITOR$AXIVITY && dformat == FORMAT$CWA) {
     starttime = P$data[1,1]
     starttime = as.POSIXlt(starttime, tz = desiredtz, origin = "1970-01-01")
     starttime = POSIXtime2iso8601(starttime, tz = desiredtz)
-  } else if (dformat == 3) { #wav
-    starttime = c()
-    #It seems that Axivity does not store timestamp in a consistent position
-    # therefore, we need to search for it in the data:
-    starttime = format(header[which(rownames(header) == "ICMTzTime"),1])
-    rn = rownames(header)
-    vl = header$value
-    if (length(starttime) == 0) {
-      if (length(which(rn == "Start")) > 0) {
-        starttime = format(header$value[which(rn == "Start")])
-        #in one of the files starttime is hidden in rowname
-        if (length(starttime) == 0) starttime = rownames(header)[2]
-      }
-      #in one of the files start variable name is hidden in the values
-      if (length(which(vl == "Start")) > 0) {
-        starttime = header$value[2]
-      }
-    }
-    if (length(starttime) == 0) starttime = P$timestamp # initially used, but apparently its is corrupted sometimes, so I am now using ICMTzTime
-    if (length(P$timestamp) == 0) starttime = format(P$hvalues[which(P$hnames == "Start")])
-  } else if (mon == 2 & dformat == 1) {
-    if ("page.timestamps" %in% names(P)) { # GENEAread
-      if (length(desiredtz) > 0) {
-        starttime = POSIXtime2iso8601(P$page.timestamps[1], tz = desiredtz)
-        if (length(unlist(strsplit(format(starttime),":"))) < 2) {
-          #needed for MaM study where first timestamp does not have clock time in it
-          starttime = POSIXtime2iso8601(P$page.timestamps[2], tz = desiredtz)
-        }
-      } else {
-        starttime = P$page.timestamps[1]
-      }
-    } else {
-      starttime = as.POSIXlt(P$data.out$time[1], tz = desiredtz, origin = "1970-01-01")
-      starttime = POSIXtime2iso8601(starttime, tz = desiredtz)
-    }
-  } else if (dformat == 2 & mon == 2) {
-    starttime = format(P[1,1])
-    starttime = as.POSIXlt(starttime)
-  } else if (dformat == 2 & (mon == 3 | mon == 4 | mon == 6)) {
-    if (mon == 3 | mon == 6) {
+  } else if (mon == MONITOR$GENEACTIV && dformat == FORMAT$BIN) {
+    starttime = as.POSIXlt(P$data.out$time[1], tz = desiredtz, origin = "1970-01-01")
+    starttime = POSIXtime2iso8601(starttime, tz = desiredtz)
+  } else if (dformat == FORMAT$CSV && (mon == MONITOR$ACTIGRAPH || mon == MONITOR$AXIVITY || mon == MONITOR$VERISENSE)) {
+    if (mon == MONITOR$ACTIGRAPH || mon == MONITOR$VERISENSE) {
       tmph = read.csv(datafile, nrow = 8, skip = 1)
       tmphi = 1
       while (tmphi < 10) {
@@ -68,7 +31,7 @@ g.getstarttime = function(datafile, P, header, mon, dformat, desiredtz, configtz
       startdate = as.character(unlist(strsplit(format(startdate)," ")))
       starttime = as.character(unlist(strsplit(format(starttime)," ")))
     }
-    if (mon == 4) {
+    if (mon == MONITOR$AXIVITY) {
       starttime = P[1,1]
       starttime = as.POSIXlt(starttime,tz = desiredtz,origin = "1970-01-01")
       startdate = unlist(strsplit(format(starttime), " "))[1]
@@ -99,7 +62,7 @@ g.getstarttime = function(datafile, P, header, mon, dformat, desiredtz, configtz
     starttime = paste0(startdate," ",starttime)
     getOption("digits.secs")
     options(digits.secs = 3)
-    if ((mon == 3 & dformat != 6) | mon == 6) {
+    if ((mon == MONITOR$ACTIGRAPH && dformat != FORMAT$GT3X) || mon == MONITOR$VERISENSE) {
       options(warn = -1)
       topline = as.matrix(colnames(as.matrix(read.csv(datafile, nrow = 1, skip = 0))))
       topline = topline[1]  #To avoid dots
@@ -169,11 +132,11 @@ g.getstarttime = function(datafile, P, header, mon, dformat, desiredtz, configtz
       Sys.setlocale("LC_TIME", "C")  # set language to English because that is what we use elsewhere in GGIR
       starttime = as.POSIXlt(starttime, format = expectedformat)
     }
-  } else if (dformat == 5 & mon == 0) {
+  } else if (dformat == FORMAT$AD_HOC_CSV && mon == MONITOR$AD_HOC) {
     starttime = P$data$timestamp[1]
-  } else if (mon == 5) {
+  } else if (mon == MONITOR$MOVISENS) {
     starttime = unisensR::readUnisensStartTime(dirname(datafile))
-  } else if (dformat == 6 & mon == 3) {
+  } else if (dformat == FORMAT$GT3X && mon == MONITOR$ACTIGRAPH) {
     if (is.null(configtz)) configtz = desiredtz
     starttime = as.POSIXct(format(P[1, 1]), tz = configtz)
     if (configtz != desiredtz) {

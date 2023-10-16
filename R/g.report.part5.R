@@ -45,7 +45,7 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
       }
       # Note: Below we intentionally only sets a criteria on daytime, because for
       # the night time we only need start and end of the SPT window.
-      if (window == "WW") {
+      if (window == "WW" | window == "OO") {
         indices = which(x$nonwear_perc_day <= maxpernwday &
                           x$dur_spt_min > 0 & x$dur_day_min > 0 & include_window == TRUE)
       } else if (window == "MM") {
@@ -139,7 +139,7 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
                                 stringsAsFactors = FALSE)
     
     # Find columns filled with missing values
-    cut = which(sapply(outputfinal, function(x) all(x == "")) == TRUE) 
+    cut = which(sapply(outputfinal, function(x) all(x == "")) == TRUE)
     if (length(cut) > 0) {
       outputfinal = outputfinal[,-cut]
     }
@@ -153,8 +153,8 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
     # split results to different spreadsheets in order to minimize individual
     # filesize and to ease organising dataset
     uwi = as.character(unique(outputfinal$window))
-    if (!all(uwi %in% c("MM", "WW"))) {
-      uwi = c(uwi[uwi %in% c("MM", "WW")], "Segments")
+    if (!all(uwi %in% c("MM", "WW", "OO"))) {
+      uwi = c(uwi[uwi %in% c("MM", "WW", "OO")], "Segments")
     }
     uTRLi = as.character(unique(outputfinal$TRLi))
     uTRMi = as.character(unique(outputfinal$TRMi))
@@ -197,7 +197,7 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
                            "-", uTRVi[h3], "-", usleepparam[h4]))
               }
               select_window = as.character(outputfinal$window) == uwi[j]
-              if (!(uwi[j] %in% c("MM", "WW"))) select_window = !(as.character(outputfinal$window) %in% c("MM", "WW"))
+              if (!(uwi[j] %in% c("MM", "WW", "OO"))) select_window = !(as.character(outputfinal$window) %in% c("MM", "WW", "OO"))
               seluwi = which(select_window &
                                as.character(outputfinal$TRLi) == uTRLi[h1] &
                                as.character(outputfinal$TRMi) == uTRMi[h2] &
@@ -210,10 +210,8 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
                 CN = colnames(outputfinal)
                 outputfinal2 = outputfinal
                 colnames(outputfinal2) = CN
-                delcol = which(colnames(outputfinal2) == "TRLi" |
-                                 colnames(outputfinal2) == "TRMi" |
-                                 colnames(outputfinal2) == "TRVi" |
-                                 colnames(outputfinal2) == "sleepparam")
+                delcol = grep(pattern = "TRLi|TRMi|TRVi|sleepparam",
+                              x = colnames(outputfinal2))
                 if (uwi[j] != "Segments") {
                   delcol = c(delcol, which(colnames(outputfinal2) == "window"))
                 }
@@ -234,12 +232,14 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
                 # store all summaries in csv files with cleaning criteria
                 validdaysi = getValidDayIndices(x = OF3, window = uwi[j],
                                                 params_cleaning = params_cleaning)
-                data.table::fwrite(
-                  OF3_clean[validdaysi, ],
-                  paste(metadatadir, "/results/part5_daysummary_",
-                        uwi[j], "_L", uTRLi[h1], "M", uTRMi[h2], "V", uTRVi[h3],
-                        "_", usleepparam[h4], ".csv", sep = ""), row.names = FALSE, na = "",
-                  sep = sep_reports)
+                if (length(validdaysi) > 0) {
+                  data.table::fwrite(
+                    OF3_clean[validdaysi, ],
+                    paste(metadatadir, "/results/part5_daysummary_",
+                          uwi[j], "_L", uTRLi[h1], "M", uTRMi[h2], "V", uTRVi[h3],
+                          "_", usleepparam[h4], ".csv", sep = ""), row.names = FALSE, na = "",
+                    sep = sep_reports)
+                }
                 #------------------------------------------------------------------------------------
                 #also compute summary per person
                 agg_plainNweighted = function(df,
@@ -248,10 +248,10 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
                                               window = "MM") {
                   # function to take both the weighted (by weekday/weekendday) and plain average of all numeric variables
                   # df: input data.frame (OF3 outside this function)
-                  ignorevar = c("daysleeper", "cleaningcode", "night_number",
-                                "sleeplog_used", "ID", "acc_available", "window_number",
-                                "window", "boutcriter.mvpa", "boutcriter.lig",
-                                "boutcriter.in", "bout.metric")
+                  
+                  ignorevar = c("daysleeper", "cleaningcode", "night_number", "sleeplog_used",
+                                "ID", "acc_available", "window_number",
+                                "boutcriter.mvpa", "boutcriter.lig", "boutcriter.in", "bout.metric") # skip cosinor variables
                   for (ee in 1:ncol(df)) { # make sure that numeric columns have class numeric
                     nr = nrow(df)
                     if (nr > 30) nr = 30
@@ -342,8 +342,8 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
                     # missing columns, add these:
                     NLUXseg = length(LUX_day_segments)
                     if (length(weeksegment) > 0) {
-                      LUX_segment_vars_expected = paste0("LUX_", LUXmetrics, "_", 
-                                                         LUX_day_segments[1:(NLUXseg - 1)], 
+                      LUX_segment_vars_expected = paste0("LUX_", LUXmetrics, "_",
+                                                         LUX_day_segments[1:(NLUXseg - 1)],
                                                          "-", LUX_day_segments[2:(NLUXseg)],
                                                          "hr_day_", weeksegment)
                     } else {
@@ -457,6 +457,7 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
                 # Calculate, weighted and plain mean of all variables
                 # add column to define what are weekenddays and weekdays as needed for function agg_plainNweighted
                 # before processing OF3, first identify which days have enough monitor wear time
+                
                 validdaysi = getValidDayIndices(x = OF3, window = uwi[j],
                                                 params_cleaning = params_cleaning)
                 if (length(validdaysi) > 0) { # do not attempt to aggregate if there are no valid days
@@ -464,8 +465,10 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
                   OF4 = agg_plainNweighted(df = OF3[validdaysi,], filename = "filename", 
                                            daytype = "daytype", window = uwi[j])
                   # calculate additional variables
-                  columns2keep = c("filename","night_number","daysleeper","cleaningcode","sleeplog_used","guider",
-                                   "acc_available","nonwear_perc_day","nonwear_perc_spt","daytype","dur_day_min",
+                  columns2keep = c("filename", "night_number", "daysleeper",
+                                   "cleaningcode","sleeplog_used","guider",
+                                   "acc_available", "nonwear_perc_day", "nonwear_perc_spt",
+                                   "daytype", "dur_day_min",
                                    "dur_spt_min")
                   if (uwi[j] == "Segments") {
                     columns2keep = c(columns2keep, "window")
@@ -625,7 +628,6 @@ g.report.part5 = function(metadatadir = c(), f0 = c(), f1 = c(), loglocation = c
                 }
               }
             }
-            
           }
         }
       }

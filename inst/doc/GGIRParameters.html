@@ -2262,156 +2262,161 @@ arguments/parameters overview</h1>
 <td>not in parameter objects</td>
 </tr>
 <tr class="even">
-<td>def.noc.sleep</td>
+<td>relyonguider_SleepEfficiency</td>
 <td>4</td>
 <td>params_sleep</td>
 </tr>
 <tr class="odd">
+<td>def.noc.sleep</td>
+<td>4</td>
+<td>params_sleep</td>
+</tr>
+<tr class="even">
 <td>data_cleaning_file</td>
 <td>4, 5</td>
 <td>params_cleaning</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>excludefirst.part4</td>
 <td>4</td>
 <td>params_cleaning</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>excludelast.part4</td>
 <td>4</td>
 <td>params_cleaning</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>sleepwindowType</td>
 <td>4</td>
 <td>params_cleaning</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>excludefirstlast.part5</td>
 <td>5</td>
 <td>params_cleaning</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>boutcriter.mvpa</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>boutcriter.in</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>boutcriter.lig</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>threshold.lig</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>threshold.mod</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>threshold.vig</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>boutdur.mvpa</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>boutdur.in</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>boutdur.lig</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>save_ms5rawlevels</td>
 <td>5</td>
 <td>params_output</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>part5_agg2_60seconds</td>
 <td>5</td>
 <td>params_general</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>includedaycrit.part5</td>
 <td>5</td>
 <td>params_cleaning</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>frag.metrics</td>
 <td>5</td>
 <td>params_phyact</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>LUXthresholds</td>
 <td>5</td>
 <td>params_247</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>LUX_cal_constant</td>
 <td>5</td>
 <td>params_247</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>LUX_cal_exponent</td>
 <td>5</td>
 <td>params_247</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>LUX_day_segments</td>
 <td>5</td>
 <td>params_247</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>timewindow</td>
 <td>5</td>
 <td>params_output</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>save_ms5raw_format</td>
 <td>5</td>
 <td>params_output</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>save_ms5raw_without_invalid</td>
 <td>5</td>
 <td>params_output</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>do.sibreport</td>
 <td>5</td>
 <td>params_output</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>visualreport_without_invalid</td>
 <td>visualreport</td>
 <td>params_output</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>dofirstpage</td>
 <td>visualreport</td>
 <td>params_output</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>visualreport</td>
 <td>visualreport</td>
 <td>params_output</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>viewingwindow</td>
 <td>visualreport</td>
 <td>params_output</td>
@@ -2893,6 +2898,12 @@ the data block will be imputed by lack of movement with gravitational
 oriationed guessed from most recent valid data block. Only applicable to
 Axivity .cwa data.</p>
 </div>
+<div id="rmc.scalefactor.acc" class="section level3 unnumbered">
+<h3 class="unnumbered">rmc.scalefactor.acc</h3>
+<p>Numeric value (default 1) to scale the acceleration signals via
+multiplication. For example, if data is provided in m/s2 then by setting
+this to 1/9.81 we would derive gravitational units.</p>
+</div>
 </div>
 <div id="metrics-parameters" class="section level2" number="2.4">
 <h2><span class="header-section-number">2.4</span> Metrics
@@ -3157,12 +3168,15 @@ integer.</p>
 <p>Numeric (default = 1). How to deal with knowledge about study
 protocol. strategy = 1 means select data based on hrs.del.start and
 hrs.del.end. strategy = 2 makes that only the data between the first
-midnight and the last midnight is used. strategy = 3 only selects the
-most active X days in the file where X is specified by argument
-ndayswindow, where the days are a series of 24-h blocks starting any
-time in the day. strategy = 4 to only use the data after the first
-midnight. strategy = 5 is similar to strategy = 3, but it selects X
-complete calendar days where X is specified by argument ndayswindow.</p>
+midnight and the last midnight is used. strategy = 3 selects the most
+active X days in the file where X is specified by argument ndayswindow,
+where the days are a series of 24-h blocks starting any time in the day
+(X hours at the begining and end of this period can be deleted with
+arguments hrs.del.start and hrs.del.end) strategy = 4 to only use the
+data after the first midnight. strategy = 5 is similar to strategy = 3,
+but it selects X complete calendar days where X is specified by argument
+ndayswindow (X hours at the begining and end of this period can be
+deleted with arguments hrs.del.start and hrs.del.end).</p>
 </div>
 <div id="maxdur" class="section level3 unnumbered">
 <h3 class="unnumbered">maxdur</h3>
@@ -3257,7 +3271,7 @@ exercise lab data typically lasting less than a day.</p>
 </div>
 <div id="nonwear_approach" class="section level3 unnumbered">
 <h3 class="unnumbered">nonwear_approach</h3>
-<p>Character (default = “2013”). Whether to use the traditional version
+<p>Character (default = “2023”). Whether to use the traditional version
 of the non-wear detection algorithm (nonwear_approach = “2013”) or the
 new version (nonwear_approach = “2023”). The 2013 version would use the
 longsize window (windowsizes[3], one hour as default) to check the
@@ -3277,11 +3291,24 @@ time should be valid.</p>
 </div>
 <div id="segmentdaysptcrit.part5" class="section level3 unnumbered">
 <h3 class="unnumbered">segmentDAYSPTcrit.part5</h3>
-<p>Numeric vector or length 2 (default = c(0, 0)). Inclusion criteria
+<p>Numeric vector or length 2 (default = c(0.9, 0)). Inclusion criteria
 for the proportion of the segment that should be classified as day
-(awake) and spt (sleep period time) to be considered valid. Usually, one
-of the two numbers is 0, and the other defines the proportion of the
-segment that should be classified as day or spt.</p>
+(awake) and spt (sleep period time) to be considered valid. One of the
+two numbers should be 0, and the other defines the proportion of the
+segment that should be classified as day or spt, respectively. The
+default setting would focus on waking hour segments and includes all
+segments that overlap for at least 90 percent with waking hours. In
+order to shift focus to the SPT you could use c(0, 0.9) which ensures
+that all segments that overlap for at least 90 percent with the SPT are
+included. Setting both to zero would be problematic and is not allowed
+as that would introduce bias in behavioural estimates for the following
+reason: A complete segment would be averaged with an incomplete segments
+(someone going to bed or waking up in the middle of a segment) by which
+it is no longer clear whether the person is less active or sleeps more
+during that segment. Similarly it is not clear whether the person has
+more wakefulness during SPT for a segment or woke up or went to bed
+during the segment. Therefore, a minimum value of 0.5 is required but
+any value closer to 1 would be better.</p>
 </div>
 </div>
 <div id="sleep-parameters" class="section level2" number="2.6">
@@ -3417,6 +3444,21 @@ algortihm that was trained in 3.5 year olds.</p>
 <p>Character (default = NULL). To specify classification model.
 Currently the only option is “hip3yr”, which corresponds to a model
 trained with hip data in 3-3.5 olds trained with parent diary data.</p>
+</div>
+<div id="sleepefficiency.metric" class="section level3 unnumbered">
+<h3 class="unnumbered">sleepefficiency.metric</h3>
+<p>Numeric (default = 1). If 1 (default), sleep efficiency is calculated
+as detected nocturnal sleep time divided by log-derived duration in
+sleep period time (considering user-reported sleep onset and wake
+times). If 2, sleep efficiency is calculated as detected nocturnal sleep
+time divided by detected duration in sleep period time plus sleep
+latency (where sleep latency refers to the difference between
+log-derived sleep onset and accelerometer-detected sleep onset).</p>
+</div>
+<div id="possible_nap_edge_acc" class="section level3 unnumbered">
+<h3 class="unnumbered">possible_nap_edge_acc</h3>
+<p>Minimum acceleration before or after the SIB for the nap to be
+considered.</p>
 </div>
 </div>
 <div id="physical-activity-parameters" class="section level2" number="2.7">
@@ -3558,7 +3600,10 @@ with no activiy log data can be skipped, no need to have a column with
 the date followed by a column with the next date. If times in the
 activity diary are not multiple of the short window size (epoch length),
 the next epoch is considered (e.g., with epoch of 5 seconds, 8:00:02
-will be redefined as 8:00:05 in the activity log).</p>
+will be redefined as 8:00:05 in the activity log). When using the
+qwindow functionality in combination with GGIR part 5 then make sure to
+check that arguments segmentWEARcrit.part5 and segmentDAYSPTcrit.part5
+are specfied to your research needs.</p>
 </div>
 <div id="qlevels" class="section level3 unnumbered">
 <h3 class="unnumbered">qlevels</h3>
@@ -3672,8 +3717,8 @@ needs to be calculated. Now this is done with argument qwindow.</p>
 </div>
 <div id="cosinor" class="section level3 unnumbered">
 <h3 class="unnumbered">cosinor</h3>
-<p>Argument depricated after version 1.5-24. Boolean (default = FALSE).
-Whether to apply the cosinor analysis from the ActCR package.</p>
+<p>Boolean (default = FALSE). Whether to apply the cosinor analysis from
+the ActCR package.</p>
 </div>
 </div>
 <div id="output-parameters" class="section level2" number="2.9">
@@ -3712,7 +3757,8 @@ accelerometer data.</p>
 <h3 class="unnumbered">timewindow</h3>
 <p>Character (default = c(“MM”, “WW”)). In g.part5: Timewindow over
 which summary statistics are derived. Value can be “MM” (midnight to
-midnight), “WW” (waking time to waking time), or both c(“MM”,“WW”).</p>
+midnight), “WW” (waking time to waking time), “OO” (sleep onset to sleep
+onset), or any combination of them.</p>
 </div>
 <div id="viewingwindow" class="section level3 unnumbered">
 <h3 class="unnumbered">viewingwindow</h3>
@@ -3780,7 +3826,12 @@ mistakes.</p>
 <div id="do.sibreport" class="section level3 unnumbered">
 <h3 class="unnumbered">do.sibreport</h3>
 <p>Boolean (default = FALSE). In g.part4: To indicate whether to
-generate report for the sustained inactivity bouts (SIB).</p>
+generate report for the sustained inactivity bouts (SIB). If set to TRUE
+and when an advanced sleep diary is available in part 4 then part 5 will
+use this to generate summary statistics on the overlap between
+self-reported nonwear and napping with SIB. Here, SIB cna be filter
+based on argument possible_nap_edge_acc and the first value of
+possible_nap_dur</p>
 </div>
 <div id="do.part2.pdf" class="section level3 unnumbered">
 <h3 class="unnumbered">do.part2.pdf</h3>

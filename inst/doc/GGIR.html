@@ -1550,7 +1550,7 @@ via: <a href="mailto:training@accelting.com" class="email">training@accelting.co
 <p>Also of interest may be the brief <a href="https://www.accelting.com/updates/short-r-tutorial/">free R
 introduction tutorial</a>.</p>
 <p><strong>Change log</strong></p>
-<p>Our log of main changes to GGIR over time can be found <a href="https://cran.r-project.org/package=GGIR/news.html">here</a>.</p>
+<p>Our log of main changes to GGIR over time can be found <a href="https://cran.r-project.org/package=GGIR/news/news.html">here</a>.</p>
 </div>
 </div>
 <div id="setting-up-your-work-environment" class="section level1" number="2">
@@ -1739,7 +1739,8 @@ the experiment.
 <li>If <code>strategy</code> is set to value 1, then check out arguments
 <code>hrs.del.start</code> and <code>hrs.del.end</code>.</li>
 <li>If <code>strategy</code> is set to value 3 or 5, then check out
-arguments <code>ndayswindow</code>.</li>
+arguments <code>ndayswindow</code>, <code>hrs.del.start</code> and
+<code>hrs.del.end</code>.</li>
 </ul></li>
 <li><code>maxdur</code> - maximum number of days you expect in a data
 file based on the study protocol.</li>
@@ -1968,8 +1969,8 @@ calendar date.</li>
 <li>You can add columns relating to self-reported napping time and
 nonwear time. These are not used for the sleep analysis in g.part3 and
 g.part4, but used in g.part5 to facilitate napping analysis, see
-argument <code>do.sibreport</code>. Multiple naps and multiple nonwear
-periods can be entered per day.</li>
+argument <code>do.sibreport</code> and the paragraph on naps. Multiple
+naps and multiple nonwear periods can be entered per day.</li>
 <li>Leave cells for missing values blank.</li>
 <li>Column names are critical for the advanced sleeplog format: Date
 columns are recognised by GGIR as any column name with the word “date”
@@ -2016,7 +2017,8 @@ minutes would count towards the duration of the MVPA bout.</li>
 </ol></li>
 <li><code>timewindow</code> to specify whether days should be defined
 from midnight to midnight <code>&quot;MM&quot;</code>, from waking-up to waking-up
-<code>&quot;WW&quot;</code>, or both <code>c(&quot;MM&quot;,&quot;WW&quot;)</code>.</li>
+<code>&quot;WW&quot;</code>, from sleep onset to sleep onset <code>&quot;OO&quot;</code>, or
+any combination of them.</li>
 <li>Configure durations of bouts: <code>boutdur.mvpa</code>,
 <code>boutdur.in</code>, and <code>boutdur.lig</code>. Note that this
 can be a vector of multiple values indicating the minimum and maximum
@@ -2457,19 +2459,21 @@ ignore specific hours; value=2 mean ignore all data before the first
 midnight and after the last midnight</td>
 </tr>
 <tr class="odd">
-<td>n hours ignored at start of meas (if strategy=1)</td>
+<td>n hours ignored at start of meas (if strategy=1, 3 or 5)</td>
 <td>number of hours ignored at the start of the measurement (if strategy
-= 1) A log of decision made in part2.R</td>
+= 1) or at the start of the <code>ndayswindow</code> (if strategy = 3 or
+5) A log of decision made in part2.R</td>
 </tr>
 <tr class="even">
-<td>n hours ignored at end of meas (if strategy=1)</td>
+<td>n hours ignored at end of meas (if strategy=1, 3 or 5)</td>
 <td>number of hours ignored at the end of the measurement (if strategy =
-1). A log of decision made in part2.R</td>
+1) or at the end of the <code>ndayswindow</code> (if strategy = 3 or 5).
+A log of decision made in part2.R</td>
 </tr>
 <tr class="odd">
-<td>n hours ignored at end of meas (if strategy=1)</td>
+<td>n hours ignored at end of meas (if strategy = 1, 3 or 5)</td>
 <td>number of days of measurement after which all data is ignored (if
-strategy = 1) A log of decision made in part2.R</td>
+strategy = 1, 3 or 5) A log of decision made in part2.R</td>
 </tr>
 <tr class="even">
 <td>epoch size to which acceleration was averaged (seconds)</td>
@@ -2597,6 +2601,161 @@ hours</td>
 </tbody>
 </table>
 </div>
+<div id="data_quality_report" class="section level3" number="4.1.3">
+<h3><span class="header-section-number">4.1.3</span>
+Data_quality_report</h3>
+<p>The data_quality_report.csv is stored in subfolder folder
+results/QC.</p>
+<table>
+<colgroup>
+<col width="36%" />
+<col width="63%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>(Part of) variable name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>filename</td>
+<td>file name</td>
+</tr>
+<tr class="even">
+<td>file.corrupt</td>
+<td>Is file corrupt? TRUE or FALSE (mainly tested for GENEActiv bin
+files)</td>
+</tr>
+<tr class="odd">
+<td>file.too.short</td>
+<td>File too short for processing? (<a href="#Minimum_recording_duration">definition</a>) TRUE or FALSE</td>
+</tr>
+<tr class="even">
+<td>use.temperature</td>
+<td>Temperature used for auto-calibration? TRUE or FALSE</td>
+</tr>
+<tr class="odd">
+<td>scale.x</td>
+<td>Auto-calibration scaling coefficient for x-axis (same for y and z
+axis, not shown here)</td>
+</tr>
+<tr class="even">
+<td>offset.x</td>
+<td>Auto-calibration offset coefficient for x-axis (same for y and z
+axis, not shown here)</td>
+</tr>
+<tr class="odd">
+<td>temperature.offset.x</td>
+<td>Auto-calibration temperature offset coefficient for x-axis (same for
+y and z axis, not shown here)</td>
+</tr>
+<tr class="even">
+<td>cal.error.start</td>
+<td>Calibration error prior to auto-calibration</td>
+</tr>
+<tr class="odd">
+<td>cal.error.end</td>
+<td>Calibration error after auto-calibration</td>
+</tr>
+<tr class="even">
+<td>n.10sec.windows</td>
+<td>Number of 10 second epochs used as sphere data in
+auto-calibration</td>
+</tr>
+<tr class="odd">
+<td>n.hours.considered</td>
+<td>Number of hours of data considered for auto-calibration</td>
+</tr>
+<tr class="even">
+<td>QCmessage</td>
+<td>Character QC message at the end of the auto-calibration</td>
+</tr>
+<tr class="odd">
+<td>mean.temp</td>
+<td>Mean temperature in sphere data</td>
+</tr>
+<tr class="even">
+<td>device.serial.number</td>
+<td>Device serial number</td>
+</tr>
+<tr class="odd">
+<td>NFilePagesSkipped</td>
+<td>(Only for Axivity .cwa format) Number of data blocks skipped</td>
+</tr>
+<tr class="even">
+<td>filehealth_totimp_min</td>
+<td>(Only for Axivity .cwa format) Total number of minutes of data
+imputed</td>
+</tr>
+<tr class="odd">
+<td>filehealth_checksumfail_min</td>
+<td>(Only for Axivity .cwa format) Total number of minutes of data where
+the checksum failed</td>
+</tr>
+<tr class="even">
+<td>filehealth_niblockid_min</td>
+<td>(Only for Axivity .cwa format) Total number of minutes of data with
+non-incremental block ids</td>
+</tr>
+<tr class="odd">
+<td>filehealth_fbias0510_min</td>
+<td>(Only for Axivity .cwa format) Total number of minutes with a
+sampling frequency bias between 5 and 10%</td>
+</tr>
+<tr class="even">
+<td>filehealth_fbias1020_min</td>
+<td>(Only for Axivity .cwa format) Total number of minutes with a
+sampling frequency bias between 10 and 20%</td>
+</tr>
+<tr class="odd">
+<td>filehealth_fbias2030_min</td>
+<td>(Only for Axivity .cwa format) Total number of minutes with a
+sampling frequency bias between 20 and 30%</td>
+</tr>
+<tr class="even">
+<td>filehealth_fbias30_min</td>
+<td>(Only for Axivity .cwa format) Total number of minutes with a
+sampling frequency bias higher than 30%</td>
+</tr>
+<tr class="odd">
+<td>filehealth_totimp_N</td>
+<td>(Only for Axivity .cwa format) Total number of data blocks that were
+imputed</td>
+</tr>
+<tr class="even">
+<td>filehealth_checksumfail_N</td>
+<td>(Only for Axivity .cwa format) Total number of blocks where the
+checksum failed</td>
+</tr>
+<tr class="odd">
+<td>filehealth_niblockid_N</td>
+<td>(Only for Axivity .cwa format) Total number of data blocks with
+non-incremental block ids</td>
+</tr>
+<tr class="even">
+<td>filehealth_fbias0510_N</td>
+<td>(Only for Axivity .cwa format) Total number of data blocks with a
+sampling frequency bias between 5 and 10%</td>
+</tr>
+<tr class="odd">
+<td>filehealth_fbias1020_N</td>
+<td>(Only for Axivity .cwa format) Total number of data blocks with a
+sampling frequency bias between 10 and 20%</td>
+</tr>
+<tr class="even">
+<td>filehealth_fbias2030_N</td>
+<td>(Only for Axivity .cwa format) Total number of data blocks with a
+sampling frequency bias between 20 and 30%</td>
+</tr>
+<tr class="odd">
+<td>filehealth_fbias30_N</td>
+<td>(Only for Axivity .cwa format) Total number of data blocks with a
+sampling frequency bias higher than 30%</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="output-part-4" class="section level2 tabset" number="4.2">
 <h2 class="tabset"><span class="header-section-number">4.2</span> Output
@@ -2609,6 +2768,12 @@ summaries</h3>
 <li>part4_nightsummary_sleep_cleaned.csv</li>
 <li>QC/part4_nightsummary_sleep_full.csv</li>
 </ul>
+<p>The latter with ’_full’ in the name is intended to aid clarifying why
+some nights (if any) are excluded from the cleaned summary report.
+Although, nights where the accelerometer was not worn at all are
+excluded from this. So, if you have a 30 day recording where the
+accelerometer was not worn from day 7 onward then you will not find the
+last 22 nights in either csv-report.</p>
 <p>The csv. files contain the variables as shown below.</p>
 <table>
 <colgroup>
@@ -2826,7 +2991,8 @@ data. If either of these applies set argument
 <tr class="even">
 <td>sleepefficiency</td>
 <td>Sleep efficiency, calculated as: SleepDurationInSpt /
-guider_inbedDuration</td>
+guider_inbedDuration or SleepDurationInSpt / (Spt + latency) as defined
+with <code>relyonguider_SleepEfficiency</code></td>
 </tr>
 <tr class="odd">
 <td>sleeplatency</td>
@@ -2886,10 +3052,12 @@ meaning may not be obvious:</p>
 </tr>
 <tr class="odd">
 <td>sleep_efficiency</td>
-<td>Accelerometer detrive sleep efficiency within the sleep period time
+<td>Accelerometer derived sleep efficiency within the sleep period time
 calculated as the ratio between acc_SleepDurationInSpt and
-acc_SptDuration (denominator). Only available at person level, because
-at night level the user can calculate this from existing variables.</td>
+guider_SptDuration (denominator) or acc_SleepDurationInSpt and
+acc_SptDuration + latency (denominator), as defined with
+relyonguider_SleepEfficiency. Only available at person level, because at
+night level the user can calculate this from existing variables.</td>
 </tr>
 <tr class="even">
 <td>n_nights_acc</td>
@@ -3133,10 +3301,10 @@ IN2MVPA | Inactivity fragments followed by MVPA |<br />
 <code>Gini_dur</code> | Gini index|<br />
 <code>CoV_dur</code> | Coefficient of Variation |<br />
 alpha | Power law exponent |<br />
-<code>x0.5</code> | Derived from power law exponent alpha, see <a href="https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub">Chastin
-et al. 201 0</a> |<br />
-<code>W0.5</code> | Derived from power law exponent alpha, see <a href="https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub">Chastin
-et al. 201 0</a> |<br />
+<code>x0.5</code> | Derived from power law exponent alpha, see <a href="https://doi.org/10.1016/j.gaitpost.2009.09.002">Chastin et al. 201
+0</a> |<br />
+<code>W0.5</code> | Derived from power law exponent alpha, see <a href="https://doi.org/10.1016/j.gaitpost.2009.09.002">Chastin et al. 201
+0</a> |<br />
 nap_count | Total number of naps, only calculated when argument
 do.sibreport = TRUE, currently optimised for 3.5-year olds. See function
 documentation for function <code>g.part5.classifyNaps</code> in the <a href="https:/CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function
@@ -3144,7 +3312,32 @@ documentation (pdf)</a>. |<br />
 nap_totalduration | Total nap duration, only calculated when argument
 do.sibreport = TRUE, currently optimised for 3.5-year old. See function
 documentation for function <code>g.part5.classifyNaps</code> in the <a href="https:/CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function
-documentation (pdf)</a>. |</div>
+documentation (pdf)</a>. |<br />
+sibreport_n_items | Only created if <code>do.sibreport = TRUE</code>.
+Number of items in the sibreport |<br />
+sibreport_n_items_day | Only created if
+<code>do.sibreport = TRUE</code>. Number of items in the sibreport for
+this specific day |<br />
+nbouts_day_X | Only created if <code>do.sibreport = TRUE</code>. Number
+of bouts in a day of X where X can be sib (sustained inactivity bout),
+srnap (self-reported nap) or srnonw (self-reported nonwear) |<br />
+noverl_X | Only created if <code>do.sibreport = TRUE</code>. Number of
+overlapping bouts in a day of X where X can be sib_srnap, sib_srnonw,
+srnap_sib, or srnonw_sib |<br />
+frag_mean_dur_X_day | Only created if <code>do.sibreport = TRUE</code>.
+Mean duration of X per day, where X can be sib, srnap or srnonw |<br />
+dur_day_X_min | Only created if <code>do.sibreport = TRUE</code>. Total
+duration in minutes of X per day, where X can be sib, srnap or srnonw
+|<br />
+mdur_X_overl_Y | Only created if <code>do.sibreport = TRUE</code>. Mean
+duration of the overlap between X and Y, which are combinations of sib,
+srnap or srnonw |<br />
+tdur_X_overl_Y | Only created if <code>do.sibreport = TRUE</code>. Total
+duration in minutes of the overlap between X and Y, which are
+combinations of sib, srnap or srnonw |<br />
+perc_X_overl_Y | Only created if <code>do.sibreport = TRUE</code>.
+Percentage of overlap between X and Y, which are combinations of sib,
+srnap or srnonw |</div>
 <p><strong>Special note if you are working on compositional data
 analysis:</strong></p>
 <p>The duration of all <code>dur_</code> variables that have
@@ -3868,8 +4061,9 @@ GGIR output.</td>
 <td>Numeric indicator of the analysis window in the recording. If
 timewindow = “MM” then these correspond to calendar days, if timewindow
 = “WW” then these correspond to which wakingup-wakingup window in the
-recording. So, in a recording of one week you may find window numbers 1,
-2, 3, 4, 5 and 6.</td>
+recording, if timewindow = “OO” then these correspond to which
+sleeponset-sleeponset window in the recording. So, in a recording of one
+week you may find window numbers 1, 2, 3, 4, 5 and 6.</td>
 </tr>
 <tr class="odd">
 <td>class_id</td>
@@ -3940,12 +4134,13 @@ the day numbers to be excluded should be listed in a column
 <h3><span class="header-section-number">5.7.3</span> Fragmentation
 metrics</h3>
 <p>When setting input argument as <code>frag.metrics=&quot;all&quot;</code> GGIR
-part 5 will perform daytime behavioural fragmentation analysis. Do this
-in combination with argument <code>part5_agg2_60seconds=TRUE</code> as
-that will aggregate the time series to 1 minute resolution as is common
-in behavioural fragmentation literature.</p>
-<p>In GGIR, a fragment is a defined as a sequence of epochs that belong
-to one of the four categories:</p>
+part 5 will perform behavioural fragmentation analysis for daytime and
+(separately) for spt. Do this in combination with argument
+<code>part5_agg2_60seconds=TRUE</code> as that will aggregate the time
+series to 1 minute resolution as is common in behavioural fragmentation
+literature.</p>
+<p>In GGIR, a fragment for daytime is a defined as a sequence of epochs
+that belong to one of the four categories:</p>
 <ol style="list-style-type: decimal">
 <li>Inactivity</li>
 <li>Light Physical Activity (LIPA)</li>
@@ -3954,9 +4149,14 @@ to one of the four categories:</p>
 </ol>
 <p>Each of these categories represents the combination of bouted and
 unbouted time in the respective categories. Inactivity and physical
-activity add up to a full day, as well as inactivity, LIPA and MVPA. The
-fragmentation metrics are applied in function
+activity add up to a full day (outside SPT), as well as inactivity, LIPA
+and MVPA. The fragmentation metrics are applied in function
 <code>g.fragmentation</code>.</p>
+<p>A fragment of SPT is defined as a sequence of epochs that belong to
+one of the four categories: 1. Estimated sleep 2. Estimated wakefulness
+3. Inactivity 4. Physical activity (can be either LIPA or MVPA)</p>
+<p>Note that from the metrics below only fragmentation metrics TP and
+NFrag are calculated for the SPT fragments.</p>
 <p><strong>Literature about these metrics:</strong></p>
 <ul>
 <li>Coefficient of Variance (<code>CoV</code>) is calculated according
@@ -3973,8 +4173,8 @@ IN.</li>
 <code>ineq</code> R package, and with it’s argument <code>corr</code>
 set to TRUE.</li>
 <li>Power law exponent metrics: Alpha, x0.5, and W0.5 are calculated
-according to <a href="https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub">Chastin
-et al. 2010</a>.</li>
+according to <a href="https://doi.org/10.1016/j.gaitpost.2009.09.002">Chastin et al.
+2010</a>.</li>
 <li>Number of fragment per minutes (<code>NFragPM</code>) is calculated
 identical to metric <code>fragmentation</code> in <a href="https://academic.oup.com/ageing/article/41/1/111/46538">Chastin et
 al. 2012</a>, but it is renamed here to be a more specific reflection of
@@ -4018,8 +4218,9 @@ fragment, but for blocks we distinguish every behavioural class, which
 includes the subcategories such as bouted and unbouted behaviour. This
 means that variables <code>Nblock_day_total_IN</code> and
 <code>Nblock_day_total_LIG</code> are identical to
-<code>Nfrag_IN_day</code> and <code>Nfrag_LIPA_day</code>,
-respectively.</p>
+<code>Nfrag_IN_day</code> and <code>Nfrag_LIPA_day</code>, respectively.
+In contrast, for fragments we may group LIPA and MVPA together when
+refering to the fragmentation of PA.</p>
 <p><strong>Differences with R package ActFrag:</strong></p>
 <p>The fragmentation functionality is loosely inspired on the great work
 done by Dr. Junrui Di and colleages in R package ActFrag, as described
@@ -4028,7 +4229,7 @@ et al. 2017</a>.</p>
 <p>However, we made a couple of a different decisions that may affect
 comparability:</p>
 <ul>
-<li>GGIR derives fragmentation metrics for day. This allows us to avoid
+<li>GGIR derives fragmentation metrics per day. This allows us to avoid
 the issue of gaps between days that need to be dealt with. Further, it
 allows us to test for behavioural differences between days of the week.
 It is well known that human behaviour can be driven by weekly rhythms,
@@ -4036,9 +4237,10 @@ e.g. work days versus weekend. Estimating fragmentation per day of the
 week allows us to study and account for such possible variation. As with
 all other GGIR variables we also report recording level aggregates of
 the daily estimates.</li>
-<li>Power law alpha exponent metrics were calculated according to <a href="https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X?via%3Dihub">Chastin
-et al. 2010</a> using the theoretical minimum fragment duration instead
-of the observed minimum fragment duration.</li>
+<li>Transition probability is according to <a href="https://doi.org/10.5665/sleep.1400">Lim et al. 2011</a></li>
+<li>Power law alpha exponent metrics were calculated according to <a href="https://doi.org/10.1016/j.gaitpost.2009.09.002">Chastin et al.
+2010</a> using the theoretical minimum fragment duration instead of the
+observed minimum fragment duration.</li>
 </ul>
 </div>
 </div>
@@ -4103,8 +4305,8 @@ LX and MX are derived per value in <code>winhr</code>. Within GGIR part
 2 MXLX is calculated per calendar day and, if argument
 <code>qwindow</code> is specified, per segment of the day. Within GGIR
 part 5 MXLX is calculated per window, and if used in combination with
-the GENEActiv accelerometer brand LUX estimates per LX and MX are
-included.</p>
+the GENEActiv or Axivity accelerometer brand LUX estimates per LX and MX
+are included.</p>
 <p>The MX metric describe here should not be confused by the MX metrics
 as proposed by <a href="https://doi.org/10.1186/s40798-019-0225-9">Rowlands et al.</a>
 which looks at accumulated most active time which may not always be
@@ -4282,6 +4484,60 @@ MX metrics as first described by <a href="https://doi.org/10.1186/s40798-019-022
 can access <a href="https://github.com/Maylor8/RadarPlotGenerator">this</a> github
 repository which provides the R code and detailed instructions on how to
 make the radar plots using your own data.</p>
+</div>
+<div id="Minimum_recording_duration" class="section level2" number="5.13">
+<h2><span class="header-section-number">5.13</span> Minimum recording
+duration</h2>
+<p>GGIR has been designed to process multi-day recordings. The minimum
+recording duration considered by GGIR depends on the type of
+analysis:</p>
+<p><strong>Running part 1 and 2</strong></p>
+<ul>
+<li><p>File size; At least 2MB, where 2MB can be adjusted with argument
+minimumFileSizeMB. This should not be changed unless you have good
+reason to believe that a smaller file size is also acceptable.</p></li>
+<li><p>Recording duration: At least two long epoch windows (default 60
+minutes) in g.readaccfile. The size of this epoch can be altered with
+the second and third value of vector argument <code>windowsizes</code>,
+where the third should not be smaller than the second. For example, in
+short lasting lab-experiments you may find it easier to set this to
+<code>windowsizes = c(5, 600, 600)</code> as non-wear detection is
+usually not necessary in lab studies.</p></li>
+</ul>
+<p><strong>Running part 3 and 4</strong></p>
+<ul>
+<li>At least one night of data is expected, where a night is expected to
+have at least the timestamp for midnight. If midnight is not found the
+sleep detection is skipped.</li>
+</ul>
+<p><strong>Running part 5</strong></p>
+<ul>
+<li>Ideally two valid consecutive nights and the waking hours in
+between.</li>
+</ul>
+</div>
+<div id="lux-sensor-data-processing" class="section level2" number="5.14">
+<h2><span class="header-section-number">5.14</span> LUX sensor data
+processing</h2>
+<p>Although GGIR focuses on accelerometer data a few brands come with
+LUX data.</p>
+<p>In part 1 GGIR calculates the peak lux per long epoch at a default
+resolution of 15 minutes, which can be modified with argument
+windowsizes. Peak light offers a more reliable estimate of light
+exposure per time window compared with taking the average. Further, LUX
+is used in the auto-calibration.</p>
+<p>In GGIR part 2 we visualise the LUX values in the qc plot. In part 3
+and 4 LUX is not used for sleep classification because relation between
+light exposure and sleep is weak.</p>
+<p>In part 5 we calculate the mean and maximum of the peak LUX per epoch
+across all waking hours of the day. Here, the mean (peak per epoch) LUX
+would then indicate average light exposure per time segment, while max
+peak would indicate the maximum light exposure per day. Further, we
+calculate the max and mean peak LUX per most active consecutive X hour
+of the day. This is intended to offer an alternative to LUX exposure
+during waking hours which relies on correct sleep classification. LUX
+exposure during M10 may be seen as an alternative if you are unsure
+whether you can trust the sleep classification in your data set.</p>
 </div>
 </div>
 <div id="other-resources" class="section level1" number="6">

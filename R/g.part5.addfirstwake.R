@@ -1,4 +1,4 @@
-g.part5.addfirstwake =function(ts, summarysleep, nightsi, sleeplog, ID, 
+g.part5.addfirstwake = function(ts, summarysleep, nightsi, sleeplog, ID, 
                                Nepochsinhour, SPTE_end) {
   # Note related to if first and last night were ignored in part 4:
   # - diur lacks the first and last night at this point in the code.
@@ -21,6 +21,9 @@ g.part5.addfirstwake =function(ts, summarysleep, nightsi, sleeplog, ID,
   }
   # test whether wake for second day is missing
   # if the full sleep period happens before midnights
+  if (length(nightsi) < 2) {
+    return(ts)
+  }
   if (firstwake > nightsi[2] | (summarysleep$sleeponset[1] < 18 &
                                 summarysleep$wakeup[1] < 18 & firstwake < nightsi[2])) { 
     wake_night1_index = c()
@@ -69,7 +72,7 @@ g.part5.addfirstwake =function(ts, summarysleep, nightsi, sleeplog, ID,
     }
     if (is.na(wake_night1_index)) wake_night1_index = 0
     if (wake_night1_index < firstwake & wake_night1_index > 1 & (wake_night1_index-1) > nightsi[1]) {
-      ts$diur[nightsi[1]:(wake_night1_index-1)] = 1
+      ts$diur[1:(wake_night1_index-1)] = 1
     } else {
       # Person slept only during the afternoon on day 2
       # And there is no sleep data available for the first night
@@ -79,8 +82,8 @@ g.part5.addfirstwake =function(ts, summarysleep, nightsi, sleeplog, ID,
       # and merging of the sleep variables is still consistent with
       # the other recording.
       dummywake = max(firstonset - round(Nepochsinhour/12), nightsi[1] + round(Nepochsinhour * 6))
-      ts$diur[nightsi[1]:dummywake] = 1 
-      ts$nonwear[nightsi[1]:firstonset] = 1
+      ts$diur[1:dummywake] = 1 
+      ts$nonwear[1:firstonset] = 1
     }
   }
   return(ts)

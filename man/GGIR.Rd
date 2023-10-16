@@ -484,6 +484,12 @@ GGIR(mode = 1:5,
         Noise level of acceleration signal in m\emph{g}-units, used when working ad-hoc .csv data formats
         using \link{read.myacc.csv}. The \link{read.myacc.csv} does not take rmc.noise as argument,
         but when interacting with \link{GGIR} or \link{g.part1} rmc.noise is used.}
+        
+      \item{rmc.scalefactor.acc}{
+        Numeric value (default 1) to scale the acceleration signals via multiplication.
+        For example, if data is provided in m/s2 then by setting this to 1/9.81
+        we would derive gravitational units.
+      }
 
       \item{frequency_tol}{
         Number (default = 0.1) as passed on to readAxivity from the GGIRread package.
@@ -492,6 +498,7 @@ GGIR(mode = 1:5,
         by lack of movement with gravitational oriationed guessed from most recent
         valid data block. Only applicable to Axivity .cwa data.
       }
+      
     }
   }
 
@@ -782,12 +789,15 @@ GGIR(mode = 1:5,
         strategy = 1 means select data based on \code{hrs.del.start} and \code{hrs.del.end}.
         strategy = 2 makes that only the data between the first
         midnight and the last midnight is used.
-        strategy = 3 only selects the most active X days in the file where X is
-        specified by argument \code{ndayswindow}, where the days are a series of 24-h blocks
-        starting any time in the day.
+        strategy = 3 selects the most active X days in the file where X is
+        specified by argument \code{ndayswindow}, where the days are a series 
+        of 24-h blocks starting any time in the day (X hours at the begining and end
+        of this period can be deleted with arguments \code{hrs.del.start} and \code{hrs.del.end})
         strategy = 4 to only use the data after the first midnight.
         strategy = 5 is similar to \code{strategy = 3}, but it selects X complete
-        calendar days where X is specified by argument \code{ndayswindow}.}
+        calendar days where X is specified by argument \code{ndayswindow} 
+        (X hours at the begining and end of this period can be deleted with 
+        arguments \code{hrs.del.start} and \code{hrs.del.end}).}
 
       \item{hrs.del.start}{
         Numeric (default = 0).
@@ -821,12 +831,26 @@ GGIR(mode = 1:5,
         0.3 indicates that at least 30 percent of the time should be valid.}
         
       \item{segmentDAYSPTcrit.part5}{
-        Numeric vector or length 2 (default = c(0, 0)).
+        Numeric vector or length 2 (default = c(0.9, 0)).
         Inclusion criteria for the proportion of the segment that should be 
         classified as day (awake) and spt (sleep period time) to be considered 
-        valid. Usually, one of the two numbers is 0, and the other defines the 
-        proportion of the segment that should be classified as day or spt.}
-
+        valid. One of the two numbers should be 0, and the other defines the 
+        proportion of the segment that should be classified as day or spt, respectively.
+        The default setting would focus on waking hour
+        segments and includes all segments that overlap for at least 90 percent 
+        with waking hours. In order to shift focus to the SPT you could use
+        c(0, 0.9) which ensures that all segments that overlap for at least
+        90 percent with the SPT are included.
+        Setting both to zero would be problematic and is not allowed as that would introduce
+        bias in behavioural estimates for the following reason: A complete segment
+        would be averaged with an incomplete segments (someone going to bed or waking up
+        in the middle of a segment) by which it is no longer clear whether the person
+        is less active or sleeps more during that segment. Similarly it is not
+        clear whether the person has more wakefulness during SPT for a segment or
+        woke up or went to bed during the segment. Therefore, a 
+        minimum value of 0.5 is required but any value closer to 1
+        would be better.
+      }
       \item{includedaycrit}{
         Numeric (default = 16).
         Minimum required number of valid hours in day specific analysis
@@ -847,7 +871,7 @@ GGIR(mode = 1:5,
       }
 
       \item{nonwear_approach}{
-        Character (default = "2013").
+        Character (default = "2023").
         Whether to use the traditional version of the non-wear detection algorithm 
         (nonwear_approach = "2013") or the new version (nonwear_approach = "2023"). 
         The 2013 version would use the longsize window (windowsizes[3], one hour 
@@ -1096,6 +1120,19 @@ GGIR(mode = 1:5,
         e.g., \code{possible_nap_dur = c(15, 240)}. Currently
         used in the context of an explorative nap classification algortihm that
         was trained in 3.5 year olds.}
+        
+      \item{sleepefficiency.metric}{
+        Numeric (default = 1).
+        If 1 (default), sleep efficiency is calculated as detected nocturnal sleep time divided by
+        log-derived duration in sleep period time (considering user-reported sleep onset and
+        wake times). If 2, sleep efficiency is calculated as detected nocturnal
+        sleep time divided by detected duration in sleep period time plus sleep latency (where
+        sleep latency refers to the difference between log-derived sleep onset and 
+        accelerometer-detected sleep onset).}
+        
+      \item{possible_nap_edge_acc}{
+        Minimum acceleration before or after the SIB for the nap to be considered.
+      }
     }
   }
 
@@ -1130,7 +1167,11 @@ GGIR(mode = 1:5,
         no need to have a column with the date followed by a column with the next 
         date. If times in the activity diary are not multiple of the short window 
         size (epoch length), the next epoch is considered (e.g., with epoch of 5 
-        seconds, 8:00:02 will be redefined as 8:00:05 in the activity log).}
+        seconds, 8:00:02 will be redefined as 8:00:05 in the activity log).
+        When using the qwindow functionality in combination with GGIR part 5 then
+        make sure to check that arguments \code{segmentWEARcrit.part5} and 
+        \code{segmentDAYSPTcrit.part5} are specfied to your research needs.
+        }
 
       \item{qwindow_dateformat}{
         Character (default = "%d-%m-%Y").
@@ -1229,7 +1270,6 @@ GGIR(mode = 1:5,
         over which L5M5 needs to be calculated. Now this is done with argument qwindow.}
 
       \item{cosinor}{
-        Argument depricated after version 1.5-24.
         Boolean (default = FALSE). Whether to apply the cosinor analysis from the ActCR package.}
 
     }
@@ -1256,7 +1296,7 @@ GGIR(mode = 1:5,
         Character (default = c("MM", "WW")).
         In \link{g.part5}: Timewindow over which summary statistics are derived.
         Value can be "MM" (midnight to midnight), "WW" (waking time to waking time),
-        or both c("MM","WW").}
+        "OO" (sleep onset to sleep onset), or any combination of them.}
 
       \item{save_ms5rawlevels}{
         Boolean (default = FALSE).
@@ -1281,7 +1321,11 @@ GGIR(mode = 1:5,
       \item{do.sibreport}{
         Boolean (default = FALSE).
         In \link{g.part4}: To indicate whether to generate report for the sustained 
-        inactivity bouts (SIB).}
+        inactivity bouts (SIB). If set to TRUE and when an advanced sleep diary is
+        available in part 4 then part 5 will use this to generate summary statistics
+        on the overlap between self-reported nonwear and napping with SIB. Here,
+        SIB cna be filter based on argument possible_nap_edge_acc and the first value
+        of possible_nap_dur}
 
       \item{do.visual}{
         Boolean (default = TRUE).

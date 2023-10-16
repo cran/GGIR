@@ -35,11 +35,13 @@ export(g.analyse, g.calibrate,
        check_params, extract_params,
        g.imputeTimegaps, g.part5.classifyNaps,
        tidyup_df, cosinorAnalyses,
-       detect_nonwear_clipping,
+       detect_nonwear_clipping, applyCosinorAnalyses,
        ShellDoc2Vignette, parametersVignette,
        correctOlderMilestoneData,
        convertEpochData, appendRecords, extractID,
-       g.part5_analyseSegment, g.part5_initialise_ts)
+       g.part5_analyseSegment, g.part5_initialise_ts,
+       g.part5.analyseRest)
+
 importFrom("grDevices", "colors", "dev.off", "pdf","rainbow","rgb")
 importFrom("graphics", "abline", "axis", "par", "plot", "plot.new",
            "rect","axis.POSIXct", "barplot", "box", "legend",
@@ -47,11 +49,11 @@ importFrom("graphics", "abline", "axis", "par", "plot", "plot.new",
 importFrom("utils", "read.csv", "sessionInfo", "write.csv",
            "installed.packages", "setTxtProgressBar",
            "txtProgressBar", "write.table", "head",
-           "memory.limit", "memory.size", "tail", "unzip")
+           "memory.limit", "memory.size", "tail", "unzip", "lsf.str")
 importFrom("stats", "aggregate.data.frame", "weighted.mean",
            "rnorm","median","aggregate","C", "lm.wfit",
            "quantile", "sd","coef", "lm", "embed", "na.pass",
-            "residuals", "fitted")
+            "residuals", "fitted", "cor")
 import(data.table)
 importFrom("methods", "is")
 importFrom("utils", "available.packages", "packageVersion", "help", "read.table")

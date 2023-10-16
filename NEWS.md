@@ -1,3 +1,65 @@
+# CHANGES IN GGIR VERSION 3.0-0
+
+- Part 1 and 2: Change default value for nonwear_approach to "2023" which labels the entire window as nonwear if conditions are met. This instead of only the middle 15 minutes as is the case for "2013" setting. Further, setting "2023" now uses a 5 Hertz version of the signals for non-wear detection, for clipping detection the code uses the original signal.
+
+- Part 2: Move cosinor analysis code to its own function in order to ease re-using it in both part 2 and part 6.
+
+- Part2: Expand cosinor analysis with R2
+
+- Part 2: Arguments hrs.del.start and hrs.del.end when combined with strategy = 3 and strategy = 5 now count
+relative to start and end of the most active time window as identified.  #905
+
+- Part 5: Change default for segmentDAYSPTcrit.part5 from c(0,0) to c(0, 0.9) and now prohibiting the use of c(0, 0) as it gives biased estimates. We knew this, but some users started using the default without attempting to understand it, by which it seems necessary to force a sensible default. #940
+
+- Part 5: Added optioned "OO" to argument timewindow, which defines windows from sleep Onset to sleep Onset #931
+
+# CHANGES IN GGIR VERSION 2.10-4
+
+- Part 4: Now better able to handle nights without sustained inactivity bouts (rest) #911
+
+- Part 5: Function g.fragmentation code cleaned up, TP formulas revised following feedback Ian Danilevicz, and code now also produces sleep fragmentation #817
+
+- Part 1: Fixed issue #914 relating to specifying timezone for processing ad-hoc csv format raw data.
+
+- Part 1: Improved recognition of ActiGraph csv that occassionally confused for Axivity csv #918
+
+- Part 1: Added argument rmc.scalefactor.acc to be used by read.myacc.csv #887
+
+- Vignette: Expanded with paragraph on minimum recording duration #835
+
+- Part 4: More informative error message when advanced sleep log has duplicate or missing dates #925
+
+- Fix recently introduced bug where GGIR environment was not exported to cluster in GGIR part 1, 2, 3, and 5 #910
+
+- Add contributing guidelines for github.io documentation #923
+
+# CHANGES IN GGIR VERSION 2.10-3
+
+- Part 1: Fixed minor bug in ismovisens that failed when datadir started with "./" #897
+
+- Part 5: Now able to assess overlap between self-reported naps and nonwear
+with sustained inactivity bouts in order to facilitate research on nap detection. Fixes #687
+
+- Part 5: Time series now also exported if recording only includes one night, even though this is not sufficient for the main part 5 analyses. #894 Further, the time series now also come with lightpeak (LUX).
+
+- Visualreport: Bug fixed extracting the numeric value of the days to exclude in g.plot5 #879
+
+- Part 1: Fixed minor bug to keep calibration data in the data quality report after re-running parts 1 and 2 with overwrite = TRUE and backup.cal.coef = "retrieve" #896
+
+- Part 5: Fix minor bug by which GGIR skipped the last day if measurement finishes before midnight and timewindow = MM #891
+
+- Part 4: Added parameter sleepefficiency.metric to decide if in-bed time (denominator) should be guider_spt or acc_spt + latency #811
+
+# CHANGES IN GGIR VERSION 2.10-2
+
+- Part 1: Revision to readability of code (credits: Lena Kushleyeva)
+
+- Part 1: Improved handling of corrupted .gt3x files #873
+
+- Part 1 + 2: Bug fixed in logging file health of Axivity data
+
+- Part 2: Addresses confusing error message for some users #888
+
 # CHANGES IN GGIR VERSION 2.10-1
 
 - Part 1 + 2: File health log captured by dependency GGIRread::readAxivity 
@@ -199,13 +261,13 @@ and incorporated in data_quality_report #866
 
 - Part 1: Deprecate brondcounts due to issues in activityCounts package
 
-- Part 5: Fix #655 (unable to handle when M5HOUR falls on midnight exactly).
+- Part 5: Fixes #655 (unable to handle when M5HOUR falls on midnight exactly).
 
 - Part 5: Additional updates that I missed in 2.8-1 in POSIXlt to character conversion to be compatible with R-devel update svn revision r82904 (2022-09-24 19:32:52)
 
-- Part5: Fix #655 (unable to handle when M5HOUR falls on midnight exactly).
+- Part5: Fixes #655 (unable to handle when M5HOUR falls on midnight exactly).
 
-- Reports: Fix #672 (improved speed of reports generation).
+- Reports: Fixes #672 (improved speed of reports generation).
 
 # CHANGES IN GGIR VERSION 2.8-1
 
@@ -371,7 +433,7 @@ and incorporated in data_quality_report #866
 
 - Minor change to parallel processing so that GGIR does not create a cluster larger than the number of files to process. Fixes #535
 
-- Part 4: Fix bug #531 re. sleeplog being ignored if first night is missing
+- Part 4: Fixes bug #531 re. sleeplog being ignored if first night is missing
 
 - Part 4: Now relies more on ID extraction in part 1-3 and only attempts to extract ID from filename if that fails. Previously it extracted the ID twice.
 
@@ -403,7 +465,7 @@ and incorporated in data_quality_report #866
 
 - Part 5: Improved handling of missing sleep estimate for first night.
 
-- General: Fix bug introduced in 2.6-0 relating to storage of configuration file on comma-separated machines
+- General: Fixes bug introduced in 2.6-0 relating to storage of configuration file on comma-separated machines
 
 - General: GGIR reports are now saved with a maximum of 3 decimal places for numeric variables.
 
@@ -461,9 +523,9 @@ and incorporated in data_quality_report #866
 
 - Part 4: Now warns when none of the IDs in the sleeplog could be matched with accelerometer data.
 
-- Part 1: read.myacc.csv fix bug with argument rmc.check4timegaps
+- Part 1: read.myacc.csv fixes bug with argument rmc.check4timegaps
 
-- Part 3: Fix #472 SRI calculation not possible when complete absence of sleep in recording
+- Part 3: Fixes #472 SRI calculation not possible when complete absence of sleep in recording
 
 - Part 5: Experimental nap detection added to report and time series, currently only model for 3.5 year olds available.
 
@@ -609,7 +671,7 @@ and incorporated in data_quality_report #866
 
 # CHANGES IN GGIR VERSION 2.2-1
 
-- Part 3 Fix bug introduced in 2.2-0 for recordings without sustained inactivity bouts
+- Part 3 Fixes bug introduced in 2.2-0 for recordings without sustained inactivity bouts
 
 - Transitioned from Travis+Appveyor CI to GitHub Actions
 
@@ -639,11 +701,11 @@ and incorporated in data_quality_report #866
 
 - Part 5 bug fixed with day name and date allocation for daysleepers for MM report
 
-- Fix bug part 4 and 5 with missing nights which are not accounted for when assessing max night number.
+- Fixes bug part 4 and 5 with missing nights which are not accounted for when assessing max night number.
 
-- Fix bug part 3 introduced in version 2.1-0 re. SPT detection for daysleepers.
+- Fixes bug part 3 introduced in version 2.1-0 re. SPT detection for daysleepers.
 
-- Fix redefinition of the time windows (with "MM") in part 5 to include all recording days when the measurement starts with multiple non-wear days.
+- Fixes redefinition of the time windows (with "MM") in part 5 to include all recording days when the measurement starts with multiple non-wear days.
 
 - GGIR version now displayed in console when running GGIR
 
@@ -781,7 +843,7 @@ and incorporated in data_quality_report #866
 
 - Fixed functionality to supply calibration coefficients file to backup.cal.coef.
 
-- Fix OSx flavor not being released on CRAN in previous version.
+- Fixes OSx flavor not being released on CRAN in previous version.
 
 - Upgrades to foreach loop to ease package maintenance
 
