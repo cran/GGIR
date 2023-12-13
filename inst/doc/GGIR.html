@@ -1603,8 +1603,9 @@ export data with timestamps. Please do not do this as this causes memory
 issues for GGIR. To cope with the absence of timestamps GGIR will
 calculate timestamps from the sample frequency, the start time and start
 date as presented in the file header.</li>
-<li><a href="https://www.movisens.com/en/">Movisens</a> with data stored
-in folders.</li>
+<li><a href="https://www.movisens.com/en/">Movisens</a> .bin files with
+data stored in folders. GGIR expects that each participant’s folder
+contains at least a file named acc.bin.</li>
 <li>Any other accelerometer brand that generates csv output, see
 documentation for functions <code>read.myacc.csv</code> and argument
 <code>rmc.noise</code> in the <a href="https://CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function
@@ -1733,14 +1734,15 @@ milestone output. Between each GGIR part, GGIR stores milestone output
 to ease re-running parts of the pipeline.</li>
 <li><code>idloc</code> - tells GGIR where to find the participant ID
 (default: inside file header)</li>
-<li><code>strategy</code> - informs GGIR how to consider the design of
-the experiment.
+<li><code>data_masking_strategy</code> - informs GGIR how to consider
+the design of the experiment.
 <ul>
-<li>If <code>strategy</code> is set to value 1, then check out arguments
-<code>hrs.del.start</code> and <code>hrs.del.end</code>.</li>
-<li>If <code>strategy</code> is set to value 3 or 5, then check out
-arguments <code>ndayswindow</code>, <code>hrs.del.start</code> and
+<li>If <code>data_masking_strategy</code> is set to value 1, then check
+out arguments <code>hrs.del.start</code> and
 <code>hrs.del.end</code>.</li>
+<li>If <code>data_masking_strategy</code> is set to value 3 or 5, then
+check out arguments <code>ndayswindow</code>, <code>hrs.del.start</code>
+and <code>hrs.del.end</code>.</li>
 </ul></li>
 <li><code>maxdur</code> - maximum number of days you expect in a data
 file based on the study protocol.</li>
@@ -1785,6 +1787,12 @@ is to monitor behaviour over larger periods of time but accelerometers
 only allow for a few weeks of data collection. GGIR will never append or
 alter the raw input file, this operation is preformed on the derived
 data.</li>
+<li><code>study_dates_file</code> - if specified trims the recorded data
+to the first and last date in which the study took place. This is
+relevant for studies that started the recording several days before the
+accelerometers were actually worn by participants. This is used on the
+top of data_masking_strategy, so that it may be combined with the
+strategies in GGIR.</li>
 </ul>
 </div>
 <div id="key-arguments-related-to-sleep-analysis" class="section level3" number="2.3.2">
@@ -2047,7 +2055,7 @@ GGIR(mode=c(1,2,3,4,5),
       #=====================
       # Part 2
       #=====================
-      strategy = 1,
+      data_masking_strategy = 1,
       hrs.del.start = 0,          hrs.del.end = 0,
       maxdur = 9,                 includedaycrit = 16,
       qwindow=c(0,24),
@@ -2437,8 +2445,9 @@ an ENMO metric threshold of 100 based on a bout criteria of 100</td>
 <td><code>WE_[100, 150)_mg_0-24h_ENMO</code></td>
 <td>Time spent between (and including) 100 mg and 150 (excluding 150
 itself) between 0 and 24 hours (the full day) using metric ENMO data
-exclusion strategy (value=1, ignore specific hours; value=2, ignore all
-data before the first midnight and after the last midnight)</td>
+exclusion data_masking_strategy (value=1, ignore specific hours;
+value=2, ignore all data before the first midnight and after the last
+midnight)</td>
 </tr>
 <tr class="even">
 <td><code>_M VPA_E5S_B1M80_T100</code></td>
@@ -2453,27 +2462,33 @@ left blank</td>
 according to AD, WD, WWE, WWD</td>
 </tr>
 <tr class="even">
-<td>data exclusion strategy</td>
+<td>data exclusion data_masking_strategy</td>
 <td>A log of the decision made when calling g.impute: value=1 mean
 ignore specific hours; value=2 mean ignore all data before the first
 midnight and after the last midnight</td>
 </tr>
 <tr class="odd">
-<td>n hours ignored at start of meas (if strategy=1, 3 or 5)</td>
-<td>number of hours ignored at the start of the measurement (if strategy
-= 1) or at the start of the <code>ndayswindow</code> (if strategy = 3 or
-5) A log of decision made in part2.R</td>
+<td>n hours ignored at start of meas (if data_masking_strategy=1, 3 or
+5)</td>
+<td>number of hours ignored at the start of the measurement (if
+data_masking_strategy = 1) or at the start of the
+<code>ndayswindow</code> (if data_masking_strategy = 3 or 5) A log of
+decision made in part2.R</td>
 </tr>
 <tr class="even">
-<td>n hours ignored at end of meas (if strategy=1, 3 or 5)</td>
-<td>number of hours ignored at the end of the measurement (if strategy =
-1) or at the end of the <code>ndayswindow</code> (if strategy = 3 or 5).
-A log of decision made in part2.R</td>
+<td>n hours ignored at end of meas (if data_masking_strategy=1, 3 or
+5)</td>
+<td>number of hours ignored at the end of the measurement (if
+data_masking_strategy = 1) or at the end of the <code>ndayswindow</code>
+(if data_masking_strategy = 3 or 5). A log of decision made in
+part2.R</td>
 </tr>
 <tr class="odd">
-<td>n hours ignored at end of meas (if strategy = 1, 3 or 5)</td>
+<td>n hours ignored at end of meas (if data_masking_strategy = 1, 3 or
+5)</td>
 <td>number of days of measurement after which all data is ignored (if
-strategy = 1, 3 or 5) A log of decision made in part2.R</td>
+data_masking_strategy = 1, 3 or 5) A log of decision made in
+part2.R</td>
 </tr>
 <tr class="even">
 <td>epoch size to which acceleration was averaged (seconds)</td>
@@ -2681,22 +2696,23 @@ auto-calibration</td>
 </tr>
 <tr class="odd">
 <td>NFilePagesSkipped</td>
-<td>(Only for Axivity .cwa format) Number of data blocks skipped</td>
+<td>(Only for Axivity .cwa format) Number of raw data blocks
+skipped</td>
 </tr>
 <tr class="even">
 <td>filehealth_totimp_min</td>
-<td>(Only for Axivity .cwa format) Total number of minutes of data
-imputed</td>
+<td>(Only for Axivity .cwa, ActiGraph gt3x, and ad-hoc csv format) Total
+number of minutes of raw data imputed</td>
 </tr>
 <tr class="odd">
 <td>filehealth_checksumfail_min</td>
-<td>(Only for Axivity .cwa format) Total number of minutes of data where
-the checksum failed</td>
+<td>(Only for Axivity .cwa format) Total number of minutes of raw data
+where the checksum failed</td>
 </tr>
 <tr class="even">
 <td>filehealth_niblockid_min</td>
-<td>(Only for Axivity .cwa format) Total number of minutes of data with
-non-incremental block ids</td>
+<td>(Only for Axivity .cwa format) Total number of minutes of raw data
+with non-incremental block ids</td>
 </tr>
 <tr class="odd">
 <td>filehealth_fbias0510_min</td>
@@ -2720,8 +2736,8 @@ sampling frequency bias higher than 30%</td>
 </tr>
 <tr class="odd">
 <td>filehealth_totimp_N</td>
-<td>(Only for Axivity .cwa format) Total number of data blocks that were
-imputed</td>
+<td>(Only for Axivity .cwa, ActiGraph gt3x, and ad-hoc csv format) Total
+number of data blocks that were imputed</td>
 </tr>
 <tr class="even">
 <td>filehealth_checksumfail_N</td>
@@ -2730,28 +2746,28 @@ checksum failed</td>
 </tr>
 <tr class="odd">
 <td>filehealth_niblockid_N</td>
-<td>(Only for Axivity .cwa format) Total number of data blocks with
+<td>(Only for Axivity .cwa format) Total number of raw data blocks with
 non-incremental block ids</td>
 </tr>
 <tr class="even">
 <td>filehealth_fbias0510_N</td>
-<td>(Only for Axivity .cwa format) Total number of data blocks with a
-sampling frequency bias between 5 and 10%</td>
+<td>(Only for Axivity .cwa format) Total number of raw data blocks with
+a sampling frequency bias between 5 and 10%</td>
 </tr>
 <tr class="odd">
 <td>filehealth_fbias1020_N</td>
-<td>(Only for Axivity .cwa format) Total number of data blocks with a
-sampling frequency bias between 10 and 20%</td>
+<td>(Only for Axivity .cwa format) Total number of raw data blocks with
+a sampling frequency bias between 10 and 20%</td>
 </tr>
 <tr class="even">
 <td>filehealth_fbias2030_N</td>
-<td>(Only for Axivity .cwa format) Total number of data blocks with a
-sampling frequency bias between 20 and 30%</td>
+<td>(Only for Axivity .cwa format) Total number of raw data blocks with
+a sampling frequency bias between 20 and 30%</td>
 </tr>
 <tr class="odd">
 <td>filehealth_fbias30_N</td>
-<td>(Only for Axivity .cwa format) Total number of data blocks with a
-sampling frequency bias higher than 30%</td>
+<td>(Only for Axivity .cwa format) Total number of raw data blocks with
+a sampling frequency bias higher than 30%</td>
 </tr>
 </tbody>
 </table>
@@ -2990,9 +3006,10 @@ data. If either of these applies set argument
 </tr>
 <tr class="even">
 <td>sleepefficiency</td>
-<td>Sleep efficiency, calculated as: SleepDurationInSpt /
-guider_inbedDuration or SleepDurationInSpt / (Spt + latency) as defined
-with <code>relyonguider_SleepEfficiency</code></td>
+<td>Sleep efficiency, calculated by one of two metrics as controlled by
+argument <code>sleepefficiency.metric</code>: SleepDurationInSpt /
+guider_inbedDuration (default) or SleepDurationInSpt / (SptDuration +
+latency)</td>
 </tr>
 <tr class="odd">
 <td>sleeplatency</td>
@@ -3213,131 +3230,276 @@ acc.metric</td>
 </tr>
 <tr class="odd">
 <td><code>_IN_</code></td>
-<td>Inactivity. Note that we use the term inactivity instead</td>
+<td>Inactivity. Note that we use the term inactivity instead of
+sedentary behaviour for the lowest intensity level of behaviour. The
+reason for this is that GGIR does not attempt to classifying the
+activity type sitting at the moment, by which we feel that using the
+term sedentary behaviour would fail to communicate that.</td>
+</tr>
+<tr class="even">
+<td><code>_LIG_</code></td>
+<td>Light activity</td>
+</tr>
+<tr class="odd">
+<td><code>_MOD_</code></td>
+<td>Moderate activity</td>
+</tr>
+<tr class="even">
+<td><code>_VIG_</code></td>
+<td>Vigorous activity</td>
+</tr>
+<tr class="odd">
+<td><code>_MVPA_</code></td>
+<td>Moderate or Vigorous activity</td>
+</tr>
+<tr class="even">
+<td><code>_unbt_</code></td>
+<td>Unbouted</td>
+</tr>
+<tr class="odd">
+<td><code>_bts_</code></td>
+<td>Bouts (also known as sojourns), which are segments that for which
+the acceleration is within a specified range for a specified fraction of
+the time.</td>
+</tr>
+<tr class="even">
+<td><code>_bts_1_10_</code></td>
+<td>Bouts lasting at least 1 minute and less than 10 minutes (1 and 9.99
+minutes are included, but 10 minutes is not).</td>
+</tr>
+<tr class="odd">
+<td>Nblock</td>
+<td>number of blocks of a certain behavioral class, not these are not
+bouts but a count of the number of times the behavioral class occurs
+without interruptions.</td>
+</tr>
+<tr class="even">
+<td>WW</td>
+<td>in filename refers to analyses based on the timewindow from waking
+to waking up</td>
+</tr>
+<tr class="odd">
+<td>MM</td>
+<td>in filename refers to analyses done on windows between midnight and
+midnight</td>
+</tr>
+<tr class="even">
+<td>calendar_date</td>
+<td>calendar date on which the window started in day/month/year format.
+So, for WW window this could mean that you have two windows starting on
+the same date.</td>
+</tr>
+<tr class="odd">
+<td>weekday</td>
+<td>weekday on which the window started. So, for WW window this could
+mean that you have two windows starting on the weekday.</td>
+</tr>
+<tr class="even">
+<td><code>_total_IN</code></td>
+<td>total time spent in inactivity (no distinction between bouted or
+unbouted behavior, this is a simple count of the number of epochs that
+meet the threshold criteria.</td>
+</tr>
+<tr class="odd">
+<td><code>_total_LIG</code></td>
+<td>total time spent in light activity.</td>
+</tr>
+<tr class="even">
+<td>nonwear_perc_day</td>
+<td>Non-wear percentage during the waking hours of this day.</td>
+</tr>
+<tr class="odd">
+<td>nonwear_perc_spt</td>
+<td>Non-wear percentage during the spt hours of this day.</td>
+</tr>
+<tr class="even">
+<td>nonwear_perc_day_spt</td>
+<td>Non-wear percentage during the whole day, including waking and
+spt.</td>
+</tr>
+<tr class="odd">
+<td>dur_day_min</td>
+<td>Duration of waking hours within this day window</td>
+</tr>
+<tr class="even">
+<td>dur_spt_min</td>
+<td>Duration of Sleep Period Time within this day window.</td>
+</tr>
+<tr class="odd">
+<td>dur_day_spt_min</td>
+<td>Duration this day window, including both waking hours and SPT.</td>
+</tr>
+<tr class="even">
+<td>sleep_efficiency</td>
+<td>sleep_efficiency in part 5 is not the same as in part 4, but
+calculated as the percentage of sleep within the sleep period time
+window. The conventional approach is the approach used in part 4.</td>
+</tr>
+<tr class="odd">
+<td>L5TIME</td>
+<td>Timing of least active 5hrs, expressed as timestamp in the day</td>
+</tr>
+<tr class="even">
+<td>M5TIME</td>
+<td>Timing of most active 5hrs</td>
+</tr>
+<tr class="odd">
+<td>L5TIME_num, M5TIME_num</td>
+<td>Timing of least/most active 5hrs, expressed as hours in the day.
+Note that L5/M5 timing variables are difficult to average across days
+because 23:00 and 1:00 would average to noon and not to midnight. So,
+caution is needed when interpreting person averages.</td>
+</tr>
+<tr class="even">
+<td>L5VALUE</td>
+<td>Acceleration value for least active 5hrs</td>
+</tr>
+<tr class="odd">
+<td>M5VALUE</td>
+<td>Acceleration value for most active 5hrs</td>
+</tr>
+<tr class="even">
+<td><code>ig_</code></td>
+<td>All variables related to intensity gradient analysis</td>
+</tr>
+<tr class="odd">
+<td><code>_gradient</code></td>
+<td>Gradient from intensity gradient analysis proposed by <a href="https://journals.lww.com/acsm-msse/Fulltext/2018/06000/Beyond_Cut_%20Points__Accelerometer_Metrics_that.25.aspx">Rowlands
+et al. 2018</a> for the waking hours window (<code>_day_</code>) and for
+the full window (<code>_day_spt_</code>)</td>
+</tr>
+<tr class="even">
+<td><code>_intercept</code></td>
+<td>Intercept from intensity gradient analysis proposed by <a href="https://journals.lww.com/acsm-msse/Fulltext/2018/06000/Beyond_Cut_%20Points__Accelerometer_Metrics_that.25.aspx">Rowlands
+et al. 2018</a> for the waking hours window (<code>_day_</code>) and for
+the full window (<code>_day_spt_</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>_rsquared</code></td>
+<td>r squared from intensity gradient analysis proposed by <a href="https://journals.lww.com/acsm-msse/Fulltext/2018/06000/Beyond_Cut_%20Points__Accelerometer_Metrics_that.25.aspx">Rowlands
+et al. 2018</a> for the waking hours window (<code>_day_</code>) and for
+the full window (<code>_day_spt_</code>)</td>
+</tr>
+<tr class="even">
+<td><code>FRAG_</code></td>
+<td>All variables related to behavioural fragmentation analysis</td>
+</tr>
+<tr class="odd">
+<td><code>TP_</code></td>
+<td>Transition probability</td>
+</tr>
+<tr class="even">
+<td>PA2IN</td>
+<td>Physical activity fragments followed by inactivity fragments</td>
+</tr>
+<tr class="odd">
+<td>IN2PA</td>
+<td>Physical inactivity fragments followed by activity fragments</td>
+</tr>
+<tr class="even">
+<td>Nfrag</td>
+<td>Number of fragments</td>
+</tr>
+<tr class="odd">
+<td>IN2LIPA</td>
+<td>Inactivity fragments followed by LIPA</td>
+</tr>
+<tr class="even">
+<td>IN2MVPA</td>
+<td>Inactivity fragments followed by MVPA</td>
+</tr>
+<tr class="odd">
+<td><code>mean_dur</code></td>
+<td>mean duration of a fragment category</td>
+</tr>
+<tr class="even">
+<td><code>Gini_dur</code></td>
+<td>Gini index</td>
+</tr>
+<tr class="odd">
+<td><code>CoV_dur</code></td>
+<td>Coefficient of Variation</td>
+</tr>
+<tr class="even">
+<td>alpha</td>
+<td>Power law exponent</td>
+</tr>
+<tr class="odd">
+<td><code>x0.5</code></td>
+<td>Derived from power law exponent alpha, see <a href="https://doi.org/10.1016/j.gaitpost.2009.09.002">Chastin et al. 201
+0</a></td>
+</tr>
+<tr class="even">
+<td><code>W0.5</code></td>
+<td>Derived from power law exponent alpha, see <a href="https://doi.org/10.1016/j.gaitpost.2009.09.002">Chastin et al. 201
+0</a></td>
+</tr>
+<tr class="odd">
+<td>nap_count</td>
+<td>Total number of naps, only calculated when argument do.sibreport =
+TRUE, currently optimised for 3.5-year olds. See function documentation
+for function <code>g.part5.classifyNaps</code> in the <a href="https:/CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function
+documentation (pdf)</a>.</td>
+</tr>
+<tr class="even">
+<td>nap_totalduration</td>
+<td>Total nap duration, only calculated when argument do.sibreport =
+TRUE, currently optimised for 3.5-year old. See function documentation
+for function <code>g.part5.classifyNaps</code> in the <a href="https:/CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function
+documentation (pdf)</a>.</td>
+</tr>
+<tr class="odd">
+<td>sibreport_n_items</td>
+<td>Only created if <code>do.sibreport = TRUE</code>. Number of items in
+the sibreport</td>
+</tr>
+<tr class="even">
+<td>sibreport_n_items_day</td>
+<td>Only created if <code>do.sibreport = TRUE</code>. Number of items in
+the sibreport for this specific day</td>
+</tr>
+<tr class="odd">
+<td>nbouts_day_X</td>
+<td>Only created if <code>do.sibreport = TRUE</code>. Number of bouts in
+a day of X where X can be sib (sustained inactivity bout), srnap
+(self-reported nap) or srnonw (self-reported nonwear)</td>
+</tr>
+<tr class="even">
+<td>noverl_X</td>
+<td>Only created if <code>do.sibreport = TRUE</code>. Number of
+overlapping bouts in a day of X where X can be sib_srnap, sib_srnonw,
+srnap_sib, or srnonw_sib</td>
+</tr>
+<tr class="odd">
+<td>frag_mean_dur_X_day</td>
+<td>Only created if <code>do.sibreport = TRUE</code>. Mean duration of X
+per day, where X can be sib, srnap or srnonw</td>
+</tr>
+<tr class="even">
+<td>dur_day_X_min</td>
+<td>Only created if <code>do.sibreport = TRUE</code>. Total duration in
+minutes of X per day, where X can be sib, srnap or srnonw</td>
+</tr>
+<tr class="odd">
+<td>mdur_X_overl_Y</td>
+<td>Only created if <code>do.sibreport = TRUE</code>. Mean duration of
+the overlap between X and Y, which are combinations of sib, srnap or
+srnonw</td>
+</tr>
+<tr class="even">
+<td>tdur_X_overl_Y</td>
+<td>Only created if <code>do.sibreport = TRUE</code>. Total duration in
+minutes of the overlap between X and Y, which are combinations of sib,
+srnap or srnonw</td>
+</tr>
+<tr class="odd">
+<td>perc_X_overl_Y</td>
+<td>Only created if <code>do.sibreport = TRUE</code>. Percentage of
+overlap between X and Y, which are combinations of sib, srnap or
+srnonw</td>
 </tr>
 </tbody>
 </table>
-<pre><code>    of sedentary behaviour for the lowest intensity level of behaviour. The reason
-    for this is that GGIR does not attempt to classifying the activity type 
-    sitting at the moment, by which we feel that using the term sedentary
-    behaviour would fail to communicate that.|</code></pre>
-<div class="line-block"><code>_LIG_</code> | Light activity |<br />
-<code>_MOD_</code> | Moderate activity |<br />
-<code>_VIG_</code> | Vigorous activity |<br />
-<code>_MVPA_</code> | Moderate or Vigorous activity |<br />
-<code>_unbt_</code> | Unbouted |<br />
-<code>_bts_</code> | Bouts (also known as sojourns), which are segments
-that for which the acceleration is within a specified range for a
-specified fraction of the time.|<br />
-<code>_bts_1_10_</code>| Bouts lasting at least 1 minute and less than
-10 minutes (1 and 9.99 minutes are included, but 10 minutes is not).
-|<br />
-Nblock | number of blocks of a certain behavioral class, not these are
-not bouts but a count of the number of times the behavioral class occurs
-without interruptions. |<br />
-WW | in filename refers to analyses based on the timewindow from waking
-to waking up |<br />
-MM | in filename refers to analyses done on windows between midnight and
-midnight |<br />
-calendar_date | calendar date on which the window started in
-day/month/year format. So, for WW window this could mean that you have
-two windows starting on the same date. |<br />
-weekday | weekday on which the window started. So, for WW window this
-could mean that you have two windows starting on the weekday. |<br />
-<code>_total_IN</code> | total time spent in inactivity (no distinction
-between bouted or unbouted behavior, this is a simple count of the
-number of epochs that meet the threshold criteria. |<br />
-<code>_total_LIG</code>| total time spent in light activity.|<br />
-nonwear_perc_day | Non-wear percentage during the waking hours of this
-day. |<br />
-nonwear_perc_spt | Non-wear percentage during the spt hours of this day.
-|<br />
-nonwear_perc_day_spt | Non-wear percentage during the whole day,
-including waking and spt. |<br />
-dur_day_min | Duration of waking hours within this day window|<br />
-dur_spt_min | Duration of Sleep Period Time within this day window.
-|<br />
-dur_day_spt_min | Duration this day window, including both waking hours
-and SPT. |<br />
-sleep_efficiency | sleep_efficiency in part 5 is not the same as in part
-4, but calculated as the percentage of sleep within the sleep period
-time window. The conventional approach is the approach used in part 4.
-|<br />
-L5TIME | Timing of least active 5hrs, expressed as timestamp in the day
-|<br />
-M5TIME | Timing of most active 5hrs |<br />
-L5TIME_num, M5TIME_num | Timing of least/most active 5hrs, expressed as
-hours in the day. Note that L5/M5 timing variables are difficult to
-average across days because 23:00 and 1:00 would average to noon and not
-to midnight. So, caution is needed when interpreting person averages.
-|<br />
-L5VALUE | Acceleration value for least active 5hrs |<br />
-M5VALUE | Acceleration value for most active 5hrs |<br />
-<code>ig_</code> | All variables related to intensity gradient analysis
-|<br />
-<code>_gradient</code> | Gradient from intensity gradient analysis
-proposed by <a href="https://journals.lww.com/acsm-msse/Fulltext/2018/06000/Beyond_Cut_%20Points__Accelerometer_Metrics_that.25.aspx">Rowlands
-et al. 2018</a> for the waking hours window (<code>_day_</code>) and for
-the full window (<code>_day_spt_</code>) |<br />
-<code>_intercept</code> | Intercept from intensity gradient analysis
-proposed by <a href="https://journals.lww.com/acsm-msse/Fulltext/2018/06000/Beyond_Cut_%20Points__Accelerometer_Metrics_that.25.aspx">Rowlands
-et al. 2018</a> for the waking hours window (<code>_day_</code>) and for
-the full window (<code>_day_spt_</code>) |<br />
-<code>_rsquared</code> | r squared from intensity gradient analysis
-proposed by <a href="https://journals.lww.com/acsm-msse/Fulltext/2018/06000/Beyond_Cut_%20Points__Accelerometer_Metrics_that.25.aspx">Rowlands
-et al. 2018</a> for the waking hours window (<code>_day_</code>) and for
-the full window (<code>_day_spt_</code>) |<br />
-<code>FRAG_</code> | All variables related to behavioural fragmentation
-analysis |<br />
-<code>TP_</code> | Transition probability|<br />
-PA2IN | Physical activity fragments followed by inactivity
-fragments|<br />
-IN2PA | Physical inactivity fragments followed by activity
-fragments|<br />
-Nfrag | Number of fragments |<br />
-IN2LIPA | Inactivity fragments followed by LIPA |<br />
-IN2MVPA | Inactivity fragments followed by MVPA |<br />
-<code>mean_dur</code> | mean duration of a fragment category |<br />
-<code>Gini_dur</code> | Gini index|<br />
-<code>CoV_dur</code> | Coefficient of Variation |<br />
-alpha | Power law exponent |<br />
-<code>x0.5</code> | Derived from power law exponent alpha, see <a href="https://doi.org/10.1016/j.gaitpost.2009.09.002">Chastin et al. 201
-0</a> |<br />
-<code>W0.5</code> | Derived from power law exponent alpha, see <a href="https://doi.org/10.1016/j.gaitpost.2009.09.002">Chastin et al. 201
-0</a> |<br />
-nap_count | Total number of naps, only calculated when argument
-do.sibreport = TRUE, currently optimised for 3.5-year olds. See function
-documentation for function <code>g.part5.classifyNaps</code> in the <a href="https:/CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function
-documentation (pdf)</a>. |<br />
-nap_totalduration | Total nap duration, only calculated when argument
-do.sibreport = TRUE, currently optimised for 3.5-year old. See function
-documentation for function <code>g.part5.classifyNaps</code> in the <a href="https:/CRAN.R-project.org/package=GGIR/GGIR.pdf">GGIR function
-documentation (pdf)</a>. |<br />
-sibreport_n_items | Only created if <code>do.sibreport = TRUE</code>.
-Number of items in the sibreport |<br />
-sibreport_n_items_day | Only created if
-<code>do.sibreport = TRUE</code>. Number of items in the sibreport for
-this specific day |<br />
-nbouts_day_X | Only created if <code>do.sibreport = TRUE</code>. Number
-of bouts in a day of X where X can be sib (sustained inactivity bout),
-srnap (self-reported nap) or srnonw (self-reported nonwear) |<br />
-noverl_X | Only created if <code>do.sibreport = TRUE</code>. Number of
-overlapping bouts in a day of X where X can be sib_srnap, sib_srnonw,
-srnap_sib, or srnonw_sib |<br />
-frag_mean_dur_X_day | Only created if <code>do.sibreport = TRUE</code>.
-Mean duration of X per day, where X can be sib, srnap or srnonw |<br />
-dur_day_X_min | Only created if <code>do.sibreport = TRUE</code>. Total
-duration in minutes of X per day, where X can be sib, srnap or srnonw
-|<br />
-mdur_X_overl_Y | Only created if <code>do.sibreport = TRUE</code>. Mean
-duration of the overlap between X and Y, which are combinations of sib,
-srnap or srnonw |<br />
-tdur_X_overl_Y | Only created if <code>do.sibreport = TRUE</code>. Total
-duration in minutes of the overlap between X and Y, which are
-combinations of sib, srnap or srnonw |<br />
-perc_X_overl_Y | Only created if <code>do.sibreport = TRUE</code>.
-Percentage of overlap between X and Y, which are combinations of sib,
-srnap or srnonw |</div>
 <p><strong>Special note if you are working on compositional data
 analysis:</strong></p>
 <p>The duration of all <code>dur_</code> variables that have
@@ -4041,6 +4203,18 @@ columns:</strong></p>
 </thead>
 <tbody>
 <tr class="odd">
+<td>timenum</td>
+<td>Time stamp in UTC time format (i.e., seconds since 1970-01-01). To
+convert timenum to time stamp format, you need to specify your desired
+time zone, e.g.,
+<code>as.POSIXct(mdat$timenum, tz = &quot;Europe/London&quot;)</code>.</td>
+</tr>
+<tr class="even">
+<td>ACC</td>
+<td>Average acceleration metric selected by <code>acc.metric</code>,
+default = “ENMO”.</td>
+</tr>
+<tr class="odd">
 <td>SleepPeriodTime</td>
 <td>Is 1 if SPT is detected, 0 if not. Note that this refers to the
 combined usage of guider and detected sustained inactivity bouts (rest
@@ -4052,9 +4226,8 @@ periods).</td>
 </tr>
 <tr class="odd">
 <td>guider</td>
-<td>Is 1 if guider method detect epoch as SPT (e.g. sleeplog, HDCZA), 0
-if not. You will not find here which guider is used, for this see other
-GGIR output.</td>
+<td>Number to indicate what guider type was used, where 1=sleeplog,
+2=HDCZA, 3=swetwindow, 4=L512, 5=HorAngle, 6=NotWorn</td>
 </tr>
 <tr class="even">
 <td>window</td>
@@ -4088,6 +4261,11 @@ data.</td>
 <td>invalid_wakinghours</td>
 <td>Fraction of SPT within the current window that represents invalid
 data.</td>
+</tr>
+<tr class="odd">
+<td>timestamp</td>
+<td>Time stamp derived from converting the column timenum, only
+available if <code>save_ms5raw_format = TRUE</code>.</td>
 </tr>
 </tbody>
 </table>

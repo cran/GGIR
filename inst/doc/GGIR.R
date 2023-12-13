@@ -37,7 +37,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #        #=====================
 #        # Part 2
 #        #=====================
-#        strategy = 1,
+#        data_masking_strategy = 1,
 #        hrs.del.start = 0,          hrs.del.end = 0,
 #        maxdur = 9,                 includedaycrit = 16,
 #        qwindow=c(0,24),
