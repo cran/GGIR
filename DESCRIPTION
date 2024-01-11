@@ -1,8 +1,8 @@
 Package: GGIR
 Type: Package
 Title: Raw Accelerometer Data Analysis
-Version: 3.0-2
-Date: 2023-12-13
+Version: 3.0-3
+Date: 2024-01-11
 Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                     email="v.vanhees@accelting.com"),
              person("Jairo H","Migueles",role="aut",
@@ -38,7 +38,7 @@ Imports: data.table, foreach, doParallel, signal, zoo, unisensR, ineq,
 Depends: stats, utils, R (>= 3.5)
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2023-12-13 16:06:50 UTC; vvanh
+Packaged: 2024-01-11 13:02:23 UTC; vvanh
 Author: Vincent T van Hees [aut, cre],
   Jairo H Migueles [aut] (<https://orcid.org/0000-0003-0366-6935>),
   Severine Sabia [ctb],
@@ -56,4 +56,4 @@ Author: Vincent T van Hees [aut, cre],
   French National Research Agency [cph, fnd],
   Chenxuan Zhao [ctb]
 Repository: CRAN
-Date/Publication: 2023-12-13 17:40:06 UTC
+Date/Publication: 2024-01-11 13:40:08 UTC
