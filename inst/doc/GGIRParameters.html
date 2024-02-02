@@ -2254,10 +2254,10 @@ arguments/parameters overview</h1>
 <tr class="even">
 <td>relyonsleeplog</td>
 <td>4</td>
-<td>not in parameter objects</td>
+<td>deprecated</td>
 </tr>
 <tr class="odd">
-<td>relyonguider_SleepEfficiency</td>
+<td>sleepefficiency.metric</td>
 <td>4</td>
 <td>params_sleep</td>
 </tr>
@@ -2432,7 +2432,9 @@ arguments</h2>
 <h3 class="unnumbered">mode</h3>
 <p>Numeric (default = 1:5). Specify which of the five parts need to be
 run, e.g., mode = 1 makes that g.part1 is run; or mode = 1:5 makes that
-the whole GGIR pipeline is run, from g.part1 to g.part5.</p>
+the whole GGIR pipeline is run, from g.part1 to g.part5. Optionally mode
+can also include the number 6 to tell GGIR to run g.part6 which is
+currently under development.</p>
 </div>
 <div id="datadir" class="section level3 unnumbered">
 <h3 class="unnumbered">datadir</h3>
@@ -2628,15 +2630,20 @@ biased output.</p>
 <div id="dataformat" class="section level3 unnumbered">
 <h3 class="unnumbered">dataFormat</h3>
 <p>Character (default = “raw”). To indicate what the format is of the
-data in datadir. Current alternatives: ukbiobank_csv, actiwatch_csv,
-actiwatch_awd, and actigraph_csv, which correspond to epoch level data
-files from, respecitively, UK Biobank in csv format, Actiwatch in csv
-format, Actiwatch in awd format, and ActiGraph csv format. Here, the
-assumed epoch size for UK Biobank csv data is 5 seconds. The epoch size
-for the other non-raw data formats is flexible, but make sure that you
-set first value of argument windowsizes needs to be set accordingly.
-Also when working with non-raw data formats specify argument
-extEpochData_timeformat as documented below.</p>
+data in datadir. Alternatives: ukbiobank_csv, actiwatch_csv,
+actiwatch_awd, actigraph_csv, and sensewear_xls, which correspond to
+epoch level data files from, respecitively, UK Biobank in csv format,
+Actiwatch in csv format, Actiwatch in awd format, ActiGraph csv format,
+and Sensewear in xls format (also works with xlsx). Here, the assumed
+epoch size for UK Biobank csvdata is 5 seconds. The epoch size for the
+other non-raw data formats is flexible, but make sure that you set first
+value of argument windowsizes accordingly. Also when working with
+non-raw data formats specify argument extEpochData_timeformat as
+documented below. For ukbiobank_csv nonwear is a column in the data
+itself, for actiwatch_csv, actiwatch_awd, actigraph_csv, and
+sensewear_xls non-wear is detected as 60 minute rolling zeros. The
+length of this window can be modified with the third value of argument
+windowsizes expressed in seconds.</p>
 </div>
 <div id="maxrecordinginterval" class="section level3 unnumbered">
 <h3 class="unnumbered">maxRecordingInterval</h3>
@@ -2657,9 +2664,9 @@ filenames of the respective recording.</p>
 <h3 class="unnumbered">extEpochData_timeformat</h3>
 <p>Character (default = “%d-%m-%Y %H:%M:%S”). To specify the time format
 used in the external epoch level data when argument dataFormat is set to
-“actiwatch_csv”, “actiwatch_awd”, or “actigraph_csv”. For example
-“%Y-%m-%d %I:%M:%S %p” for “2023-07-11 01:24:01 PM” or “%m/%d/%Y
-%H:%M:%S” “2023-07-11 13:24:01”</p>
+“actiwatch_csv”, “actiwatch_awd”, “actigraph_csv” or “sensewear_xls”.
+For example “%Y-%m-%d %I:%M:%S %p” for “2023-07-11 01:24:01 PM” or
+“%m/%d/%Y %H:%M:%S” “2023-07-11 13:24:01”</p>
 </div>
 </div>
 <div id="raw-data-parameters" class="section level2" number="2.3">
@@ -2668,9 +2675,12 @@ Parameters</h2>
 <div id="chunksize" class="section level3 unnumbered">
 <h3 class="unnumbered">chunksize</h3>
 <p>Numeric (default = 1). Value between 0.2 and 1 to specify the size of
-chunks to be loaded as a fraction of a 12 hour period, e.g., 0.5 equals
-6 hour chunks, 1 equals 12 hour chunks. For machines with less than 4Gb
-of RAM memory a value below 1 is recommended.</p>
+chunks to be loaded as a fraction of an approximately 12 hour period for
+auto-calibration procedure and as fraction of 24 hour period for the
+metric calculation, e.g., 0.5 equals 6 and 12 hour chunks, respectively.
+For machines with less than 4Gb of RAM memory or with &lt; 2GB memory
+per process when using do.parallel = TRUE a value below 1 is
+recommended.</p>
 </div>
 <div id="spherecrit" class="section level3 unnumbered">
 <h3 class="unnumbered">spherecrit</h3>
@@ -3211,9 +3221,10 @@ when data_masking_strategy = 1.</p>
 </div>
 <div id="includedaycrit.part5" class="section level3 unnumbered">
 <h3 class="unnumbered">includedaycrit.part5</h3>
-<p>Numeric (default = 2/3). Inclusion criteria for number of valid
-hours, either as expressed as a ratio of 1 or as the number of hours in
-a 24 hour day.</p>
+<p>Numeric (default = 2/3). Inclusion criteria for number of valid hours
+during the waking hours of a day, either as expressed as a ratio of 1 or
+as the number of hours, which is converted by GGIR to a ratio. For
+example 16 become 16/24=2/3.</p>
 </div>
 <div id="excludefirstlast.part5" class="section level3 unnumbered">
 <h3 class="unnumbered">excludefirstlast.part5</h3>
@@ -3385,7 +3396,9 @@ van Hees et al. 2018. Other options included: “HorAngle”, which is based
 on HDCZA but replaces non-movement detection of the HDCZA algorithm by
 looking for time segments where the angle of the longitudinal sensor
 axis has an angle relative to the horizontal plane between -45 and +45
-degrees.</p>
+degrees. And “NotWorn” which is also the same as HDCZA but looks for
+time segments when the 5 minute rolling average of counts is below 20
+per cent of its standard deviation.</p>
 </div>
 <div id="hasib.algo" class="section level3 unnumbered">
 <h3 class="unnumbered">HASIB.algo</h3>
@@ -3402,8 +3415,9 @@ Actigraphy such as Galland2012.</p>
 <div id="longitudinal_axis" class="section level3 unnumbered">
 <h3 class="unnumbered">longitudinal_axis</h3>
 <p>Integer (default = NULL). To indicate which axis is the longitudinal
-axis. If not provided, the function will estimate longitudinal axis.
-Only used when sensor.location = “hip” or HASPT.algo = “HorAngle”.</p>
+axis. If not provided, the function will estimate longitudinal axis as
+the axis with the highest 24 hour lagged autocorrelation. Only used when
+sensor.location = “hip” or HASPT.algo = “HorAngle”.</p>
 </div>
 <div id="haspt.ignore.invalid" class="section level3 unnumbered">
 <h3 class="unnumbered">HASPT.ignore.invalid</h3>
@@ -3710,8 +3724,9 @@ minutes.</p>
 </div>
 <div id="winhr" class="section level3 unnumbered">
 <h3 class="unnumbered">winhr</h3>
-<p>Numeric (default = 5). Vector of window size(s) (unit: hours) of L5
-and M5 analysis.</p>
+<p>Numeric (default = 5). Vector of window size(s) (unit: hours) of LX
+and MX analysis, where look for least and most active consecutive number
+of X hours.</p>
 </div>
 <div id="iglevels" class="section level3 unnumbered">
 <h3 class="unnumbered">iglevels</h3>

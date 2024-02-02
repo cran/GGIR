@@ -1728,7 +1728,7 @@ of. We are not giving a detailed explanation, please see the package
 manual for that.</p>
 <ul>
 <li><code>mode</code> - which part of GGIR to run, GGIR is constructed
-in five parts.</li>
+in five parts with a sixth part under development.</li>
 <li><code>overwrite</code> - whether to overwrite previously produced
 milestone output. Between each GGIR part, GGIR stores milestone output
 to ease re-running parts of the pipeline.</li>
@@ -2354,7 +2354,10 @@ modifiable by argument <code>winhr</code>)</td>
 </tr>
 <tr class="even">
 <td>L5hr_A_mg_0-24</td>
-<td>Starting time in hours and fractions of hours of L5_A_mg_0-24</td>
+<td>Starting time in hours and fractions of hours of L5_A_mg_0-24, where
+hours below 12 are incremented with 24 to create a continuous scale
+throughout the night (e.g. 36 = 6am) in line with numeric timeing of
+sleep variables in GGIR part 4 output.</td>
 </tr>
 <tr class="odd">
 <td>M5hr_A_mg_0-24</td>
@@ -3073,8 +3076,8 @@ meaning may not be obvious:</p>
 calculated as the ratio between acc_SleepDurationInSpt and
 guider_SptDuration (denominator) or acc_SleepDurationInSpt and
 acc_SptDuration + latency (denominator), as defined with
-relyonguider_SleepEfficiency. Only available at person level, because at
-night level the user can calculate this from existing variables.</td>
+sleepefficiency.metric. Only available at person level, because at night
+level the user can calculate this from existing variables.</td>
 </tr>
 <tr class="even">
 <td>n_nights_acc</td>
@@ -4266,6 +4269,14 @@ data.</td>
 <td>timestamp</td>
 <td>Time stamp derived from converting the column timenum, only
 available if <code>save_ms5raw_format = TRUE</code>.</td>
+</tr>
+<tr class="even">
+<td>angle</td>
+<td>anglez by default. If <code>sensor.location = &quot;hip&quot;</code> or
+<code>HASPT.algo = &quot;HorAngle&quot;</code> then angle represents the angle for
+the longitudinal axis as provided by argument longitudinal_axis or
+estimated if no angle was provided. If more angles were extracted in
+part 1 then these will be add with their letter appended. }</td>
 </tr>
 </tbody>
 </table>

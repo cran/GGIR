@@ -50,11 +50,23 @@ HASPT = function(angle, perc = 10, spt_threshold = 15,
       }
     } else if (HASPT.algo == "NotWorn") {  
       # When protocol is to not wear sensor during the night,
-      # then look for longest period of zero or very low intensity
+      # and data is collected in count units we do not know angle
+      # as needed for HorAngle and HDCZA.
+      # Instead look for longest period of zero or very low intensity
+      
+      # First attempt:
       # However, we need to take into account that there may be some
-      # noise in the data, so take 10th percentile and multiply by 2.
+      # noise in the data, so threshold needs to be above zero
       x = activity
-      activityThreshold = quantile(x = x, probs = 0.1) * 2
+      
+      # smooth x to 5 minute rolling average to reduce sensitivity to sudden peaks
+      ma <- function(x, n = 300 / ws3){stats::filter(x, rep(1 / n, n), sides = 2, circular = TRUE)}
+      x = ma(x)
+      activityThreshold = sd(x, na.rm = TRUE) * 0.2
+      # For sensewear external data this will not work as it mostly has values of 1 and up.
+      if (activityThreshold < min(activity)) {
+        activityThreshold = quantile(x, probs = 0.1)  
+      }
       if (HASPT.ignore.invalid == TRUE) {
         invalid = adjustlength(x, invalid)
         zeroMovement = which(x <= activityThreshold & invalid == 0)
@@ -113,6 +125,5 @@ HASPT = function(angle, perc = 10, spt_threshold = 15,
     }
     tib.threshold = pp
   }
-  invisible(list(SPTE_start=SPTE_start,
-                 SPTE_end=SPTE_end, tib.threshold=tib.threshold))
+  invisible(list(SPTE_start = SPTE_start, SPTE_end = SPTE_end, tib.threshold = tib.threshold))
 }
