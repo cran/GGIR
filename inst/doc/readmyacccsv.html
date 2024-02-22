@@ -1531,8 +1531,10 @@ function</h1>
 intended to be used within function <code>GGIR</code>. All the arguments
 of the <code>read.myacc.csv</code> can be easily recognized as they all
 start by “rmc”. The GGIR function checks whether the argument
-rmc.firstrow.acc is provided by the user; in such case, GGIR will derive
-the reading of the data to the <code>read.myacc.csv</code>.</p>
+<code>rmc.firstrow.acc</code> is provided by the user; in such case,
+GGIR will attempt to read the data with <code>read.myacc.csv</code>. In
+other words you always need to specify <code>rmc.firstrow.acc</code> to
+use <code>read.myacc.csv</code>.</p>
 <div id="input-arguments" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Input arguments</h2>
 <p>As the <code>read.myacc.csv</code> function tries to read csv files

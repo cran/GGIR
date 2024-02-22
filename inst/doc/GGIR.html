@@ -4247,23 +4247,25 @@ week you may find window numbers 1, 2, 3, 4, 5 and 6.</td>
 meta/ms5outraw/behaviouralcodes.csv. Class codes above class 8 will be
 analysis specific, because it depends on the number time variants of the
 bouts used. For example, if you look at MVPA lasting 1-10, 10-20, 30-40
-then all of them will have their own class_id.</td>
+then all of them will have their own class_id. In behaviouralcodes.csv
+you will find a column with class_names which match the behavioural
+classes as reported in the part 5 report.</td>
 </tr>
 <tr class="even">
 <td>invalid_fullwindow</td>
-<td>Fraction of the window (see above) that represents invalid data. I
-added this to make it easier to filter the timeseries based on whether
-days are valid or not.</td>
+<td>Percentage of the window (see above) that represents invalid data,
+included to ease filtering the timeseries based on whether windows are
+valid or not.</td>
 </tr>
 <tr class="odd">
 <td>invalid_sleepperiod</td>
-<td>Fraction of SPT within the current window that represents invalid
+<td>Percentage of SPT within the current window that represents invalid
 data.</td>
 </tr>
 <tr class="even">
 <td>invalid_wakinghours</td>
-<td>Fraction of SPT within the current window that represents invalid
-data.</td>
+<td>Percentage of waking hours within the current window that represents
+invalid data.</td>
 </tr>
 <tr class="odd">
 <td>timestamp</td>
