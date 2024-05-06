@@ -289,6 +289,7 @@ g.part4 = function(datadir = c(), metadatadir = c(), f0 = f0, f1 = f1,
               defaultSptWake = 31
               warning("Guider not identified in ID ", accid, ", falling back on 9pm-7am window", call. = FALSE)
             }
+            defaultGuider = guider
           } else if ((length(params_sleep[["def.noc.sleep"]]) == 1 ||
                       length(params_sleep[["loglocation"]]) != 0) &&
                      length(SPTE_start) != 0) {
@@ -326,7 +327,7 @@ g.part4 = function(datadir = c(), metadatadir = c(), f0 = f0, f1 = f1,
             # use constant onset and waking time as specified with def.noc.sleep argument
             defaultSptOnset = params_sleep[["def.noc.sleep"]][1]  #onset
             defaultSptWake = params_sleep[["def.noc.sleep"]][2]  #wake
-            guider = "setwindow"
+            defaultGuider = guider = "setwindow"
           }
           if (defaultSptOnset >= 24) {
             defaultSptOnset = defaultSptOnset - 24
@@ -1082,7 +1083,15 @@ g.part4 = function(datadir = c(), metadatadir = c(), f0 = f0, f1 = f1,
           nightsummary = nightsummary[, which(colnames(nightsummary) %in% c("sleeplatency", "sleepefficiency") ==
                                                 FALSE)]
         }
-        save(nightsummary, tail_expansion_log, file = paste0(metadatadir, ms4.out, "/", fnames[i]))
+        GGIRversion = "GGIR not used"
+        if (is.element('GGIR', installed.packages()[,1])) {
+          GGIRversion = as.character(utils::packageVersion("GGIR"))
+          if (length(GGIRversion) != 1) GGIRversion = sessionInfo()$otherPkgs$GGIR$Version
+        }
+        if (nrow(nightsummary) > 0) {
+          nightsummary$GGIRversion = GGIRversion
+        }
+        save(nightsummary, tail_expansion_log, GGIRversion, file = paste0(metadatadir, ms4.out, "/", fnames[i]))
       }
     }
   }  #end of loop through acc files

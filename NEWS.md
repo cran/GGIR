@@ -1,3 +1,35 @@
+# CHANGES IN GGIR VERSION 3.1-0
+
+- Minor issue fixes introduced in 3.0-10 related to handling nights without sustained inactivity bouts, handling recordings without midnight and storage of GGIR version in the part 4 output when there are no valid nights.
+
+- Part 5 report: Add option to filter part 5 windows based on parameter includedaycrit originally used in part 2, for details see documentation of parameter includedaycrit and #1113
+
+# CHANGES IN GGIR VERSION 3.0-10
+
+- Part 1:
+  - Change default for parameter "minloadcrit" to 168 hours, see #1101.
+
+  - Improve handling of failure to extract sampling frequency from gt3x file #1098
+
+  - Fix bug in handling ad-hoc csv format data expressed in mg units #1110
+
+  - Fix bug introduced in 3.0-6 affecting handling of time gaps, #1104
+
+- Part 1-6: GGIR release number now stored in each milestone data file and in each
+report to ease tracing what release was used per recording and per GGIR part, see #1101.
+
+- Part 3: Revert change to HDCZA in 3.0-7, see issue #1102
+
+- Part 4: Fixes issue #1095 introduced in 3.0-7 that causes GGIR part 4 to stop when processing data without non-default sleep algorithms.
+
+- Part 2 and 5:
+
+  - qwindow functionality enhanced to also consider fractions of minutes, #1093
+
+  - Fix minor bug in activity diary loading when date format is %Y-%m-%d, #1090
+
+- Part 5 and 6: Correct algorithm for coefficient of variance (CoV) in g.fragmentation, #1105
+
 # CHANGES IN GGIR VERSION 3.0-9
 
 - Part 5: Temperature (if available) added to time series output #1085.

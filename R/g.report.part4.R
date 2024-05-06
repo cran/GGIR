@@ -63,6 +63,15 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), loglocation = c(),
       if (length(tail_expansion_log) != 0) {
         nightsummary = nightsummary[-which(nightsummary$night == max(nightsummary$night)),] # remove last row because it may not be trustworthy
       }
+      if ("GGIRversion" %in% colnames(nightsummary) == FALSE) {
+        if (nrow(nightsummary) > 0) {
+          nightsummary$GGIRversion = "" #before 3.0-10 this column did not exist
+        } else {
+          nightsummary[1, ] = NA
+          nightsummary$GGIRversion = NA
+          nightsummary = nightsummary[0, ]
+        }
+      }
       out = as.matrix(nightsummary)
     }
     nightsummary2 = as.data.frame(do.call(rbind, lapply(fnames.ms4, myfun)), stringsAsFactors = FALSE)
@@ -330,12 +339,14 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), loglocation = c(),
                   Seli = which(weekday == "Friday" | weekday == "Saturday")
                 }
                 relevant_rows = this_sleepparam[Seli]
-                for (gdni in 1:length(gdn)) {
-                  personSummary[i, cnt + 1] = mean(nightsummary.tmp[relevant_rows, gdn[gdni]], na.rm = TRUE)
-                  personSummary[i, cnt + 2] = sd(nightsummary.tmp[relevant_rows, gdn[gdni]], na.rm = TRUE)
-                  personSummarynames = c(personSummarynames, paste(gdn[gdni], "_", TW, "_mn", sep = ""),
-                                         paste(gdn[gdni], "_", TW, "_sd", sep = ""))
-                  cnt = cnt + 2
+                if (length(relevant_rows) > 0) {
+                  for (gdni in 1:length(gdn)) {
+                    personSummary[i, cnt + 1] = mean(nightsummary.tmp[relevant_rows, gdn[gdni]], na.rm = TRUE)
+                    personSummary[i, cnt + 2] = sd(nightsummary.tmp[relevant_rows, gdn[gdni]], na.rm = TRUE)
+                    personSummarynames = c(personSummarynames, paste(gdn[gdni], "_", TW, "_mn", sep = ""),
+                                           paste(gdn[gdni], "_", TW, "_sd", sep = ""))
+                    cnt = cnt + 2
+                  }
                 }
                 if ("nonwear_perc_spt" %in% colnames(nightsummary.tmp)) {
                   personSummary[i, cnt + 1] = mean(nightsummary.tmp$nonwear_perc_spt[this_sleepparam[Seli]], na.rm = TRUE)
@@ -490,13 +501,17 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), loglocation = c(),
                   }
                 }
               }
-              personSummarynames_backup = personSummarynames  #if (length(personSummarynames) >= 29)
+              personSummary[i, cnt + 1] = as.character(nightsummary$GGIRversion[this_file[1]])
+              cnt = cnt + 1
+              personSummarynames = c(personSummarynames, "GGIRversion")
+              personSummarynames_backup = personSummarynames
             }
           }
           # replace matrix values 'NA' and 'NaN' by empty cells
           for (colli in 1:ncol(personSummary)) {
-            missingv = which(is.na(personSummary[, colli]) == TRUE | personSummary[, colli] == "NA" | personSummary[,
-                                                                                                                    colli] == "NaN")
+            missingv = which(is.na(personSummary[, colli]) == TRUE |
+                               personSummary[, colli] == "NA" |
+                               personSummary[, colli] == "NaN")
             if (length(missingv) > 0) {
               personSummary[missingv, colli] = ""
             }

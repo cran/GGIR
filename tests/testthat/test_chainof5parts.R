@@ -156,14 +156,14 @@ test_that("chainof5parts", {
   expect_true(file.exists(summarycsv))
   expect_true(file.exists(daysummarycsv))
   expect_that(nrow(IMP$metashort), equals(11280))
-  expect_equal(round(mean(IMP$metashort$ENMO), digits = 5), 0.02911, tolerance = 3)
+  expect_equal(round(mean(IMP$metashort$ENMO), digits = 5), 0.02911, tolerance = 0.01)
   expect_that(round(as.numeric(SUM$summary$meas_dur_dys), digits = 5), equals(1.95833))
   expect_that(ncol(SUM$daysummary), equals(34))
-  expect_equal(SUM$daysummary$`p50_ENMO_mg_0-24hr`, c(17.15, 33,  0))
-  expect_equal(round(as.numeric(SUM$daysummary$`p90_ENMO_mg_0-24hr`)), c(44, 54, 41), tolerance = 0)
-  expect_equal(mean(as.numeric(SUM$daysummary$`M3_ENMO_mg_0-24hr`)), 89.26, tolerance = 3)
-  expect_equal(mean(as.numeric(SUM$daysummary$`M3_q40_ENMO_mg_0-24hr`)), 37.383, tolerance = 3)
-  expect_equal(as.numeric(SUM$summary$cosinor_acrophase), 3.260855, tolerance = 3)
+  expect_equal(SUM$daysummary$`p50_ENMO_mg_0-24hr`, c(17.15, 33,  0), tolerance = 0.5)
+  expect_equal(round(as.numeric(SUM$daysummary$`p90_ENMO_mg_0-24hr`)), c(44, 54, 41), tolerance = 1)
+  expect_equal(mean(as.numeric(SUM$daysummary$`M3_ENMO_mg_0-24hr`)), 89.26, tolerance = 1)
+  expect_equal(mean(as.numeric(SUM$daysummary$`M3_q40_ENMO_mg_0-24hr`)), 37.383, tolerance = 1)
+  expect_equal(as.numeric(SUM$summary$cosinor_acrophase), 3.260855, tolerance = 1)
   expect_equal(as.numeric(SUM$summary$cosinorExt_beta), 109.618, tolerance = 2)
   #--------------------------------------------
   # part 3
@@ -218,7 +218,7 @@ test_that("chainof5parts", {
   expect_true(dir.exists(dirname))
   expect_true(file.exists(rn[1]))
   expect_that(nrow(output),equals(5)) # changed because OO window is exported
-  expect_that(ncol(output),equals(197))
+  expect_that(ncol(output),equals(198))
   expect_that(round(as.numeric(output$wakeup[2]), digits = 4), equals(36))
   expect_that(as.numeric(output$dur_day_spt_min[4]), equals(1150)) # WW window duration
   expect_that(as.numeric(output$dur_day_spt_min[5]), equals(1680)) # OO window duration

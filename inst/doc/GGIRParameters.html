@@ -1998,7 +1998,7 @@ arguments/parameters overview</h1>
 </tr>
 <tr class="odd">
 <td>includedaycrit</td>
-<td>2</td>
+<td>2, 5</td>
 <td>params_cleaning</td>
 </tr>
 <tr class="even">
@@ -2705,11 +2705,11 @@ is sufficiently populated</p>
 </div>
 <div id="minloadcrit" class="section level3 unnumbered">
 <h3 class="unnumbered">minloadcrit</h3>
-<p>Numeric (default = 72). The minimum number of hours the code needs to
-read for the autocalibration procedure to be effective (only sensitive
-to multitudes of 12 hrs, other values will be ceiled). After loading
-these hours only extra data is loaded if calibration error has not been
-reduced to under 0.01 g.</p>
+<p>Numeric (default = 168). The minimum number of hours the code needs
+to read for the autocalibration procedure to be effective (only
+sensitive to multitudes of 12 hrs, other values will be ceiled). After
+loading these hours only extra data is loaded if calibration error has
+not been reduced to under 0.01 g.</p>
 </div>
 <div id="printsummary" class="section level3 unnumbered">
 <h3 class="unnumbered">printsummary</h3>
@@ -3183,11 +3183,13 @@ NeishabouriCount.</p>
 Parameters</h2>
 <div id="includedaycrit" class="section level3 unnumbered">
 <h3 class="unnumbered">includedaycrit</h3>
-<p>Numeric (default = 16). Minimum required number of valid hours in day
-specific analysis (NOTE: there is no minimum required number of hours
-per day in the summary of an entire measurement, every available hour is
-used to make the best possible inference on average metric value per
-average day).</p>
+<p>Numeric (default = 16). Minimum required number of valid hours in
+calendar day specific to analysis in part 2. If you specify two values
+as in c(16, 16) then the first value will be used in part 2 and the
+second value will be used in part 5 and applied as a criterion on the
+full part 5 window. Note that this is then applied in addition to
+parameter includedaycrit.part5 which only looks at valid data during
+waking hours.</p>
 </div>
 <div id="ndayswindow" class="section level3 unnumbered">
 <h3 class="unnumbered">ndayswindow</h3>
@@ -3198,7 +3200,9 @@ data_masking_strategy 5 it needs to be an integer.</p>
 </div>
 <div id="strategy" class="section level3 unnumbered">
 <h3 class="unnumbered">strategy</h3>
-<p>Numeric (default = 1). See data_masking_strategy below.</p>
+<p>Deprecated and replaced by data_masking_strategy. If strategy is
+specified then its value is passed on and used for
+data_masking_strategy.</p>
 </div>
 <div id="data_masking_strategy" class="section level3 unnumbered">
 <h3 class="unnumbered">data_masking_strategy</h3>
@@ -3236,12 +3240,12 @@ when data_masking_strategy = 1.</p>
 </div>
 <div id="includedaycrit.part5" class="section level3 unnumbered">
 <h3 class="unnumbered">includedaycrit.part5</h3>
-<p>Numeric (default = 2/3). Inclusion criteria for number of valid hours
-during the waking hours of a day, when value is smaller than or equal to
-1 used as fraction of waking hours, when value above 1 used as absolute
-number of valid hours required. Do not confuse this argument with
-argument includedaycrit which is only used in GGIR part 2 and applies to
-the entire day.</p>
+<p>Numeric (default = 2/3). Inclusion criteria used in part 5 for number
+of valid hours during the waking hours of a day, when value is smaller
+than or equal to 1 used as fraction of waking hours, when value above 1
+used as absolute number of valid hours required. Do not confuse this
+argument with argument includedaycrit which is only used in GGIR part 2
+and applies to the entire day.</p>
 </div>
 <div id="excludefirstlast.part5" class="section level3 unnumbered">
 <h3 class="unnumbered">excludefirstlast.part5</h3>
@@ -3251,11 +3255,18 @@ g.part5.</p>
 </div>
 <div id="timesegments2zerofile" class="section level3 unnumbered">
 <h3 class="unnumbered">TimeSegments2ZeroFile</h3>
-<p>Data frame (default = NULL). Optional data.frame to specify which
-time segments need to be ignored for the imputation, and acceleration
-metrics to be imputed by zeros. The data.frame is expected to contain
-two columns named windowstart and windowend, with the start- and end
-time of the time segment in POSIXlt class.</p>
+<p>Character (default = NULL). Takes path to a csv file that has columns
+“windowstart” and “windowend” to refer to the start and end time of a
+time windows in format “2024-10-12 20:00:00”, and “filename” of the GGIR
+milestone data file without the “meta_” segment of the name. GGIR part 2
+uses this to set all acceleration values to zero and the non-wear
+classification to zero (meaning sensor worn). Motivation: When the
+accelerometer is not worn during the night GGIR automatically labels
+them as invalid, while the user may like to treat them as zero movement.
+Disclaimer: This functionality was developed in 2019. With hindsight it
+is not generic enough and in need for revision. Please contact GGIR
+maintainers if you would like us to invest time in improving this
+functionality.</p>
 </div>
 <div id="do.imp" class="section level3 unnumbered">
 <h3 class="unnumbered">do.imp</h3>
@@ -3532,11 +3543,13 @@ naps.</p>
 </div>
 <div id="hdcza_threshold" class="section level3 unnumbered">
 <h3 class="unnumbered">HDCZA_threshold</h3>
-<p>Numeric (default = 0.2) If HASPT.algo is set to “HDCZA” then
-HDCZA_threshold will be used as threshold instead of 6th step in the
-diagram of Figure 1 in van Hees et al. 2018 Scientific Report (doi:
-10.1038/s41598-018-31266-z). We have now simplified this step to a
-constant number, which can be modified via HDCZA_threshold.</p>
+<p>Numeric (default = c()) If HASPT.algo is set to “HDCZA” and
+HDCZA_threshold is NOT NULL, (e.g., HDCZA_threshold = 0.2), then that
+value will be used as threshold in the 6th step in the diagram of Figure
+1 in van Hees et al. 2018 Scientific Report (doi:
+10.1038/s41598-018-31266-z). However, doing so has not been supported by
+research yet and is only intended to facilitate methodological research,
+so we advise sticking with the default in line with the publication.</p>
 </div>
 </div>
 <div id="physical-activity-parameters" class="section level2" number="2.7">
@@ -3545,7 +3558,7 @@ Parameters</h2>
 <div id="mvpathreshold" class="section level3 unnumbered">
 <h3 class="unnumbered">mvpathreshold</h3>
 <p>Numeric (default = 100). Acceleration threshold for MVPA estimation
-in GGIR g.part2. This can be a single number or an array of numbers,
+in GGIR g.part2. This can be a single number or an vector of numbers,
 e.g., mvpathreshold = c(100, 120). In the latter case the code will
 estimate MVPA separately for each threshold. If this variable is left
 blank, e.g., mvpathreshold = c(), then MVPA is not estimated.</p>
@@ -3581,17 +3594,17 @@ fraction of a bout needs to be above the threshold.mod.</p>
 <h3 class="unnumbered">threshold.lig</h3>
 <p>Numeric (default = 40). In g.part5: Threshold for light physical
 activity to separate inactivity from light. Value can be one number or
-an array of multiple numbers, e.g., threshold.lig =c(30,40). If multiple
-numbers are entered then analysis will be repeated for each combination
-of threshold values. Threshold is applied to the first metric in the
-milestone data, so if you have only specified do.enmo = TRUE then it
-will be applied to ENMO.</p>
+an vector of multiple numbers, e.g., threshold.lig =c(30,40). If
+multiple numbers are entered then analysis will be repeated for each
+combination of threshold values. Threshold is applied to the first
+metric in the milestone data, so if you have only specified do.enmo =
+TRUE then it will be applied to ENMO.</p>
 </div>
 <div id="threshold.mod" class="section level3 unnumbered">
 <h3 class="unnumbered">threshold.mod</h3>
 <p>Numeric (default = 100). In g.part5: Threshold for moderate physical
 activity to separate light from moderate. Value can be one number or an
-array of multiple numbers, e.g., threshold.mod = c(100, 120). If
+vector of multiple numbers, e.g., threshold.mod = c(100, 120). If
 multiple numbers are entered then analysis will be repeated for each
 combination of threshold values. Threshold is applied to the first
 metric in the milestone data, so if you have only specified do.enmo =
@@ -3601,7 +3614,7 @@ TRUE then it will be applied to ENMO.</p>
 <h3 class="unnumbered">threshold.vig</h3>
 <p>Numeric (default = 400). In g.part5: Threshold for vigorous physical
 activity to separate moderate from vigorous. Value can be one number or
-an array of multiple numbers, e.g., threshold.vig =c(400,500). If
+an vector of multiple numbers, e.g., threshold.vig =c(400,500). If
 multiple numbers are entered then analysis will be repeated for each
 combination of threshold values. Threshold is applied to the first
 metric in the milestone data, so if you have only specified do.enmo =
@@ -3690,7 +3703,7 @@ research needs.</p>
 </div>
 <div id="qlevels" class="section level3 unnumbered">
 <h3 class="unnumbered">qlevels</h3>
-<p>Numeric (default = NULL). Array of percentiles for which value needs
+<p>Numeric (default = NULL). Vector of percentiles for which value needs
 to be extracted. These need to be expressed as a fraction of 1, e.g.,
 c(0.1, 0.5, 0.75). There is no limit to the number of percentiles. If
 left empty then percentiles will not be extracted. Distribution will be

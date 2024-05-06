@@ -3,15 +3,16 @@ title: "Embedding external functions in GGIR"
 author: "Vincent van Hees"
 date: "March 7 2023"
 output:
-  pdf_document:
-    toc: true
-    toc_depth: 3
+   html_document:
+    toc : true
     number_sections: true
+    toc_depth: 3
+    toc_float: true #by turning this on, the table of contents moves to the left of the page.
 urlcolor: blue
 vignette: >
   %\VignetteIndexEntry{Embedding external functions in GGIR}
-  %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
 header-includes:
   - \usepackage{titling}
   - \pretitle{\begin{center}
@@ -212,4 +213,4 @@ Next, in part2 GGIR aims to detect non-wear periods and imputes those. The imput
 # External functions released by GGIR collaborators:
 
 - Wrist-based step detection algorithm: https://github.com/ShimmerEngineering/Verisense-Toolbox/tree/master/Verisense_step_algorithm
-- Wrist-based sleep classification as described by Sundararajan et al. 2021 [link to paper](https://www.nature.com/articles/s41598-020-79217-x), and corresponding code is here: https://github.com/wadpac/SleepStageClassification/tree/master/ggir_ext
+- Wrist-based sleep classification as described by Sundararajan et al. 2021 [link to paper](https://www.nature.com/articles/s41598-020-79217-x), and corresponding code is here: https://github.com/wadpac/Sundararajan-SleepClassification-2021/tree/master/ggir_ext
