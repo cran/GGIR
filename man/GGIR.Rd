@@ -355,12 +355,15 @@ GGIR(mode = 1:5,
 
       \item{chunksize}{
         Numeric (default = 1).
-        Value between 0.2 and 1 to specify the size of chunks to be
+        Value to specify the size of chunks to be
         loaded as a fraction of an approximately 12 hour period for auto-calibration
         procedure and as fraction of 24 hour period for the metric calculation, e.g., 
         0.5 equals 6 and 12 hour chunks, respectively. 
         For machines with less than 4Gb of RAM memory or with < 2GB memory per process
-        when using \code{do.parallel = TRUE} a value below 1 is recommended.}
+        when using \code{do.parallel = TRUE} a value below 1 is recommended.
+        The value is constrained by GGIR to not be lower than 0.05. Please note that
+        setting 0.05 will not produce output when 3rd value of parameter windowsizes
+        is 3600.}
 
       \item{dynrange}{
         Numeric (default = NULL).
@@ -1143,8 +1146,10 @@ GGIR(mode = 1:5,
         the HDCZA algorithm by looking for time segments where the angle of the
         longitudinal sensor axis has an angle relative to the horizontal plane
         between -45 and +45 degrees. And "NotWorn" which is also the same as HDCZA
-        but looks for time segments when the 5 minute rolling average of counts is
-        below 20 per cent of its standard deviation.}
+        but looks for time segments when a rolling average of acceleration
+        magnitude is below 5 per cent of its standard deviation, see 
+        Cookbook vignette in the Annexes of https://wadpac.github.io/GGIR/ 
+        for more detailed guidance on how to use "NotWorn".}
     
       \item{HDCZA_threshold}{
         Numeric (default = c())
@@ -1154,7 +1159,9 @@ GGIR(mode = 1:5,
         et al. 2018 Scientific Report (doi: 10.1038/s41598-018-31266-z). However,
         doing so has not been supported by research yet and is only intended to
         facilitate methodological research, so we advise sticking with the default in
-        line with the publication.
+        line with the publication. Further, if HDCZA_threshold is set to a numeric vector of
+        length 2, e.g. c(10, 15), that will be used as percentile and 
+        multiplier for the above mentioned 6th step.
       }
 
       \item{HASPT.ignore.invalid}{

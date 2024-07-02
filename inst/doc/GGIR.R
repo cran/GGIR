@@ -13,18 +13,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  library(GGIR)
-#  print(load_params())
-
-## ----eval=FALSE---------------------------------------------------------------
-#  library(GGIR)
-#  print(load_params()$params_sleep)
-
-## ----eval=FALSE---------------------------------------------------------------
-#  library(GGIR)
-#  print(load_params()$params_sleep[["HASIB.algo"]])
-
-## ----eval=FALSE---------------------------------------------------------------
-#  library(GGIR)
 #  GGIR(datadir="C:/mystudy/mydata",
 #   outputdir="D:/myresults")
 
@@ -65,26 +53,8 @@ knitr::opts_chunk$set(echo = TRUE)
 #        timewindow = c("WW"),
 #        visualreport=TRUE)
 
-## ----eval=FALSE---------------------------------------------------------------
-#  library(GGIR)
-#  GGIR(datadir="C:/mystudy/mydata",
-#               outputdir="D:/myresults", configfile = "D:/myconfigfiles/config.csv")
-
-## ----eval=FALSE---------------------------------------------------------------
-#  options(echo=TRUE)
-#  args = commandArgs(TRUE)
-#  if(length(args) > 0) {
-#    for (i in 1:length(args)) {
-#      eval(parse(text = args[[i]]))
-#    }
-#  }
-#  GGIR(f0=f0,f1=f1,...)
-
 ## ----out.width = "700px",echo=FALSE-------------------------------------------
 knitr::include_graphics("reportexample.jpg")
-
-## ----out.width = "700px",echo=FALSE-------------------------------------------
-knitr::include_graphics("example_dovisual.jpg")
 
 ## ----echo=FALSE, out.width = "60%", out.extra='style="border: 0; padding:20px"'----
 knitr::include_graphics("GGIR-MASTERLOGO-RGB.png")
