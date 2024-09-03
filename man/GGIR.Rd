@@ -513,7 +513,8 @@ GGIR(mode = 1:5,
 
       \item{rmc.noise}{
         Numeric (default = 13).
-        Noise level of acceleration signal in m\emph{g}-units, used when working ad-hoc .csv data formats
+        Noise level of acceleration signal in m\emph{g}-units, used when working 
+        ad-hoc .csv data formats
         using \link{read.myacc.csv}. The \link{read.myacc.csv} does not take rmc.noise as argument,
         but when interacting with \link{GGIR} or \link{g.part1} rmc.noise is used.}
         
@@ -529,6 +530,11 @@ GGIR(mode = 1:5,
         per data block is larger than this fraction then the data block will be imputed
         by lack of movement with gravitational oriationed guessed from most recent
         valid data block. Only applicable to Axivity .cwa data.
+      }
+      \item{nonwear_range_threshold}{
+        Numeric (default 150) used to define maximum value range per axis for non-wear
+        detection, used in combination with brand specific standard deviation per
+        axis.
       }
       
     }
@@ -1167,13 +1173,13 @@ GGIR(mode = 1:5,
       \item{HASPT.ignore.invalid}{
         Boolean (default = FALSE).
         To indicate whether invalid time segments should be ignored in the
-        Sleep Period Time detection. If \code{FALSE} (default), the imputed 
-        angle or activity metric during the invalid time segments is used 
-        in the Sleep Period Time detection. If \code{TRUE}, invalid time 
-        segments are ignored for the Sleep Period Time detection 
-        (i.e., considered to be out of the Sleep Period Time). 
-        If \code{NA}, then invalid time segments are considered to be no movement
-        segments.
+        heuristic guiders. If \code{FALSE} (default), the imputed 
+        angle or activity metric during the invalid time segments are used.
+        If \code{TRUE}, invalid time segments are ignored (i.e., they cannot 
+        contribute to the guider). If \code{NA}, then invalid time segments are 
+        considered to be no movement segments and can contribute to the guider.
+        When HASPT.algo is "NotWorn", HASPT.ignore.invalid is automatically set to
+        NA.
         }
 
       \item{HASIB.algo}{

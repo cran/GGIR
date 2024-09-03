@@ -1,8 +1,8 @@
 Package: GGIR
 Type: Package
 Title: Raw Accelerometer Data Analysis
-Version: 3.1-2
-Date: 2024-07-02
+Version: 3.1-4
+Date: 2024-09-03
 Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                     email="v.vanhees@accelting.com"),
              person("Jairo H","Migueles",role="aut",
@@ -21,6 +21,7 @@ Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                     comment = c(ORCID = "0000-0002-6033-960X")),
              person(given = "Taren",family = "Sanders", role = "ctb"),
              person("Chenxuan","Zhao",role="ctb"),
+             person("Segantin","Gaia",role="ctb"),
              person("Medical Research Council UK",  role = c("cph", "fnd")),
              person("Accelting",  role = c("cph", "fnd")),
              person("French National Research Agency",  role = c("cph", "fnd")))
@@ -37,7 +38,7 @@ Imports: data.table, foreach, doParallel, signal, zoo, unisensR, ineq,
 Depends: stats, utils, R (>= 3.5)
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-07-02 15:17:28 UTC; vvanh
+Packaged: 2024-09-03 09:45:58 UTC; vvanh
 Author: Vincent T van Hees [aut, cre],
   Jairo H Migueles [aut] (<https://orcid.org/0000-0003-0366-6935>),
   Severine Sabia [ctb],
@@ -51,8 +52,9 @@ Author: Vincent T van Hees [aut, cre],
   Patrick Bos [ctb] (<https://orcid.org/0000-0002-6033-960X>),
   Taren Sanders [ctb],
   Chenxuan Zhao [ctb],
+  Segantin Gaia [ctb],
   Medical Research Council UK [cph, fnd],
   Accelting [cph, fnd],
   French National Research Agency [cph, fnd]
 Repository: CRAN
-Date/Publication: 2024-07-02 15:50:05 UTC
+Date/Publication: 2024-09-03 11:00:18 UTC
