@@ -61,7 +61,7 @@ load_params = function(topic = c("sleep", "metrics", "rawdata",
       rmc.desiredtz = NULL, rmc.configtz = NULL,  rmc.sf = c(),
       rmc.headername.sf = c(), rmc.headername.sn = c(),
       rmc.headername.recordingid = c(), rmc.header.structure = c(),
-      rmc.check4timegaps = FALSE,  rmc.noise = 13, nonwear_range_threshold = 50,
+      rmc.check4timegaps = FALSE,  rmc.noise = 13, nonwear_range_threshold = 150,
       rmc.col.wear = c(), rmc.doresample = FALSE,
       interpolationType = 1,
       imputeTimegaps = TRUE, frequency_tol = 0.1, rmc.scalefactor.acc = 1)
@@ -115,7 +115,8 @@ load_params = function(topic = c("sleep", "metrics", "rawdata",
                          do.sibreport = FALSE, do.part2.pdf = TRUE,
                          sep_reports = ",", sep_config = ",", 
                          dec_reports = ".", dec_config = ".", 
-                         visualreport_without_invalid = TRUE)
+                         visualreport_without_invalid = TRUE,
+                         require_complete_lastnight_part5 = FALSE)
 
   }
   if ("general" %in% topic) {

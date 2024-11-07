@@ -2,8 +2,10 @@ g.part5.savetimeseries = function(ts, LEVELS, desiredtz, rawlevels_fname,
                                   DaCleanFile = NULL,
                                   includedaycrit.part5 = 2/3, ID = NULL,
                                   params_output,
-                                  params_247 = NULL) {
-  
+                                  params_247 = NULL,
+                                  filename = "",
+                                  timewindow = NULL) {
+
   ms5rawlevels = data.frame(date_time = ts$time, class_id = LEVELS,
                             # class_name = rep("",Nts),
                             stringsAsFactors = FALSE)
@@ -17,12 +19,36 @@ g.part5.savetimeseries = function(ts, LEVELS, desiredtz, rawlevels_fname,
   }
   # Create numeric time to faciltiate merging
   ts$timenum = as.numeric(ts$timestamp)
+  epochSize = ts$timenum[2] - ts$timenum[1]
   ms5rawlevels$timenum = as.numeric(ms5rawlevels$date_time)
   mdat = merge(ts, ms5rawlevels, by = "timenum")
   rm(ts, ms5rawlevels)
   names(mdat)[which(names(mdat) == "nonwear")] = "invalidepoch"
   names(mdat)[which(names(mdat) == "diur")] = "SleepPeriodTime"
   mdat = mdat[,-which(names(mdat) == "date_time")]
+  if ("require_complete_lastnight_part5" %in% names(params_output) &&
+      params_output[["require_complete_lastnight_part5"]] == TRUE) {
+    N_window0_at_end = which(rev(mdat$window) != 0)[1]
+    N_hours_window0_at_end = ((N_window0_at_end * epochSize) / 3600)
+    lastHour = as.numeric(format(mdat$timestamp[length(mdat$timestamp)], "%H"))
+    # If last hour is less than 9 then we know recording ended between midnight and 9am
+    # which means that sleep onset may not be reliably detected
+    # If last window with a non-zero number ends after 6pm in the before last day
+    # then that confirms that sleep was estimated fromt his incomplete night
+    if ((timewindow == "MM" || timewindow == "OO") && lastHour < 9 &&
+        N_hours_window0_at_end < 9 + 6) {
+      mdat$window[which(mdat$window == max(mdat$window))] = 0 
+    }
+    # If last hour is less than 15 then we know recording ended between midnight and 3pm
+    # which means that wakeup may not be reliably detected
+    # If last window with a non-zero number ends after 6pm in the before last day
+    # then that confirms that sleep was estimated from this incomplete night
+    if (timewindow == "WW" && lastHour < 15 &&
+        N_hours_window0_at_end < 15 + 6) {
+      mdat$window[which(mdat$window == max(mdat$window))] = 0 
+    }
+  }
+  
   # Add invalid day indicator
   mdat$invalid_wakinghours = mdat$invalid_sleepperiod =  mdat$invalid_fullwindow = 100
   wakeup = which(diff(c(mdat$SleepPeriodTime,0)) == -1) + 1 # first epoch of each day
@@ -92,7 +118,7 @@ g.part5.savetimeseries = function(ts, LEVELS, desiredtz, rawlevels_fname,
       mdat$timestamp = as.POSIXct(mdat$timenum, origin = "1970-01-01",tz = desiredtz)
       rawlevels_fname = gsub(pattern = ".csv", replacement = ".RData", x = rawlevels_fname)
       fname = unique(rawlevels_fname[grep("*RData$", rawlevels_fname)])
-      save(mdat, file = fname)
+      save(mdat, filename, file = fname)
     }
     #===============================
     rm(mdat)

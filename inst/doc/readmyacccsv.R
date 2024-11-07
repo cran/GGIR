@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #                 rmc.unit.temp = "C",
 #                 rmc.unit.time = "POSIX",
 #                 rmc.format.time = "%d/%m/%Y %H:%M:%OS",
-#                 rmc.desiredtz = "Europe/London",
+#                 desiredtz = "Europe/London",
 #                 rmc.sf = 100)
 
 ## ----eval=FALSE---------------------------------------------------------------
@@ -38,7 +38,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #               rmc.unit.temp = "C",
 #               rmc.unit.time = "POSIX",
 #               rmc.format.time = "%d/%m/%Y %H:%M:%OS",
-#               rmc.desiredtz = "Europe/London",
+#               desiredtz = "Europe/London",
 #               rmc.sf = 100,
 #               rmc.noise = 0.013
 #  )
