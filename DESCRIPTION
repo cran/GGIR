@@ -1,8 +1,8 @@
 Package: GGIR
 Type: Package
 Title: Raw Accelerometer Data Analysis
-Version: 3.1-5
-Date: 2024-11-07
+Version: 3.2-0
+Date: 2025-02-20
 Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                     email="v.vanhees@accelting.com"),
              person("Jairo H","Migueles",role="aut",
@@ -21,10 +21,16 @@ Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                     comment = c(ORCID = "0000-0002-6033-960X")),
              person(given = "Taren",family = "Sanders", role = "ctb"),
              person("Chenxuan","Zhao",role="ctb"),
+             person("Ian","Meneghel Danilevicz", role="ctb",
+                    email="ian.meneghel-danilevicz @ inserm.fr",
+                    comment = c(ORCID = "0000-0003-4541-0524")),
+             person("Victor","Barreto Mesquita", role="ctb",
+                    email="victormesquita40@hotmail.com"),
              person("Gaia","Segantin",role="ctb"),
              person("Medical Research Council UK",  role = c("cph", "fnd")),
              person("Accelting",  role = c("cph", "fnd")),
-             person("French National Research Agency",  role = c("cph", "fnd")))
+             person("French National Research Agency",  role = c("cph", "fnd"))
+             )
 Maintainer: Vincent T van Hees <v.vanhees@accelting.com>
 Description: A tool to process and analyse data collected with wearable raw acceleration sensors as described in Migueles and colleagues (JMPB 2019), and van Hees and colleagues (JApplPhysiol 2014; PLoSONE 2015). The package has been developed and tested for binary data from 'GENEActiv' <https://activinsights.com/>, binary (.gt3x) and .csv-export data from  'Actigraph' <https://theactigraph.com> devices, and binary (.cwa) and .csv-export data from 'Axivity' <https://axivity.com>. These devices are currently widely used in research on human daily physical activity. Further, the package can handle accelerometer data file from any other sensor brand providing that the data is stored in csv format. Also the package allows for external function embedding.
 URL: https://github.com/wadpac/GGIR/,
@@ -38,7 +44,7 @@ Imports: data.table, foreach, doParallel, signal, zoo, unisensR, ineq,
 Depends: stats, utils, R (>= 3.5)
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-11-07 08:11:04 UTC; vvanh
+Packaged: 2025-02-20 09:23:47 UTC; vvanh
 Author: Vincent T van Hees [aut, cre],
   Jairo H Migueles [aut] (<https://orcid.org/0000-0003-0366-6935>),
   Severine Sabia [ctb],
@@ -52,9 +58,11 @@ Author: Vincent T van Hees [aut, cre],
   Patrick Bos [ctb] (<https://orcid.org/0000-0002-6033-960X>),
   Taren Sanders [ctb],
   Chenxuan Zhao [ctb],
+  Ian Meneghel Danilevicz [ctb] (<https://orcid.org/0000-0003-4541-0524>),
+  Victor Barreto Mesquita [ctb],
   Gaia Segantin [ctb],
   Medical Research Council UK [cph, fnd],
   Accelting [cph, fnd],
   French National Research Agency [cph, fnd]
 Repository: CRAN
-Date/Publication: 2024-11-07 19:50:13 UTC
+Date/Publication: 2025-02-20 10:10:06 UTC

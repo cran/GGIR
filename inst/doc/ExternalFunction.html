@@ -1482,8 +1482,8 @@ border-radius: 0px;
 </div>
 
 
-<p><strong>NOTE: If you are viewing this page via CRAN note that
-additional documentation can be found in the <a href="https://wadpac.github.io/GGIR/">GGIR GitHub
+<p><strong>NOTE: If you are viewing this page via CRAN note that the
+main GGIR documentation has been migrated to the <a href="https://wadpac.github.io/GGIR/">GGIR GitHub
 pages</a>.</strong></p>
 <div id="introduction" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
@@ -1586,7 +1586,14 @@ first columm of the data matrix..</li>
 <li><code>reporttype</code> Character to indicate the type of reporting
 by GGIR: “scalar” if it should be averaged per day, “event” if it should
 be summed per day, or “type” if it is categorical variable that can only
-be aggregated per day by tabulating it.</li>
+be aggregated per day by tabulating it. For <code>reporttype</code>
+“event” GGIR will as of release 3.2-0 not summarise the events in
+part2_summary.csv and part2_daysummary.csv but in part2_eventsummary.csv
+and part2_dayeventsummary.csv.</li>
+<li><code>name</code> Character to indicate the name of the entity being
+detected in the cases of event detection, this name is used in the
+output filename, e.g. part2_stepsummary.csv when name is “step”. At the
+moment name is only use for event detection algorithms</li>
 </ul>
 <p>Next, add a call to GGIR function GGIR with <code>myfun</code>
 provided as one of its arguments:</p>
@@ -1714,6 +1721,10 @@ these to be directly stored in a csv file then set argument
 released by GGIR collaborators:</h1>
 <ul>
 <li>Wrist-based step detection algorithm: <a href="https://github.com/ShimmerEngineering/Verisense-Toolbox/tree/master/Verisense_step_algorithm" class="uri">https://github.com/ShimmerEngineering/Verisense-Toolbox/tree/master/Verisense_step_algorithm</a></li>
+</ul>
+<p>which is not actively maintained, for the latest version of the
+function see: <a href="https://github.com/wadpac/GGIR/blob/master/user-scripts/verisense_count_steps.R" class="uri">https://github.com/wadpac/GGIR/blob/master/user-scripts/verisense_count_steps.R</a></p>
+<ul>
 <li>Wrist-based sleep classification as described by Sundararajan et
 al. 2021 <a href="https://www.nature.com/articles/s41598-020-79217-x">link to
 paper</a>, and corresponding code is here: <a href="https://github.com/wadpac/Sundararajan-SleepClassification-2021/tree/master/ggir_ext" class="uri">https://github.com/wadpac/Sundararajan-SleepClassification-2021/tree/master/ggir_ext</a></li>

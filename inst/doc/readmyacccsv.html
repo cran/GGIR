@@ -1483,8 +1483,8 @@ GGIR</h1>
 </div>
 
 
-<p><strong>NOTE: If you are viewing this page via CRAN note that
-additional documentation can be found in the <a href="https://wadpac.github.io/GGIR/">GGIR GitHub
+<p><strong>NOTE: If you are viewing this page via CRAN note that the
+main GGIR documentation has been migrated to the <a href="https://wadpac.github.io/GGIR/">GGIR GitHub
 pages</a>.</strong></p>
 <div id="introduction" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
@@ -1518,7 +1518,7 @@ GGIR to read accelerometer raw data stored in csv files.</p>
 <p>Internally GGIR loads csv files with accelerometer data and
 standardises the output format to make the data compatible with other
 GGIR functions. Data format standardisation includes unit of
-measurement, timestamp, header format, and column locations.</p>
+measurement, timestamp, file header format, and column locations.</p>
 </div>
 <div id="the-read.myacc.csv-function" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> The read.myacc.csv
@@ -1576,18 +1576,28 @@ file header then that will be used instead.</li>
 <h3><span class="header-section-number">2.1.2</span> Arguments for files
 containing a header</h3>
 <ul>
-<li><code>rmc.firstrow.header</code> - First row (number) of the header.
-Leave blank (default) if the file does not have a header.</li>
+<li><code>rmc.firstrow.header</code> - First row (number) of the file
+header. Leave blank (default) if the file does not have a file header.
+Not to be confused with a one row column header, a file header typically
+takes up several rows and has one or two columns. If the header has two
+columns, the first column is assumed to be the header item names and the
+second column is assumed to have the header item values. If the header
+has one column then it is assumed that each value contains both the name
+and the value of the item.</li>
 <li><code>rmc.header.length</code> - If file has header, specify header
 length (numeric).</li>
 <li><code>rmc.headername.sf</code> - If file has a header, row name
-(character) under which the sample frequency can be found.</li>
+(character) under which the sample frequency can be found,
+e.g. “sample_rate”.</li>
 <li><code>rmc.headername.sn</code> - If file has a header, row name
-(character) under which the serial number can be found.</li>
+(character) under which the serial number can be found,
+e.g. “serial_number”.</li>
 <li><code>rmc.headername.recordingid</code> - If file has a header, row
-name (character) under which the recording ID can be found.</li>
+name (character) under which the recording ID can be found,
+e.g. “ID”.</li>
 <li><code>rmc.header.structure</code> - Character used to split the
-header name from the header value, e.g. “:” or ” “.</li>
+header name from the header value, e.g. “:” if a header value would look
+like “ID: 123” or ” ” if the ehader value would be like “ID 123”.</li>
 </ul>
 </div>
 <div id="arguments-for-files-including-timestamps" class="section level3" number="2.1.3">
@@ -1599,6 +1609,7 @@ timestamps are stored. Leave in default setting if timestamps are not
 stored.</li>
 <li><code>rmc.unit.time</code> - Character with unit of timestamps:
 “POSIX”, “UNIXsec” (seconds since origin, see argument rmc.origin),
+“UNIXmsec” (milliseconds since origin, see argument rmc.origin),
 “character”, or “ActivPAL” (exotic timestamp format only used in the
 ActivPAL activity monitor).</li>
 <li><code>rmc.format.time</code> - Character string giving a date-time
@@ -1747,12 +1758,12 @@ structure:</p>
 <p>This file contains timestamps in the column 1 (formatted as “%d/%m/%Y
 %H:%M:%OS”), the acceleration signals (in <em>g</em>’s) for the x, y,
 and z axis in the columns 2, 3, and 4, respectively, and temperature
-information in Celsius in the column 5. Also, this file has no
+information in Celsius in the column 5. Also, this file has no file
 header.</p>
 <p>Before we can use this with GGIR, we first test read this file using
 the <code>read.myacc.csv</code> function directly.</p>
 <pre class="r"><code>library(GGIR)
-read.myacc.csv(rmc.file = &quot;C:/mystudy/mydata/datafile.csv&quot;,
+data = read.myacc.csv(rmc.file = &quot;C:/mystudy/mydata/datafile.csv&quot;,
                rmc.nrow = Inf,
                rmc.skip = 0,
                rmc.dec = &quot;.&quot;,
@@ -1766,6 +1777,9 @@ read.myacc.csv(rmc.file = &quot;C:/mystudy/mydata/datafile.csv&quot;,
                rmc.format.time = &quot;%d/%m/%Y %H:%M:%OS&quot;,
                desiredtz = &quot;Europe/London&quot;,
                rmc.sf = 100)</code></pre>
+<p>The object data is a list with a data.frame name data and a header.
+The time column in the data.frame represents timestamps expressed in
+seconds since 1-1-1970.</p>
 <div id="example-using-the-shell-function" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> Example using the
 shell function</h2>

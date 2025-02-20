@@ -1493,36 +1493,13 @@ location.</strong></p>
 <h1><span class="header-section-number">1</span> Introduction</h1>
 <div id="what-is-ggir" class="section level2" number="1.1">
 <h2><span class="header-section-number">1.1</span> What is GGIR?</h2>
-<p><a href="https://CRAN.R-project.org/package=GGIR">GGIR</a> is an
-R-package to process multi-day raw accelerometer data for physical
-activity and sleep research. The term <strong><em>raw</em></strong>
-refers to data being expressed in m/s<sup>2</sup> or gravitational
-acceleration as opposed to the previous generation accelerometers which
-stored data in accelerometer brand specific units. The signal processing
-includes automatic calibration, detection of sustained abnormally high
-values, detection of non-wear and calculation of average magnitude of
-dynamic acceleration based on a variety of metrics. Next, GGIR uses this
-information to describe the data per recording, per day of measurement,
-and (optionally) per segment of a day of measurement, including
-estimates of physical activity, inactivity and sleep. We published an
-overview paper of GGIR in 2019 <a href="https://doi.org/10.1123/jmpb.2018-0063">link</a>.</p>
-<p>This vignette provides a general introduction on how to use GGIR and
-interpret the output, additionally you can find a <a href="https://youtu.be/RuFBCAqFJ2M">introduction video</a> and a <a href="https://youtu.be/S8YPTrYNWdU">mini-tutorial</a> on YouTube. If you
-want to use your own algorithms for raw data then GGIR facilitates this
-with it’s external function embedding feature, documented in a separate
-vignette: <a href="https://CRAN.R-project.org/package=GGIR">Embedding
-external functions in GGIR</a>. GGIR is increasingly being used by
-research groups across the world. A non-exhaustive overview of academic
-publications related to GGIR can be found <a href="https://github.com/wadpac/GGIR/wiki/Publication-list">here</a>. R
-package GGIR would not have been possible without the support of the
-contributors listed in the author list at <a href="https://CRAN.R-project.org/package=GGIR">GGIR</a>, with specific
-code contributions over time since April 2016 (when GGIR development
-moved to GitHub) shown <a href="https://github.com/wadpac/GGIR/graphs/contributors">here</a>.</p>
+<p>This section has been migrated to this <a href="https://wadpac.github.io/GGIR/articles/chapter1_WhatIsGGIR.html">section</a>
+in the GGIR github-pages, which is now the main documentation resource
+for GGIR.</p>
 <p><strong>Cite GGIR:</strong></p>
-<p>When you use GGIR in publications do not forget to cite it properly
-as that makes your research more reproducible and it gives credit to
-it’s developers. See paragraph on <a href="#CitingGGIR">Citing GGIR</a>
-for details.</p>
+<p>This section has been migrated to this <a href="https://wadpac.github.io/GGIR/authors.html#citation">section</a>
+in the GGIR github-pages, which is now the main documentation resource
+for GGIR.</p>
 </div>
 <div id="contributing-support-and-keeping-up-to-date" class="section level2" number="1.2">
 <h2><span class="header-section-number">1.2</span> Contributing,
@@ -1545,8 +1522,8 @@ online GGIR training courses. Check our dedicated training <a href="https://www.
 details and the option to book your training. Do you have questions
 about the training or the booking process? Do not hesitate to contact us
 via: <a href="mailto:training@accelting.com" class="email">training@accelting.com</a>.</p>
-<p>Also of interest may be the brief <a href="https://www.accelting.com/updates/short-r-tutorial/">free R
-introduction tutorial</a>.</p>
+<p>Also of interest may be the brief <a href="https://www.accelting.com/short-r-tutorial/">free R introduction
+tutorial</a>.</p>
 <p><strong>Change log</strong></p>
 <p>Our log of main changes to GGIR over time can be found <a href="https://cran.r-project.org/package=GGIR/news/news.html">here</a>.</p>
 </div>
@@ -1579,7 +1556,8 @@ package with <code>install.packages(&quot;read.gt3x&quot;)</code></li>
 package with <code>install.packages(&quot;actilifecounts&quot;)</code></li>
 <li>If you want to derive circadian rhythm indicators using the [Cosinor
 analysis and Extended Cosinor analysis] (with
-<code>cosinor = TRUE</code>), install the ActCR package with
+<code>cosinor = TRUE</code> for part 2, in part 6 it is always
+performed), install the ActCR package with
 <code>install.packages(&quot;ActCR&quot;)</code></li>
 </ul>
 </div>
@@ -1981,6 +1959,87 @@ in the GGIR github-pages, which is now the main documentation resource
 for GGIR.</p>
 </div>
 </div>
+<div id="output-part-6" class="section level2 tabset" number="4.4">
+<h2 class="tabset"><span class="header-section-number">4.4</span> Output
+part 6</h2>
+<p>When <code>part6CR = TRUE</code> and the vector as specified for
+paramter <code>do.report</code> includes the number 6, a csv report will
+be stored with the following variables:</p>
+<table>
+<colgroup>
+<col width="38%" />
+<col width="61%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ID</td>
+<td>Participant ID extracted from file</td>
+</tr>
+<tr class="even">
+<td>starttime</td>
+<td>Start timestamp for the data as used for the analysis</td>
+</tr>
+<tr class="odd">
+<td>filename</td>
+<td>File name</td>
+</tr>
+<tr class="even">
+<td>N_days</td>
+<td>Number of days in the data as used for the analysis</td>
+</tr>
+<tr class="odd">
+<td>N_valid_days</td>
+<td>Number of valid days in the data as used for the analysis, defined
+as the cumulative number of epoch expressed in days</td>
+</tr>
+<tr class="even">
+<td><code>cosinor_</code></td>
+<td>Cosinor analysis estimates such as mes, amp, acrophase, and
+acrotime, as documented in the <a href="https://CRAN.R-project.org/package=ActCR">Ac tCR</a> package.</td>
+</tr>
+<tr class="odd">
+<td><code>cosinorExt_</code></td>
+<td>Extended Cosinor analysis estimates such as minimum, amp, alpha,
+beta, acrotime, UpMesor, DownMesor, MESOR, and F_pseudo, as documented
+in the <a href="https://CRAN.R-project.org/package=ActCR">Ac tCR</a>
+package.</td>
+</tr>
+<tr class="even">
+<td><code>IV</code></td>
+<td>Intradaily Variability (IV) after Eus J. W. Van Someren
+(Chronobiology International. 1999. Volume 16, issue 4). Implementation
+described in Ian Meneghel Danilevicz et al. <a href="https://doi.org/10.21203/rs.3.rs-3543711/v1" class="uri">https://doi.org/10.21203/rs.3.rs-3543711/v1</a></td>
+</tr>
+<tr class="odd">
+<td><code>IS</code></td>
+<td>Interdaily Stability (IS) after Eus J. W. Van Someren (Chronobiology
+International. 1999. Volume 16, issue 4). Implementation described in
+Ian Meneghel Danilevicz et al. <a href="https://doi.org/10.21203/rs.3.rs-3543711/v1" class="uri">https://doi.org/10.21203/rs.3.rs-3543711/v1</a></td>
+</tr>
+<tr class="even">
+<td>phi</td>
+<td>Ian Meneghel Danilevicz et al. <a href="https://doi.org/10.21203/rs.3.rs-3543711/v1" class="uri">https://doi.org/10.21203/rs.3.rs-3543711/v1</a></td>
+</tr>
+<tr class="odd">
+<td>SSP</td>
+<td>Only created when <code>part6DFA = TRUE</code>. Self-Similarity
+parameter as part of the Detrended Fluctuation Analysis. Implementation
+described in Ian Meneghel Danilevicz et al. <a href="https://doi.org/10.21203/rs.3.rs-3543711/v1" class="uri">https://doi.org/10.21203/rs.3.rs-3543711/v1</a>.</td>
+</tr>
+<tr class="even">
+<td>ABI</td>
+<td>Only created when <code>part6DFA = TRUE</code>. Activity Balance
+Index. Implementation described in Ian Meneghel Danilevicz et al. <a href="https://doi.org/10.21203/rs.3.rs-3543711/v1" class="uri">https://doi.org/10.21203/rs.3.rs-3543711/v1</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="motivation-and-clarification" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> Motivation and
@@ -2230,13 +2289,9 @@ for GGIR.</p>
 <div id="actigraphs-idle-sleep-mode" class="section level2" number="5.11">
 <h2><span class="header-section-number">5.11</span> ActiGraph’s idle
 sleep mode</h2>
-<p>The idle sleep mode is <a href="https://actigraphcorp.my.site.com/support/s/article/Idle-Sleep-Mode-Explained">explained</a>
-on the manufacturer’s website. In short, idle sleep mode is a setting
-that can be turned on or off by the user. When it is turned on the
-device will fall asleep during periods of no movement, resulting in time
-gaps in the data. This functionality was probably introduced to safe
-battery life and minimize data size. However, it also means that we end
-up with time gaps that need to be accounted for.</p>
+<p>This section has been migrated to this <a href="https://wadpac.github.io/GGIR/articles/GGIR.html?q=idle%20slee#actigraphs-idle-sleep-mode">section</a>
+in the GGIR github-pages, which is now the main documentation resource
+for GGIR.</p>
 <div id="time-gap-imputation" class="section level3" number="5.11.1">
 <h3><span class="header-section-number">5.11.1</span> Time gap
 imputation</h3>
@@ -2262,33 +2317,9 @@ for GGIR.</p>
 <div id="Minimum_recording_duration" class="section level2" number="5.13">
 <h2><span class="header-section-number">5.13</span> Minimum recording
 duration</h2>
-<p>GGIR has been designed to process multi-day recordings. The minimum
-recording duration considered by GGIR depends on the type of
-analysis:</p>
-<p><strong>Running part 1 and 2</strong></p>
-<ul>
-<li><p>File size; At least 2MB, where 2MB can be adjusted with argument
-minimumFileSizeMB. This should not be changed unless you have good
-reason to believe that a smaller file size is also acceptable.</p></li>
-<li><p>Recording duration: At least two long epoch windows (default 60
-minutes) in g.readaccfile. The size of this epoch can be altered with
-the second and third value of vector argument <code>windowsizes</code>,
-where the third should not be smaller than the second. For example, in
-short lasting lab-experiments you may find it easier to set this to
-<code>windowsizes = c(5, 600, 600)</code> as non-wear detection is
-usually not necessary in lab studies.</p></li>
-</ul>
-<p><strong>Running part 3 and 4</strong></p>
-<ul>
-<li>At least one night of data is expected, where a night is expected to
-have at least the timestamp for midnight. If midnight is not found the
-sleep detection is skipped.</li>
-</ul>
-<p><strong>Running part 5</strong></p>
-<ul>
-<li>Ideally two valid consecutive nights and the waking hours in
-between.</li>
-</ul>
+<p>This section has been migrated to this <a href="https://wadpac.github.io/GGIR/articles/GGIR.html?q=minimum%20recording#Minimum_recording_duration">section</a>
+in the GGIR github-pages, which is now the main documentation resource
+for GGIR.</p>
 </div>
 <div id="lux-sensor-data-processing" class="section level2" number="5.14">
 <h2><span class="header-section-number">5.14</span> LUX sensor data
