@@ -29,7 +29,7 @@ g.analyse.perfile = function(I, C, metrics_nav,
   # Person identification number
   filesummary[vi] = file_summary$ID
   # Identify which of the metrics are in g-units to aid deciding whether to multiply by 1000
-  g_variables_lookat = lookat[grep(x = colnames_to_lookat, pattern = "BrondCount|ZCX|ZCY|NeishabouriCount", invert = TRUE)]
+  g_variables_lookat = lookat[grep(x = colnames_to_lookat, pattern = "BrondCount|ZCX|ZCY|ZCZ|NeishabouriCount|ExtAct|ExtHeartRate", invert = TRUE)]
   
   # Serial number
   filesummary[(vi + 1)] = file_summary$deviceSerialNumber
@@ -37,10 +37,26 @@ g.analyse.perfile = function(I, C, metrics_nav,
   vi = vi + 2
   # starttime of measurement, body location, filename
   filesummary[vi] = file_summary$sensor.location
-  filesummary[(vi + 1)] = file_summary$fname
+  if (!is.null(params_general[["recording_split_times"]])) {
+    filename = file_summary$fname
+    splitnames = getSplitNames(filename)
+    segment_names = splitnames$segment_names
+    filename = splitnames$filename
+  } else {
+    segment_names = NULL
+    filename = file_summary$fname
+  }
+  filesummary[(vi + 1)] = filename
   filesummary[(vi + 2)] = file_summary$startt # starttime of measurement
   s_names[vi:(vi + 2)] = c("bodylocation","filename","start_time")
   vi = vi + 3
+  
+  if (!is.null(params_general[["recording_split_times"]]) && !is.null(segment_names)) {
+    filesummary[vi] = segment_names[2]
+    filesummary[vi + 1] = segment_names[3]
+    s_names[vi:(vi + 1)] = c("split1_name","split2_name")
+    vi = vi + 2
+  }
   # weekday on which measurement started, sample frequency and device
   filesummary[vi] = file_summary$wdayname
   filesummary[(vi + 1)] = I$sf
@@ -128,7 +144,21 @@ g.analyse.perfile = function(I, C, metrics_nav,
                     "filehealth_totimp_N")
     vi = vi + 2
   }
-  
+  if ("filehealth_ExtSleep_y_ExtAct_missing" %in% names(file_summary)) {
+    Fitbit_filehealth_columns = c("filehealth_0vars_missing",
+                                  "filehealth_1vars_missing",
+                                  "filehealth_2vars_missing",
+                                  "filehealth_3vars_missing",
+                                  "filehealth_4vars_missing",
+                                  "filehealth_ExtAct_missing",
+                                  "filehealth_ExtStep_missing",
+                                  "filehealth_ExtHeartRate_missing",
+                                  "filehealth_ExtSleep_missing",
+                                  "filehealth_ExtSleep_y_ExtAct_missing")
+    filesummary[vi:(vi + 9)] = file_summary[, Fitbit_filehealth_columns]
+    s_names[vi:(vi + 9)] = Fitbit_filehealth_columns
+    vi = vi = 10
+  }
   #quantile, ML5, and intensity gradient variables
   if (doquan == TRUE) {
     q1 = length(output_avday$QUAN)

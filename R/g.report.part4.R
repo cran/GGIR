@@ -37,15 +37,10 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                                "SleepDurationInSpt", "WASO", "duration_sib_wakinghours", "number_sib_sleepperiod", "number_of_awakenings",
                                "number_sib_wakinghours", "duration_sib_wakinghours_atleast15min", "sleeponset_ts", "wakeup_ts", "guider_onset_ts",
                                "guider_wakeup_ts", "sleeplatency", "sleepefficiency", "page", "daysleeper", "weekday", "calendar_date",
-                               "filename", "cleaningcode", "sleeplog_used", "sleeplog_ID", "acc_available", "guider", "SleepRegularityIndex", "SriFractionValid",
+                               "filename", "cleaningcode", "sleeplog_used", "sleeplog_ID", "acc_available", "guider", "SleepRegularityIndex1", "SriFractionValid",
                                "longitudinal_axis")
     nightsummary2 = as.data.frame(matrix(0, 0, length(colnames_nightsummary2)))
-    if (params_sleep[["sleepwindowType"]] == "TimeInBed") {
-      colnames(nightsummary2) = gsub(replacement = "guider_inbedStart", pattern = "guider_onset", x = colnames(nightsummary2))
-      colnames(nightsummary2) = gsub(replacement = "guider_inbedEnd", pattern = "guider_wakeup", x = colnames(nightsummary2))
-      colnames(nightsummary2) = gsub(replacement = "guider_inbedDuration", pattern = "guider_SptDuration",
-                                     x = colnames(nightsummary2))
-    }
+
     sumi = 1
     sleeplog_used = rep(" ", ((f1 - f0) + 1))
     fnames.ms4 = list.files(paste0(metadatadir, ms4.out), full.names = TRUE)
@@ -78,6 +73,13 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
     nightsummary2$calendar_date = as.Date(nightsummary2$calendar_date, format = "%d/%m/%Y")
     nightsummary2$calendar_date = format(nightsummary2$calendar_date, format = "%Y-%m-%d")
     nightsummary2$filename = gsub(".RData$", "", nightsummary2$filename)
+    
+    if (params_sleep[["sleepwindowType"]] == "TimeInBed" || params_sleep[["consider_marker_button"]] == TRUE) {
+      colnames(nightsummary2) = gsub(replacement = "guider_inbedStart", pattern = "guider_onset", x = colnames(nightsummary2))
+      colnames(nightsummary2) = gsub(replacement = "guider_inbedEnd", pattern = "guider_wakeup", x = colnames(nightsummary2))
+      colnames(nightsummary2) = gsub(replacement = "guider_inbedDuration", pattern = "guider_SptDuration",
+                                     x = colnames(nightsummary2))
+    }
     # ====================================== Add non-wearing during SPT from part 5, if it is availabe:
     ms5.out = "/meta/ms5.out"
     if (file.exists(paste(metadatadir, ms5.out, sep = ""))) {
@@ -171,7 +173,7 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
       } else {
         nightsummary_clean = tidyup_df(nightsummary)
         data.table::fwrite(nightsummary_clean, file = paste(resultfolder, "/results/QC/part4_nightsummary_sleep_full.csv",
-                                                   sep = ""), row.names = FALSE, na = "",
+                                                            sep = ""), row.names = FALSE, na = "",
                            sep = params_output[["sep_reports"]],
                            dec = params_output[["dec_reports"]])
         nightsummary_bu = nightsummary
@@ -267,6 +269,14 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                                                                       nightsummary.tmp$guider == "sleeplog")])  # number of nights with sleeplog
             personSummary[i, cntt + 6] = n_nights_sleeplog
             personSummarynames = c(personSummarynames, paste("n_nights_sleeplog", sep = ""))
+            cntt = cntt + 6
+            # total number of nights with marker button as guider
+            if (params_sleep[["consider_marker_button"]] == TRUE) {
+              personSummary[i, cntt + 1] = length(nightsummary.tmp$night[which(nightsummary.tmp$sleepparam == udef[1] &
+                                                    nightsummary.tmp$guider == "markerbutton")])
+              personSummarynames = c(personSummarynames, "n_nights_markerbutton")
+              cntt = cntt + 1
+            }
             # total number of complete weekend and week nights
             th3 = nightsummary.tmp$weekday[this_sleepparam]
             if (only.use.sleeplog == TRUE) {
@@ -275,23 +285,23 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
               validcleaningcode = 1
             }
             
-            personSummary[i, cntt + 7] = length(which(nightsummary.tmp$cleaningcode[this_sleepparam] <= validcleaningcode &
+            personSummary[i, cntt + 1] = length(which(nightsummary.tmp$cleaningcode[this_sleepparam] <= validcleaningcode &
                                                         (th3 == "Friday" | th3 == "Saturday")))
-            personSummary[i, cntt + 8] = length(which(nightsummary.tmp$cleaningcode[this_sleepparam] <= validcleaningcode &
+            personSummary[i, cntt + 2] = length(which(nightsummary.tmp$cleaningcode[this_sleepparam] <= validcleaningcode &
                                                         (th3 == "Monday" | th3 == "Tuesday" | th3 == "Wednesday" |
                                                            th3 == "Thursday" | th3 == "Sunday")))
             personSummarynames = c(personSummarynames, paste("n_WE_nights_complete", sep = ""), paste("n_WD_nights_complete",
                                                                                                       sep = ""))
             # number of days with sleep during the day
-            personSummary[i, cntt + 9] = length(which(nightsummary.tmp$daysleep[this_sleepparam] == 1 &
+            personSummary[i, cntt + 3] = length(which(nightsummary.tmp$daysleep[this_sleepparam] == 1 &
                                                         (th3 == "Friday" | th3 == "Saturday")))
-            personSummary[i, cntt + 10] = length(which(nightsummary.tmp$daysleep[this_sleepparam] == 1 & 
-                                                        (th3 == "Monday" | th3 == "Tuesday" | 
-                                                           th3 == "Wednesday" | th3 == "Thursday" |
-                                                           th3 == "Sunday")))
+            personSummary[i, cntt + 4] = length(which(nightsummary.tmp$daysleep[this_sleepparam] == 1 & 
+                                                         (th3 == "Monday" | th3 == "Tuesday" | 
+                                                            th3 == "Wednesday" | th3 == "Thursday" |
+                                                            th3 == "Sunday")))
             personSummarynames = c(personSummarynames, paste("n_WEnights_daysleeper", sep = ""), paste("n_WDnights_daysleeper",
                                                                                                        sep = ""))
-            cnt = cntt + 10
+            cnt = cntt + 4
             #-------------------------------------------
             # sleep log summary
             turn_numeric = function(x, varnames) {
@@ -303,9 +313,10 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
               }
               return(x)
             }
-            if (params_sleep[["sleepwindowType"]] == "SPT") {
+            if (params_sleep[["sleepwindowType"]] == "SPT" && params_sleep[["consider_marker_button"]] == FALSE) {
               gdn = c("guider_SptDuration", "guider_onset", "guider_wakeup")
-            } else if (params_sleep[["sleepwindowType"]] == "TimeInBed") {
+            } else if (params_sleep[["sleepwindowType"]] == "TimeInBed" || 
+                       params_sleep[["consider_marker_button"]] == TRUE) {
               gdn = c("guider_inbedDuration", "guider_inbedStart", "guider_inbedEnd")
             }
             if (dotwice == 1) {
@@ -319,7 +330,7 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                              "sleeplatency", "sleepefficiency", "number_of_awakenings",
                              "guider_inbedDuration", "guider_inbedStart",
                              "guider_inbedEnd", "guider_SptDuration", "guider_onset",
-                             "guider_wakeup", "SleepRegularityIndex",
+                             "guider_wakeup", "SleepRegularityIndex1",
                              "SriFractionValid")
             nightsummary.tmp = turn_numeric(x = nightsummary.tmp, 
                                             varnames = varnames_tmp)
@@ -368,13 +379,14 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
             if (only.use.sleeplog == FALSE) {
               # when sleep log is not available
               if (dotwice == 2) {
-                CRIT = which(nightsummary$filename == uniquefn[i] & (nightsummary$cleaningcode == 0 | nightsummary$cleaningcode ==
-                                                            1))
+                CRIT = which(nightsummary$filename == uniquefn[i] &
+                               (nightsummary$cleaningcode == 0 | nightsummary$cleaningcode == 1))
               } else {
                 CRIT = which(nightsummary$filename == uniquefn[i])
               }
             } else {
-              CRIT = which(nightsummary$filename == uniquefn[i] & nightsummary$cleaningcode == 0)  #when sleep log is available
+              CRIT = which(nightsummary$filename == uniquefn[i] &
+                             nightsummary$cleaningcode == 0)  #when sleep log is available
             }
             personSummarynames_backup = c()
             if (length(CRIT) > 0) {
@@ -468,17 +480,17 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                   personSummary[i, (cnt + 23)] = sd(nightsummary.tmp$wakeup[indexUdef], na.rm = TRUE)
                   personSummarynames = c(personSummarynames, paste("wakeup_", TW, "_", udefn[j], "_mn",
                                                                    sep = ""), paste("wakeup_", TW, "_", udefn[j], "_sd", sep = ""))
-                  personSummary[i, (cnt + 24)] = mean(nightsummary.tmp$SleepRegularityIndex[indexUdef],
+                  personSummary[i, (cnt + 24)] = mean(nightsummary.tmp$SleepRegularityIndex1[indexUdef],
                                                       na.rm = TRUE)
-                  personSummary[i, (cnt + 25)] = sd(nightsummary.tmp$SleepRegularityIndex[indexUdef], na.rm = TRUE)
-                  personSummarynames = c(personSummarynames, paste("SleepRegularityIndex_", TW, "_", udefn[j],
-                                                                   "_mn", sep = ""), paste("SleepRegularityIndex_", TW, "_", udefn[j], "_sd", sep = ""))
+                  personSummary[i, (cnt + 25)] = sd(nightsummary.tmp$SleepRegularityIndex1[indexUdef], na.rm = TRUE)
+                  personSummarynames = c(personSummarynames, paste("SleepRegularityIndex1_", TW, "_", udefn[j],
+                                                                   "_mn", sep = ""), paste("SleepRegularityIndex1_", TW, "_", udefn[j], "_sd", sep = ""))
                   personSummary[i, (cnt + 26)] = mean(nightsummary.tmp$SriFractionValid[indexUdef], na.rm = TRUE)
                   personSummary[i, (cnt + 27)] = sd(nightsummary.tmp$SriFractionValid[indexUdef], na.rm = TRUE)
                   personSummarynames = c(personSummarynames, paste("SriFractionValid_", TW, "_", udefn[j],
                                                                    "_mn", sep = ""), paste("SriFractionValid_", TW, "_", udefn[j], "_sd", sep = ""))
                   cnt = cnt + 27
-                  if (params_sleep[["sleepwindowType"]] == "TimeInBed") {
+                  if (params_sleep[["sleepwindowType"]] == "TimeInBed" || params_sleep[["consider_marker_button"]] == TRUE) {
                     sleepefficiency = nightsummary.tmp$sleepefficiency[indexUdef]
                     latency = nightsummary.tmp$sleeplatency[indexUdef]
                     if (params_sleep[["sib_must_fully_overlap_with_TimeInBed"]][1] == FALSE) {
@@ -530,7 +542,7 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
                     personSummary[i, (cnt + 3)] = mean(nightsummary.tmp$guider_inbedDuration[indexUdef],
                                                        na.rm = TRUE)
                     personSummary[i, (cnt + 4)] = sd(nightsummary.tmp$guider_inbedDuration[indexUdef],
-                                                      na.rm = TRUE)
+                                                     na.rm = TRUE)
                     personSummarynames = c(personSummarynames, paste("guider_inbedDuration_", TW, "_", udefn[j],
                                                                      "_mn", sep = ""), paste("guider_inbedDuration_", TW, "_", udefn[j], "_sd", sep = ""))
                     cnt = cnt + 4
@@ -572,7 +584,16 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
             personSummary = personSummary[, -emptycolumns]
           }
         }
-        #######################################################
+        #----------------------------------------------------
+        # Identify whether recordings where split.
+        # If yes, then extract names for each plot.
+        if (nrow(nightsummary) != 0) {
+          personSummary = addSplitNames(personSummary)
+          if ("split1_name" %in% colnames(personSummary) == TRUE) {
+            nightsummary = addSplitNames(nightsummary)
+          }
+        }
+        #----------------------------------------------------
         if (nrow(nightsummary) == 0) {
           if (verbose == TRUE) {
             if (dotwice == 1) {
@@ -585,22 +606,22 @@ g.report.part4 = function(datadir = c(), metadatadir = c(), f0 = c(), f1 = c(),
           nightsummary_clean = tidyup_df(nightsummary)
           personSummary_clean = tidyup_df(personSummary)
           if (dotwice == 1) {
-            data.table::fwrite(nightsummary_clean, file = paste(resultfolder, "/results/QC/part4_nightsummary_sleep_full.csv",
-                                                       sep = ""), row.names = FALSE, na = "",
-                               sep = params_output[["sep_reports"]],
+            csv_name = paste0(resultfolder, "/results/QC/part4_nightsummary_sleep_full.csv")
+            data.table::fwrite(nightsummary_clean, file = csv_name, row.names = FALSE,
+                               na = "", sep = params_output[["sep_reports"]],
                                dec = params_output[["dec_reports"]])
-            data.table::fwrite(personSummary_clean, file = paste(resultfolder, "/results/QC/part4_summary_sleep_full.csv",
-                                                        sep = ""), row.names = FALSE, na = "",
-                               sep = params_output[["sep_reports"]],
+            csv_name = paste0(resultfolder, "/results/QC/part4_summary_sleep_full.csv")
+            data.table::fwrite(personSummary_clean, file = csv_name, row.names = FALSE,
+                               na = "", sep = params_output[["sep_reports"]],
                                dec = params_output[["dec_reports"]])
           } else {
-            data.table::fwrite(nightsummary_clean, file = paste(resultfolder, "/results/part4_nightsummary_sleep_cleaned.csv",
-                                                       sep = ""), row.names = FALSE, na = "",
-                               sep = params_output[["sep_reports"]],
+            csv_name = paste0(resultfolder, "/results/part4_nightsummary_sleep_cleaned.csv")
+            data.table::fwrite(nightsummary_clean, file = csv_name, row.names = FALSE,
+                               na = "", sep = params_output[["sep_reports"]],
                                dec = params_output[["dec_reports"]])
-            data.table::fwrite(personSummary_clean, file = paste(resultfolder, "/results/part4_summary_sleep_cleaned.csv",
-                                                        sep = ""), row.names = FALSE, na = "",
-                               sep = params_output[["sep_reports"]],
+            csv_name = paste0(resultfolder, "/results/part4_summary_sleep_cleaned.csv")
+            data.table::fwrite(personSummary_clean, file = csv_name, row.names = FALSE,
+                               na = "", sep = params_output[["sep_reports"]],
                                dec = params_output[["dec_reports"]])
           }
         }

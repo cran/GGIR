@@ -28,7 +28,14 @@ load_params = function(topic = c("sleep", "metrics", "rawdata",
                         possible_nap_edge_acc = Inf,
                         nap_model = c(), sleepefficiency.metric = 1,
                         HDCZA_threshold = c(),
-                        sib_must_fully_overlap_with_TimeInBed = c(TRUE, TRUE))
+                        oakley_threshold = 20,
+                        consider_marker_button = FALSE,
+                        impute_marker_button = FALSE,
+                        sib_must_fully_overlap_with_TimeInBed = c(TRUE, TRUE),
+                        nap_markerbutton_method = 0,
+                        nap_markerbutton_max_distance = 30,
+                        SRI1_smoothing_wsize_hrs = NULL,
+                        SRI1_smoothing_frac = NULL)
   }
   if ("metrics" %in% topic) {
     params_metrics = list(do.anglex = FALSE, do.angley = FALSE, do.anglez = TRUE,
@@ -79,7 +86,8 @@ load_params = function(topic = c("sleep", "metrics", "rawdata",
                       L5M5window = c(0, 24), cosinor = FALSE,
                       part6CR = FALSE, part6HCA = FALSE,
                       part6Window = c("start", "end"),
-                      part6DFA = FALSE, clevels = c(30, 150))
+                      part6DFA = FALSE, clevels = c(30, 150),
+                      SRI2_WASOmin = 30)
 
   }
   if ("phyact" %in% topic) {
@@ -139,7 +147,11 @@ load_params = function(topic = c("sleep", "metrics", "rawdata",
                           sensor.location = "wrist",
                           expand_tail_max_hours = NULL, recordingEndSleepHour = NULL,
                           dataFormat = "raw", maxRecordingInterval = NULL,
-                          extEpochData_timeformat = "%d-%m-%Y %H:%M:%S")
+                          extEpochData_timeformat = "%d-%m-%Y %H:%M:%S",
+                          recording_split_times = NULL,
+                          recording_split_timeformat = "%d/%m/%Y %H:%M",
+                          recording_split_overlap = 0,
+                          recording_split_ignore_edges = FALSE)
   }
   invisible(list(params_sleep = params_sleep,
                  params_metrics = params_metrics,

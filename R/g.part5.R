@@ -90,7 +90,8 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
   # Extract activity diary if applicable
   if (is.character(params_247[["qwindow"]])) {
     if (length(grep(pattern = "onlyfilter|filteronly", x = params_247[["qwindow"]])) == 0) {
-      epochSize_tmp = ifelse(params_general[["part5_agg2_60seconds"]], yes = 60, no = params_general[["windowsizes"]][1])
+      epochSize_tmp = ifelse(params_general[["part5_agg2_60seconds"]],
+                             yes = 60, no = params_general[["windowsizes"]][1])
       params_247[["qwindow"]] = g.conv.actlog(params_247[["qwindow"]],
                                               params_247[["qwindow_dateformat"]],
                                               epochSize = epochSize_tmp)
@@ -277,7 +278,7 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
             nightsi2 = which(sec == 0 & min == 0 & hour == 0)
           }
           # include last window if has been expanded and not present in ts
-          if (length(tail_expansion_log) != 0 & nrow(ts) > max(nightsi)) nightsi[length(nightsi) + 1] = nrow(ts)
+          if (length(tail_expansion_log) != 0 && nrow(ts) > max(nightsi)) nightsi[length(nightsi) + 1] = nrow(ts)
           # create copy of only relevant part of sleep summary dataframe
           summarysleep_tmp2 = summarysleep_tmp[which(summarysleep_tmp$sleepparam == sibDef),]
           # Add sustained inactivity bouts (sib) to the time series
@@ -323,14 +324,20 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
               }
               temperature_col = grep(pattern = "temperature", x = names(ts), value = TRUE)
               
+              # aggregate steps by taking the sum
               stepcount_available = ifelse("step_count" %in% names(ts), yes = TRUE, no = FALSE)
-                
               if (stepcount_available) {
                 step_count_tmp = aggregate(ts$step_count, by = list(ts$time_num), FUN = function(x) sum(x))
                 colnames(step_count_tmp)[2] = "step_count"
               }
+              # aggregate guider names as the first value per time segment
+              agg_guider = aggregate(ts$guider,
+                                     by = list(ts$time_num), FUN = function(x) x[1])
+              colnames(agg_guider)[2] = "guider"
+              # aggregate all other variables by taking the mean
               ts = aggregate(ts[,c("ACC","sibdetection", "diur", "nonwear", angleColName, light_columns, temperature_col)],
                              by = list(ts$time_num), FUN = function(x) mean(x))
+              ts = merge(x = ts, y = agg_guider, by = "Group.1")
               if (stepcount_available) {
                 ts = merge(x = ts, y = step_count_tmp, by = "Group.1")
               }
@@ -415,6 +422,7 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                 #===========================================
                 # THIS IS THE OLD NAP DETECTION IMPLEMENTATION
                 # nap detection
+                # the new NAP detection happens inside g.part5.analyseRest
                 if (params_general[["acc.metric"]] != "ENMO" |
                     params_sleep[["HASIB.algo"]] != "vanHees2015") {
                   warning("\nNap classification currently assumes acc.metric = ENMO and HASIB.algo = vanHees2015, so output may not be meaningful")
@@ -497,7 +505,11 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                   # now 0.5+6+0.5 midnights and 7 days
                   for (timewindowi in params_output[["timewindow"]]) {
                     nightsi = nightsi_bu
-                    ts$guider = "unknown"
+                    # part3 estimate used for first night then
+                    part3_estimates_firstnight = which(ts$guider == "part3_estimate")
+                    if (length(part3_estimates_firstnight) > 0) {
+                      ts$guider[part3_estimates_firstnight] = rev(params_sleep[["HASPT.algo"]])[1]
+                    }
                     if (timewindowi == "WW") {
                       if (length(FM) > 0) {
                         # ignore first and last midnight because we did not do sleep detection on it
@@ -684,11 +696,16 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                     if (length(diaryImputationCode_col) == 0) {
                       diaryImputationCode_col = NULL
                     }
+                    
+                    marker_col = grep(pattern = "marker", x = names(ts), value = TRUE)
+                    if (length(marker_col) == 0) {
+                      marker_col = NULL
+                    }
                     g.part5.savetimeseries(ts = ts[, c("time", "ACC", "diur", "nonwear",
                                                        "guider", "window", "sibdetection", napNonwear_col,
                                                        lightpeak_col, selfreported_col,
                                                        angle_col, temperature_col, step_count_col,
-                                                       diaryImputationCode_col)],
+                                                       diaryImputationCode_col, marker_col)],
                                            LEVELS = LEVELS,
                                            desiredtz = params_general[["desiredtz"]],
                                            rawlevels_fname = rawlevels_fname,
