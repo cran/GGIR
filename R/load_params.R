@@ -140,7 +140,7 @@ load_params = function(topic = c("sleep", "metrics", "rawdata",
                          viewingwindow = 1, dofirstpage = TRUE, visualreport = TRUE,
                          week_weekend_aggregate.part5 = FALSE, do.part3.pdf = FALSE,
                          outliers.only = FALSE, criterror = 3, do.visual = TRUE,
-                         do.sibreport = TRUE, do.part2.pdf = TRUE,
+                         do.sibreport = TRUE, do.part2.pdf = NULL, do.part2.png = NULL,
                          sep_reports = ",", sep_config = ",", 
                          dec_reports = ".", dec_config = ".", 
                          visualreport_without_invalid = TRUE,
@@ -163,7 +163,8 @@ load_params = function(topic = c("sleep", "metrics", "rawdata",
                           recording_split_times = NULL,
                           recording_split_timeformat = "%d/%m/%Y %H:%M",
                           recording_split_overlap = 0,
-                          recording_split_ignore_edges = FALSE)
+                          recording_split_ignore_edges = FALSE,
+                          use_trycatch_serial = FALSE)
   }
   invisible(list(params_sleep = params_sleep,
                  params_metrics = params_metrics,

@@ -1,3 +1,41 @@
+# CHANGES IN GGIR VERSION 3.3-4
+
+- Part 2: Improved handling of corrupted RData files in part 1 or 2. #1447 and #1449
+
+- Part 1: Minor tidy up of code related to splitting recordings. #1446
+
+- General: Zenodo release generation again has not been triggered since release 3.2-8, this is now fixed by correcting mistake in json file. #1426
+
+# CHANGES IN GGIR VERSION 3.3-3
+
+- Part 2: Step/cadence expanded with a variety of output variables #1398. Credits for funding this enhancement: Ben Maylor and Alex Rowlands.
+
+- Part 1: Fix bug that caused GENEAsleep binary data to no longer to be recognised as such since the introduction of functionality for Parmay binary data. #1432
+
+- Part 4:
+
+  - Now attempts to handle scenario where an integer participant ID is saved by Excel with decimal places, e.g. 123 versus 123.00. #1256
+
+  - Fix bug causing the error about missing object defaultGuiderCorrected. #1438
+
+# CHANGES IN GGIR VERSION 3.3-2
+
+- Part 1: Fractional sampling rate for GENEActiv now automatically resampled to rounded sampling rate to ease and avoid ambiguity in epoch level aggregation #1408.
+
+- Part 3: Fixed a bug in handling HASPT_ignore_invalid = NA when no guider (SPT) window was detected #1414
+
+- Part 3: Fixed bug in the guider correction algorithm where the main SPT window was directly preceded or followed by candidate (discarded) windows. #1415
+
+# CHANGES IN GGIR VERSION 3.3-1
+
+- Part 2: Replaces QC plot as pdf file by QC plots as png file per recording to help speed up report generation #1402
+
+- Part 3: Fix bug in calculation of Oakley1994, Galland2012, and ColeKripke1997 #1404
+
+- Part 6: Fixed bug triggering an error when running part 6 with do.parallel = TRUE. #1400
+
+- Error handling: Added parameter "use_trycatch_serial" to optionally log file-level errors without interrupting GGIR when "do.parallel = FALSE". #1308
+
 # CHANGES IN GGIR VERSION 3.3-0
 
 - Part 3: Adding option to auto-correct sleep guider that failed to detect the full main sleep period or incorrectly focused on a daytime nap. The new algorithm comes with new parameters guider_cor_maxgap_hrs, guider_cor_min_frac_sib, guider_cor_min_hrs, guider_cor_meme_frac_out, guider_cor_meme_frac_in, guider_cor_meme_min_hrs #1307
