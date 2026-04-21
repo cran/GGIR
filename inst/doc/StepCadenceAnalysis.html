@@ -253,7 +253,7 @@ for GGIR is the Verisense algorithm, which was design for data collected
 on the wrist. The algorithm has been described and evaluated in studies
 by <a href="https://doi.org/10.3390/s22249984">Maylor 2022</a> and <a href="https://doi.org/10.1080/02640414.2022.2147134">Rowlands
 2022</a>.</p>
-<p>The original <a href="https://github.com/ShimmerEngineering/Verisense-Toolbox/tree/master/Verisense_step_algorithm">Verisense
+<p>The original <a href="https://github.com/ShimmerResearch/Verisense-Toolbox/tree/master/Verisense_step_algorithm">Verisense
 algortihm code</a> is not actively maintained at the time of writing
 this documentation. An <a href="https://github.com/wadpac/GGIR/blob/master/user-scripts/verisense_count_steps.R">improved
 copy of the Verisense algortihms code</a> with minor bug fixes is part
@@ -441,10 +441,11 @@ out with both ENMO, ENMOa, and MAD metric then that should work.</p>
 <li><code>ebout.dur</code> a numeric vector of length 1 or larger with
 the minimum bout duration(s) of interest,
 e.g. <code>ebout.dur = c(1, 5, 10)</code>.</li>
-<li><code>ebout.th.cad</code> a single number being the minimum cadence
-value in steps per minute, e.g. <code>ebout.th.cad = 30</code>.</li>
-<li><code>ebout.th.acc</code> a single number being the minimum
-acceleration value in steps per minute,
+<li><code>ebout.th.cad</code> a numeric vector of length 1 or larger
+being the minimum cadence value in steps per minute,
+e.g. <code>ebout.th.cad = 30</code>.</li>
+<li><code>ebout.th.acc</code> a numeric vector of length 1 or larger
+being the minimum acceleration value in steps per minute,
 e.g. <code>ebout.th.acc = 50</code>.</li>
 <li><code>ebout.criter</code> a single number as a fraction of 1 being
 the faction of a bout for which the inclusion criteria need to be met
