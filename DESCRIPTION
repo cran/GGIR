@@ -1,13 +1,16 @@
 Package: GGIR
 Type: Package
 Title: Raw Accelerometer Data Analysis
-Version: 3.3-6
-Date: 2026-04-21
+Version: 3.3-8
+Date: 2026-07-24
 Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"),
                     email="v.vanhees@accelting.com"),
              person("Jairo H","Migueles",role="aut",
                     email="jairo@jhmigueles.com",
                     comment = c(ORCID = "0000-0003-0366-6935")),
+             person("Samuel T","Afolabi",role="ctb",
+                    email="samuelafolabimails@gmail.com",
+                    comment = c(ORCID = "0009-0002-7325-6405")),                    
              person("Severine","Sabia",role="ctb"),
              person("Matthew R","Patterson",role="ctb"),
              person("Zhou","Fang",role="ctb"),
@@ -39,13 +42,15 @@ BugReports: https://github.com/wadpac/GGIR/issues
 License: Apache License (== 2.0) | file LICENSE
 Suggests: testthat, covr, knitr, rmarkdown, actilifecounts, readxl
 Imports: data.table, foreach, doParallel, signal, zoo, unisensR, ineq,
-        methods, psych, irr, lubridate, GGIRread, ActCR, read.gt3x
+        methods, psych, irr, lubridate, GGIRread, ActCR, read.gt3x,
+        arrow
 Depends: stats, utils, R (>= 3.5)
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2026-04-21 07:21:43 UTC; vvanh
+Packaged: 2026-07-24 16:23:52 UTC; vvanh
 Author: Vincent T van Hees [aut, cre],
   Jairo H Migueles [aut] (ORCID: <https://orcid.org/0000-0003-0366-6935>),
+  Samuel T Afolabi [ctb] (ORCID: <https://orcid.org/0009-0002-7325-6405>),
   Severine Sabia [ctb],
   Matthew R Patterson [ctb],
   Zhou Fang [ctb],
@@ -66,4 +71,4 @@ Author: Vincent T van Hees [aut, cre],
   Accelting [cph, fnd],
   French National Research Agency [cph, fnd]
 Repository: CRAN
-Date/Publication: 2026-04-21 10:22:10 UTC
+Date/Publication: 2026-07-24 17:30:17 UTC
