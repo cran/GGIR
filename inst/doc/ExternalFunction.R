@@ -88,3 +88,15 @@ knitr::opts_chunk$set(
 #              myfun = myfun,
 #              do.parallel = FALSE)
 
+## ----eval=FALSE---------------------------------------------------------------
+# myfun$colnames = c("activity", "intensity")
+# myfun$outputtype = c("character", "numeric")
+# myfun$reporttype = c("type", "scalar")
+# myfun$aggfunction = list(function(x) x[1], mean)
+
+## ----eval=FALSE---------------------------------------------------------------
+# function(x) {
+#   counts = table(as.character(x))
+#   if (length(counts) == 0) NA_character_ else names(which.max(counts))
+# }
+
